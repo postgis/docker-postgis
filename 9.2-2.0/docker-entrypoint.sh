@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = 'postgres' ]; then
   chown -R postgres "$PGDATA"
-  
+
   if [ -z "$(ls -A "$PGDATA")" ]; then
     gosu postgres initdb
 
@@ -17,10 +17,10 @@ EOSQL
     gosu postgres postgres --single template_postgis -j < $POSTGIS_CONTRIB/spatial_ref_sys.sql
 
     sed -ri "s/^#(listen_addresses\s*=\s*)\S+/\1'*'/" "$PGDATA"/postgresql.conf
-    
+
     { echo; echo 'host all all 0.0.0.0/0 trust'; } >> "$PGDATA"/pg_hba.conf
   fi
-  
+
   exec gosu postgres "$@"
 fi
 
