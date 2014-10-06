@@ -7,6 +7,8 @@ if [ "$1" = 'postgres' ]; then
   if [ -z "$(ls -A "$PGDATA")" ]; then
     gosu postgres initdb
 
+    pg_createcluster $PG_MAJOR main
+
     gosu postgres \
       sh -c '/etc/init.d/postgresql start && \
              createdb template_postgis && \
