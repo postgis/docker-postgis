@@ -7,16 +7,15 @@ if [ "$1" = 'postgres' ]; then
   if [ -z "$(ls -A "$PGDATA")" ]; then
     gosu postgres initdb
 
-    pg_createcluster $PG_MAJOR main
+    gosu postgres postgres --single -E <<EOSQL
+      CREATE DATABASE template_postgis
+      UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis'
+EOSQL
 
-    gosu postgres \
-      sh -c '/etc/init.d/postgresql start && \
-             createdb template_postgis && \
-             psql template_postgis -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = '\''template_postgis'\''" && \
-             psql template_postgis < /usr/share/postgresql/'$PG_MAJOR'/contrib/postgis-'$POSTGIS_MAJOR'/postgis.sql && \
-             psql template_postgis < /usr/share/postgresql/'$PG_MAJOR'/contrib/postgis-'$POSTGIS_MAJOR'/spatial_ref_sys.sql && \
-             /etc/init.d/postgresql stop'
-    
+    POSTGIS_CONTRIB=/usr/share/postgresql/$PG_MAJOR/contrib/postgis-$POSTGIS_MAJOR
+    gosu postgres postgres --single template_postgis -j < $POSTGIS_CONTRIB/postgis.sql
+    gosu postgres postgres --single template_postgis -j < $POSTGIS_CONTRIB/spatial_ref_sys.sql
+
     sed -ri "s/^#(listen_addresses\s*=\s*)\S+/\1'*'/" "$PGDATA"/postgresql.conf
     
     { echo; echo 'host all all 0.0.0.0/0 trust'; } >> "$PGDATA"/pg_hba.conf
