@@ -11,5 +11,5 @@ RUN apt-get update \
            postgis=$POSTGIS_VERSION \
       && rm -rf /var/lib/apt/lists/*
 
-# Need to replace upstream entrypoint to allow postgis initialization
-COPY ./docker-entrypoint.sh /
+RUN mkdir -p /docker-entrypoint-initdb.d
+COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
