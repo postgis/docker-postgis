@@ -8,4 +8,5 @@ EOSQL
 
 POSTGIS_CONFIG=/usr/share/postgresql/$PG_MAJOR/contrib/postgis-$POSTGIS_MAJOR
 $POSTGRES --single template_postgis -j < $POSTGIS_CONFIG/postgis.sql
+$POSTGRES --single template_postgis -j < $POSTGIS_CONFIG/topology.sql
 $POSTGRES --single template_postgis -j < $POSTGIS_CONFIG/spatial_ref_sys.sql
