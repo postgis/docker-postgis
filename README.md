@@ -1,6 +1,6 @@
 # postgis
 
-[![Build Status](https://travis-ci.org/appropriate/docker-postgis.svg)](https://travis-ci.org/appropriate/docker-postgis) [![Join the chat at https://gitter.im/md5/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/md5/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/appropriate/docker-postgis.svg)](https://travis-ci.org/appropriate/docker-postgis) [![Join the chat at https://gitter.im/appropriate/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/appropriate/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 The `postgis` image provides a Docker container running Postgres 9 with
 [PostGIS 2.1](http://postgis.net/docs/manual-2.1/) installed. This image is
