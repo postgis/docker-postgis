@@ -4,7 +4,6 @@ MAINTAINER Mike Dillon <mike@embody.org>
 ENV POSTGIS_MAJOR %%POSTGIS_MAJOR%%
 ENV POSTGIS_VERSION %%POSTGIS_VERSION%%
 
-RUN echo deb http://http.debian.net/debian wheezy-backports main >> /etc/apt/sources.list
 RUN apt-get update \
       && apt-get install -y --no-install-recommends \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
