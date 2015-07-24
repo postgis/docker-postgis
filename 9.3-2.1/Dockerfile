@@ -1,5 +1,5 @@
 FROM postgres:9.3
-MAINTAINER Mike Dillon <mike@embody.org>
+MAINTAINER Mike Dillon <mike@appropriate.io>
 
 ENV POSTGIS_MAJOR 2.1
 ENV POSTGIS_VERSION 2.1.7+dfsg-3~94.git954a8d0.pgdg80+1

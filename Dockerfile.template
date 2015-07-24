@@ -1,5 +1,5 @@
 FROM postgres:%%PG_MAJOR%%
-MAINTAINER Mike Dillon <mike@embody.org>
+MAINTAINER Mike Dillon <mike@appropriate.io>
 
 ENV POSTGIS_MAJOR %%POSTGIS_MAJOR%%
 ENV POSTGIS_VERSION %%POSTGIS_VERSION%%
