@@ -17,6 +17,7 @@ curl -sSL "${packagesUrl}.bz2" | bunzip2 > "$packages"
 for version in "${versions[@]}"; do
 	IFS=- read pg_major postgis_major <<< "$version"
 	fullVersion="$(grep -m1 -A10 "^Package: postgresql-$pg_major-postgis-$postgis_major\$" "$packages" | grep -m1 '^Version: ' | cut -d' ' -f2)"
+	[ -z "$fullVersion" ] && { echo >&2 "Unable to find package for PostGIS $postgis_major on Postgres $pg_major"; exit 1; }
 	(
 		set -x
 		cp Dockerfile.template initdb-postgis.sh README.md "$version/"
