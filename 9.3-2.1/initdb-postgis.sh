@@ -2,8 +2,8 @@
 
 set -e
 
-# Perform all actions as user 'postgres'
-export PGUSER=postgres
+# Perform all actions as $POSTGRES_USER
+export PGUSER="$POSTGRES_USER"
 
 # Create the 'template_postgis' template db
 psql <<EOSQL
