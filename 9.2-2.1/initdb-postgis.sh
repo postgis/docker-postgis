@@ -11,8 +11,12 @@ CREATE DATABASE template_postgis;
 UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
 EOSQL
 
-# Populate 'template_postgis'
-cd /usr/share/postgresql/$PG_MAJOR/contrib/postgis-$POSTGIS_MAJOR
-psql --dbname template_postgis < postgis.sql
-psql --dbname template_postgis < topology.sql
-psql --dbname template_postgis < spatial_ref_sys.sql
+# Load PostGIS into both template_database and $POSTGRES_DB
+cd "/usr/share/postgresql/$PG_MAJOR/contrib/postgis-$POSTGIS_MAJOR"
+for DB in template_postgis "$POSTGRES_DB"; do
+	echo "Loading PostGIS into $DB"
+
+	psql --dbname="$DB" < postgis.sql
+	psql --dbname="$DB" < topology.sql
+	psql --dbname="$DB" < spatial_ref_sys.sql
+done
