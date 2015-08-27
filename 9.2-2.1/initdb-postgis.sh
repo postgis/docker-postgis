@@ -6,7 +6,7 @@ set -e
 export PGUSER="$POSTGRES_USER"
 
 # Create the 'template_postgis' template db
-psql <<EOSQL
+psql <<- 'EOSQL'
 CREATE DATABASE template_postgis;
 UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template_postgis';
 EOSQL
@@ -16,7 +16,15 @@ cd "/usr/share/postgresql/$PG_MAJOR/contrib/postgis-$POSTGIS_MAJOR"
 for DB in template_postgis "$POSTGRES_DB"; do
 	echo "Loading PostGIS into $DB"
 
-	psql --dbname="$DB" < postgis.sql
-	psql --dbname="$DB" < topology.sql
-	psql --dbname="$DB" < spatial_ref_sys.sql
+	if (( $(awk "BEGIN { exit $PG_MAJOR >= 9.1 ? 0 : 1 }") )); then
+		echo <<- 'EOSQL' | psql --dbname="$DB"
+			CREATE EXTENSION postgis;
+			CREATE EXTENSION postgis_topology;
+			CREATE EXTENSION postgis_tiger_geocoder;
+		EOSQL
+	else
+		psql --dbname="$DB" < postgis.sql
+		psql --dbname="$DB" < topology.sql
+		psql --dbname="$DB" < spatial_ref_sys.sql
+	fi
 done
