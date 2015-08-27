@@ -1,0 +1,1 @@
+testAlias+=([postgis]=postgres)

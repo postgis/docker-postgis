@@ -10,10 +10,14 @@ env:
   - VERSION=9.3-2.1
   - VERSION=9.4-2.1
 
+install:
+  - git clone -b additional-test-config https://github.com/appropriate/docker-library-official-images.git ~/official-images
+
 before_script:
   - env | sort
   - cd "$VERSION"
-  - image="appropriate/postgis:$VERSION"
+  - image="postgis:$VERSION"
 
 script:
   - docker build --pull -t "$image" .
+  - ~/official-images/test/run.sh -c "$(readlink -f ../test/postgis-config.sh)" "$image"
