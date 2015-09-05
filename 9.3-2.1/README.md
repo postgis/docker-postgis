@@ -12,8 +12,8 @@ This image ensures that the default database created by the parent `postgres`
 image will have the `postgis` and `postgis_topology` extensions installed.
 Unless `-e POSTGRES_DATABASE` is passed to the container at startup time, this
 database will be named after the admin user (either `postgres` or the user
-specified with `-e POSTGRES_USER`). For Postgres 9.1+, the
-`postgis_tiger_geocoder` extension is also installed.
+specified with `-e POSTGRES_USER`). For Postgres 9.1+, the `fuzzystrmatch` and
+`postgis_tiger_geocoder` extensions are also installed.
 
 If you would prefer to use the older template database mechanism for enabling
 PostGIS, the image also provides a PostGIS-enabled template database called
