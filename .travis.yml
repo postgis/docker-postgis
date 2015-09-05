@@ -16,8 +16,8 @@ install:
 before_script:
   - env | sort
   - cd "$VERSION"
-  - image="postgis:$VERSION"
+  - image="appropriate/postgis:$VERSION"
 
 script:
   - docker build --pull -t "$image" .
-  - ~/official-images/test/run.sh -c "$(readlink -f ../test/postgis-config.sh)" "$image"
+  - ~/official-images/test/run.sh -c ~/official-images/test/config.sh -c ../test/postgis-config.sh "$image"
