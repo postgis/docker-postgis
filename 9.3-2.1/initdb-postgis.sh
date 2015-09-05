@@ -24,8 +24,16 @@ for DB in template_postgis "$POSTGRES_DB"; do
 		EOSQL
 	else
 		echo "Loading PostGIS into $DB via files"
-		psql --dbname="$DB" < postgis.sql
-		psql --dbname="$DB" < topology.sql
-		psql --dbname="$DB" < spatial_ref_sys.sql
+		files='
+			postgis
+			postgis_comments
+			topology
+			topology_comments
+			rtpostgis
+			raster_comments
+		'
+		for file in $files; do
+			psql --dbname="$DB" < "${file}.sql"
+		done
 	fi
 done
