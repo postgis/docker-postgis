@@ -14,15 +14,16 @@ EOSQL
 # Load PostGIS into both template_database and $POSTGRES_DB
 cd "/usr/share/postgresql/$PG_MAJOR/contrib/postgis-$POSTGIS_MAJOR"
 for DB in template_postgis "$POSTGRES_DB"; do
-	echo "Loading PostGIS into $DB"
-
-	if (( $(awk "BEGIN { exit $PG_MAJOR >= 9.1 ? 0 : 1 }") )); then
-		echo <<- 'EOSQL' | psql --dbname="$DB"
+	if awk "BEGIN { exit $PG_MAJOR >= 9.1 ? 0 : 1 }"; then
+		echo "Loading PostGIS into $DB via CREATE EXTENSION"
+		psql --dbname="$DB" <<-'EOSQL'
 			CREATE EXTENSION postgis;
 			CREATE EXTENSION postgis_topology;
+			CREATE EXTENSION fuzzystrmatch;
 			CREATE EXTENSION postgis_tiger_geocoder;
 		EOSQL
 	else
+		echo "Loading PostGIS into $DB via files"
 		psql --dbname="$DB" < postgis.sql
 		psql --dbname="$DB" < topology.sql
 		psql --dbname="$DB" < spatial_ref_sys.sql
