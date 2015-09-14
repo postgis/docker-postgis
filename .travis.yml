@@ -11,7 +11,7 @@ env:
   - VERSION=9.4-2.1
 
 install:
-  - git clone -b additional-test-config https://github.com/appropriate/docker-library-official-images.git ~/official-images
+  - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
   - env | sort
