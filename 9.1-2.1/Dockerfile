@@ -2,7 +2,7 @@ FROM postgres:9.1
 MAINTAINER Mike Dillon <mike@appropriate.io>
 
 ENV POSTGIS_MAJOR 2.1
-ENV POSTGIS_VERSION 2.1.7+dfsg-3~94.git954a8d0.pgdg80+1
+ENV POSTGIS_VERSION 2.1.8+dfsg-5~97.git43a09cc.pgdg80+1
 
 RUN apt-get update \
       && apt-get install -y --no-install-recommends \
