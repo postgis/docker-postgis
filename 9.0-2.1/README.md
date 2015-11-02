@@ -10,7 +10,7 @@ base image (9.0-9.4).
 
 This image ensures that the default database created by the parent `postgres`
 image will have the `postgis` and `postgis_topology` extensions installed.
-Unless `-e POSTGRES_DATABASE` is passed to the container at startup time, this
+Unless `-e POSTGRES_DB` is passed to the container at startup time, this
 database will be named after the admin user (either `postgres` or the user
 specified with `-e POSTGRES_USER`). For Postgres 9.1+, the `fuzzystrmatch` and
 `postgis_tiger_geocoder` extensions are also installed.
