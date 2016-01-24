@@ -9,6 +9,7 @@ env:
   - VERSION=9.2-2.1
   - VERSION=9.3-2.1
   - VERSION=9.4-2.1
+  - VERSION=9.5-2.2
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
