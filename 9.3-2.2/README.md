@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/appropriate/docker-postgis.svg)](https://travis-ci.org/appropriate/docker-postgis) [![Join the chat at https://gitter.im/appropriate/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/appropriate/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `mdillon/postgis` image provides a Docker container running Postgres 9 with [PostGIS](http://postgis.net/) installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides variants for each version of Postgres 9 supported by the base image (9.1-9.5) along with each version of PostGIS packaged for that Postgres version (2.2 as available).
+The `mdillon/postgis` image provides a Docker container running Postgres 9 with [PostGIS 2.2](http://postgis.net/) installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides variants for each version of Postgres 9 supported by the base image (9.1-9.5).
 
 This image ensures that the default database created by the parent `postgres` image will have the `postgis` and `postgis_topology` extensions installed.  Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). For Postgres 9.1+, the `fuzzystrmatch` and `postgis_tiger_geocoder` extensions are also installed.
 
