@@ -13,11 +13,11 @@ EOSQL
 
 # Load PostGIS into both template_database and $POSTGRES_DB
 for DB in template_postgis "$POSTGRES_DB"; do
-    echo "Loading PostGIS extensions into $DB"
-    psql --dbname="$DB" <<-'EOSQL'
-        CREATE EXTENSION postgis;
-        CREATE EXTENSION postgis_topology;
-        CREATE EXTENSION fuzzystrmatch;
-        CREATE EXTENSION postgis_tiger_geocoder;
+	echo "Loading PostGIS extensions into $DB"
+	psql --dbname="$DB" <<-'EOSQL'
+		CREATE EXTENSION postgis;
+		CREATE EXTENSION postgis_topology;
+		CREATE EXTENSION fuzzystrmatch;
+		CREATE EXTENSION postgis_tiger_geocoder;
 EOSQL
 done
