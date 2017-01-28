@@ -1,23 +1,29 @@
 ---
 language: bash
+services: docker
 
 dist: trusty
 
 env:
-  - VERSION=9.2-2.3
-  - VERSION=9.3-2.3
-  - VERSION=9.4-2.3
-  - VERSION=9.5-2.3
   - VERSION=9.6-2.3
+  - VERSION=9.6-2.3 VARIANT=alpine
+  - VERSION=9.5-2.3
+  - VERSION=9.5-2.3 VARIANT=alpine
+  - VERSION=9.4-2.3
+  - VERSION=9.4-2.3 VARIANT=alpine
+  - VERSION=9.3-2.3
+  - VERSION=9.3-2.3 VARIANT=alpine
+  - VERSION=9.2-2.3
+  - VERSION=9.2-2.3 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
   - env | sort
-  - cd "$VERSION"
-  - image="appropriate/postgis:$VERSION"
+  - cd "$VERSION/$VARIANT"
+  - image="appropriate/postgis:$VERSION${VARIANT:+-${VARIANT}}"
 
 script:
   - docker build --pull -t "$image" .
-  - ~/official-images/test/run.sh -c ~/official-images/test/config.sh -c ../test/postgis-config.sh "$image"
+  - ~/official-images/test/run.sh -c ~/official-images/test/config.sh -c "../${VARIANT:+../}test/postgis-config.sh" "$image"
