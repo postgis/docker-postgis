@@ -27,3 +27,25 @@ Once you have started a database container, you can then connect to the database
         sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
 
 See [the PostGIS documentation](http://postgis.net/docs/postgis_installation.html#create_new_db_extensions) for more details on your options for creating and using a spatially-enabled database.
+
+## Known Issues / Errors
+
+When You encouter errors due to PostGIS update `OperationalError: could not access file "$libdir/postgis-X.X`, run:
+
+`docker exec some-postgis update-postgis.sh`
+
+It will update to Your newest PostGIS. Update is idempotent, so it won't hurt when You run it more than once, You will get notification like:
+
+```
+Updating PostGIS extensions template_postgis to X.X.X
+NOTICE:  version "X.X.X" of extension "postgis" is already installed
+NOTICE:  version "X.X.X" of extension "postgis_topology" is already installed
+NOTICE:  version "X.X.X" of extension "postgis_tiger_geocoder" is already installed
+ALTER EXTENSION
+Updating PostGIS extensions docker to X.X.X
+NOTICE:  version "X.X.X" of extension "postgis" is already installed
+NOTICE:  version "X.X.X" of extension "postgis_topology" is already installed
+NOTICE:  version "X.X.X" of extension "postgis_tiger_geocoder" is already installed
+ALTER EXTENSION
+```
+
