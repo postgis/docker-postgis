@@ -21,7 +21,7 @@ for version in "${versions[@]}"; do
 	[ -z "$fullVersion" ] && { echo >&2 "Unable to find package for PostGIS $postgis_major on Postgres $pg_major"; exit 1; }
 	(
 		set -x
-		cp Dockerfile.template initdb-postgis.sh README.md "$version/"
+		cp Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
 		mv "$version/Dockerfile.template" "$version/Dockerfile"
 		sed -i 's/%%PG_MAJOR%%/'$pg_major'/g; s/%%POSTGIS_MAJOR%%/'$postgis_major'/g; s/%%POSTGIS_VERSION%%/'$fullVersion'/g' "$version/Dockerfile"
 	)
@@ -34,7 +34,7 @@ for version in "${versions[@]}"; do
 		fi
 		(
 			set -x
-			cp Dockerfile.alpine.template initdb-postgis.sh "$version/$variant/"
+			cp Dockerfile.alpine.template initdb-postgis.sh update-postgis.sh "$version/$variant/"
 			mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
 			sed -i 's/%%PG_MAJOR%%/'"$pg_major"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
 		)
