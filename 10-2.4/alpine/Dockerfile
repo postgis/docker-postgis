@@ -1,8 +1,8 @@
-FROM postgres:9.6-alpine
+FROM postgres:10-alpine
 MAINTAINER Régis Belson <me@regisbelson.fr>
 
-ENV POSTGIS_VERSION 2.3.3
-ENV POSTGIS_SHA256 3403d5635b4b86c90f6a225a366a515c6bc734d1bad625c7df4e8c6fde7e8588
+ENV POSTGIS_VERSION 2.4.0
+ENV POSTGIS_SHA256 afa91ef89f827de317c7d7fe259e4a2ca4a57837c94a08e9040cbba77ad3e938
 
 RUN set -ex \
     \
