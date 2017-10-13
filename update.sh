@@ -10,13 +10,23 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/Dockerfile}" )
 
-packagesUrl='http://apt.postgresql.org/pub/repos/apt/dists/jessie-pgdg/main/binary-amd64/Packages'
-packages="$(echo "$packagesUrl" | sed -r 's/[^a-zA-Z.-]+/-/g')"
-curl -sSL "${packagesUrl}.bz2" | bunzip2 > "$packages"
+packagesUrlJessie='http://apt.postgresql.org/pub/repos/apt/dists/jessie-pgdg/main/binary-amd64/Packages'
+packagesJessie="$(echo "$packagesUrlJessie" | sed -r 's/[^a-zA-Z.-]+/-/g')"
+curl -sSL "${packagesUrlJessie}.bz2" | bunzip2 > "$packagesJessie"
+
+packagesUrlStretch='http://apt.postgresql.org/pub/repos/apt/dists/stretch-pgdg/main/binary-amd64/Packages'
+packagesStretch="$(echo "$packagesUrlStretch" | sed -r 's/[^a-zA-Z.-]+/-/g')"
+curl -sSL "${packagesUrlStretch}.bz2" | bunzip2 > "$packagesStretch"
 
 travisEnv=
 for version in "${versions[@]}"; do
 	IFS=- read pg_major postgis_major <<< "$version"
+	if [[ $pg_major = 9* ]]; then
+		packages="$packagesJessie"
+	else
+		packages="$packagesStretch"
+	fi
+
 	fullVersion="$(grep -m1 -A10 "^Package: postgresql-$pg_major-postgis-$postgis_major\$" "$packages" | grep -m1 '^Version: ' | cut -d' ' -f2)"
 	[ -z "$fullVersion" ] && { echo >&2 "Unable to find package for PostGIS $postgis_major on Postgres $pg_major"; exit 1; }
 	(
@@ -46,4 +56,5 @@ done
 travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
 echo "$travis" > .travis.yml
 
-rm "$packages"
+rm "$packagesJessie"
+rm "$packagesStretch"
