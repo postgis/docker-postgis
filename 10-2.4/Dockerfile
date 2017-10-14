@@ -1,8 +1,8 @@
-FROM postgres:9.2
+FROM postgres:10
 MAINTAINER Mike Dillon <mike@appropriate.io>
 
-ENV POSTGIS_MAJOR 2.3
-ENV POSTGIS_VERSION 2.3.3+dfsg-1.pgdg80+1
+ENV POSTGIS_MAJOR 2.4
+ENV POSTGIS_VERSION 2.4.0+dfsg-1.pgdg90+1
 
 RUN apt-get update \
       && apt-get install -y --no-install-recommends \
