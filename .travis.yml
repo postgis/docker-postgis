@@ -15,6 +15,8 @@ env:
   - VERSION=9.3-2.3 VARIANT=alpine
   - VERSION=9.2-2.3
   - VERSION=9.2-2.3 VARIANT=alpine
+  - VERSION=10-2.4
+  - VERSION=10-2.4 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
