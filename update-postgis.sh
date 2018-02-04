@@ -10,7 +10,7 @@ POSTGIS_VERSION="${POSTGIS_VERSION%%+*}"
 # Load PostGIS into both template_database and $POSTGRES_DB
 for DB in template_postgis "$POSTGRES_DB" "${@}"; do
     echo "Updating PostGIS extensions '$DB' to $POSTGIS_VERSION"
-    psql -p "${POSTGRES_PORT:-5432}" --dbname="$DB" -c "
+    psql --dbname="$DB" -c "
         -- Upgrade PostGIS (includes raster)
         CREATE EXTENSION IF NOT EXISTS postgis VERSION '$POSTGIS_VERSION';
         ALTER EXTENSION postgis  UPDATE TO '$POSTGIS_VERSION';
