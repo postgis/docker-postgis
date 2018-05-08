@@ -1,7 +1,7 @@
 FROM postgres:10-alpine
 MAINTAINER Régis Belson <me@regisbelson.fr>
 
-ENV POSTGIS_VERSION 2.4.3
+ENV POSTGIS_VERSION 2.4.4
 ENV POSTGIS_SHA256 b9754c7b9cbc30190177ec34b570717b2b9b88ed271d18e3af68eca3632d1d95
 
 RUN set -ex \
