@@ -22,7 +22,7 @@ travisEnv=
 for version in "${versions[@]}"; do
 	IFS=- read pg_major postgis_major <<< "$version"
 	if [[ $pg_major = 9* ]]; then
-		packages="$packagesJessie"
+		packages="$packagesStretch"
 	else
 		packages="$packagesStretch"
 	fi
