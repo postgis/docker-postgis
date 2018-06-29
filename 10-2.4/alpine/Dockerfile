@@ -63,3 +63,7 @@ RUN set -ex \
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
+
+COPY ./healthcheck.sh /usr/local/bin/docker-healthcheck
+RUN chmod +x /usr/local/bin/docker-healthcheck
+HEALTHCHECK CMD ["docker-healthcheck"]
