@@ -31,9 +31,9 @@ RUN set -ex \
         make \
         perl \
     \
-    && apk add --no-cache --virtual .build-deps-testing \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+    && apk add --no-cache --virtual .build-deps-edge \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         gdal-dev \
         geos-dev \
         proj4-dev \
@@ -48,16 +48,16 @@ RUN set -ex \
     && make install \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
-    && apk add --no-cache --virtual .postgis-rundeps-testing \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+    && apk add --no-cache --virtual .postgis-rundeps-edge \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \        
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         geos \
         gdal \
         proj4 \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \
-    && apk del .fetch-deps .build-deps .build-deps-testing
+    && apk del .fetch-deps .build-deps .build-deps-edge
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
