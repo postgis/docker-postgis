@@ -30,13 +30,15 @@ See [the PostGIS documentation](http://postgis.net/docs/postgis_installation.htm
 
 ## Known Issues / Errors
 
+### Updating PostGIS
+
 When You encouter errors due to PostGIS update `OperationalError: could not access file "$libdir/postgis-X.X`, run:
 
 `docker exec some-postgis update-postgis.sh`
 
 It will update to Your newest PostGIS. Update is idempotent, so it won't hurt when You run it more than once, You will get notification like:
 
-```
+ ```
 Updating PostGIS extensions template_postgis to X.X.X
 NOTICE:  version "X.X.X" of extension "postgis" is already installed
 NOTICE:  version "X.X.X" of extension "postgis_topology" is already installed
@@ -49,3 +51,15 @@ NOTICE:  version "X.X.X" of extension "postgis_tiger_geocoder" is already instal
 ALTER EXTENSION
 ```
 
+### Adding custom locale
+
+If you need to use another locale, just generate a new Dockerfile with this content (this example is for italian locale):
+
+```
+FROM mdillon/postgis:11
+RUN localedef -i it_IT -c -f UTF-8 -A /usr/share/locale/locale.alias it_IT.UTF-8
+ENV LANG it_IT.utf8
+```
+see more: [#136][i19]
+
+[i19]: https://github.com/appropriate/docker-postgis/issues/136
