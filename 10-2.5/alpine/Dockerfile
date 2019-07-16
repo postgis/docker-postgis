@@ -36,7 +36,7 @@ RUN set -ex \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         gdal-dev \
         geos-dev \
-        proj4-dev \
+        proj-dev \
         protobuf-c-dev \
     && cd /usr/src/postgis \
     && ./autogen.sh \
@@ -53,7 +53,7 @@ RUN set -ex \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \        
         geos \
         gdal \
-        proj4 \
+        proj \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \
