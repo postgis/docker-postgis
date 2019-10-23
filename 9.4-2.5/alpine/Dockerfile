@@ -24,7 +24,6 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
-        g++ \
         json-c-dev \
         libtool \
         libxml2-dev \
@@ -34,6 +33,7 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-deps-edge \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        g++ \
         gdal-dev \
         geos-dev \
         proj-dev \
@@ -54,6 +54,7 @@ RUN set -ex \
         geos \
         gdal \
         proj \
+        libstdc++ \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \

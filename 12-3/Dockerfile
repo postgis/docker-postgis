@@ -1,8 +1,8 @@
-FROM postgres:10
+FROM postgres:12
 MAINTAINER Mike Dillon <mike@appropriate.io>
 
-ENV POSTGIS_MAJOR 2.5
-ENV POSTGIS_VERSION 2.5.2+dfsg-1~exp1.pgdg90+1
+ENV POSTGIS_MAJOR 3
+ENV POSTGIS_VERSION 3.0.0+dfsg-1.pgdg100+1
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \

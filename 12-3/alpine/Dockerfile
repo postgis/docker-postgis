@@ -1,8 +1,7 @@
-FROM postgres:10-alpine
-MAINTAINER Régis Belson <me@regisbelson.fr>
+FROM postgres:12-alpine
 
-ENV POSTGIS_VERSION 2.5.2
-ENV POSTGIS_SHA256 225aeaece00a1a6a9af15526af81bef2af27f4c198de820af1367a792ee1d1a9
+ENV POSTGIS_VERSION 3.0.0
+ENV POSTGIS_SHA256 1c83fb2fc8870d36ed49859c49a12c8c4c8ae8c5c3f912a21a951c5bcc249123
 
 RUN set -ex \
     \
@@ -24,7 +23,6 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
-        g++ \
         json-c-dev \
         libtool \
         libxml2-dev \
@@ -32,8 +30,9 @@ RUN set -ex \
         perl \
     \
     && apk add --no-cache --virtual .build-deps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \    
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        g++ \
         gdal-dev \
         geos-dev \
         proj-dev \
@@ -49,11 +48,12 @@ RUN set -ex \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
     && apk add --no-cache --virtual .postgis-rundeps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \    
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \        
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         geos \
         gdal \
         proj \
+        libstdc++ \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \
