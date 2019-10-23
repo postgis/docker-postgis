@@ -5,7 +5,7 @@ services: docker
 dist: trusty
 
 env:
-  - VERSION=12.0beta2-3.0.0alpha3 VARIANT=alpine
+  - VERSION=12-3.0 VARIANT=alpine
   - VERSION=11-2.5
   - VERSION=11-2.5 VARIANT=alpine
   - VERSION=10-2.5

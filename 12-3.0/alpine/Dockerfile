@@ -1,7 +1,7 @@
-FROM postgres:12-beta2-alpine
+FROM postgres:12-alpine
 
-ENV POSTGIS_VERSION 3.0.0alpha3
-ENV POSTGIS_SHA256 b75e28139fe74158a27b7e7b2d1c2c0a7acb3abe8c60cfc72d45b0827dd12364
+ENV POSTGIS_VERSION 3.0.0
+ENV POSTGIS_SHA256 1c83fb2fc8870d36ed49859c49a12c8c4c8ae8c5c3f912a21a951c5bcc249123
 
 RUN set -ex \
     \
@@ -23,7 +23,6 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
-        g++ \
         json-c-dev \
         libtool \
         libxml2-dev \
@@ -36,6 +35,8 @@ RUN set -ex \
         gdal-dev \
         geos-dev \
         proj-dev \
+        g++ \
+        libstdc++ \
         protobuf-c-dev \
     && cd /usr/src/postgis \
     && ./autogen.sh \
@@ -53,6 +54,7 @@ RUN set -ex \
         geos \
         gdal \
         proj \
+        libstdc++ \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \
