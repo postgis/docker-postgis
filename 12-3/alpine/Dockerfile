@@ -30,7 +30,7 @@ RUN set -ex \
         perl \
     \
     && apk add --no-cache --virtual .build-deps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         g++ \
         gdal-dev \
@@ -48,7 +48,7 @@ RUN set -ex \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
     && apk add --no-cache --virtual .postgis-rundeps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+        --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         geos \
         gdal \
