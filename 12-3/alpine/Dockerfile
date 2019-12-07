@@ -33,6 +33,7 @@ RUN set -ex \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
         --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         g++ \
+        gcc \
         gdal-dev \
         geos-dev \
         proj-dev \
