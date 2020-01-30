@@ -1,4 +1,5 @@
 FROM postgres:12-alpine
+MAINTAINER Régis Belson <me@regisbelson.fr>
 
 ENV POSTGIS_VERSION 3.0.0
 ENV POSTGIS_SHA256 1c83fb2fc8870d36ed49859c49a12c8c4c8ae8c5c3f912a21a951c5bcc249123

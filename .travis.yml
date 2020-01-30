@@ -5,17 +5,18 @@ services: docker
 dist: trusty
 
 env:
-  - VERSION=12-3 VARIANT=alpine
-  - VERSION=11-3
-  - VERSION=11-3 VARIANT=alpine
-  - VERSION=10-3
-  - VERSION=10-3 VARIANT=alpine
   - VERSION=9.6-3
   - VERSION=9.6-3 VARIANT=alpine
   - VERSION=9.5-3
   - VERSION=9.5-3 VARIANT=alpine
   - VERSION=9.4-2.5
   - VERSION=9.4-2.5 VARIANT=alpine
+  - VERSION=12-3
+  - VERSION=12-3 VARIANT=alpine
+  - VERSION=11-3
+  - VERSION=11-3 VARIANT=alpine
+  - VERSION=10-3
+  - VERSION=10-3 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
