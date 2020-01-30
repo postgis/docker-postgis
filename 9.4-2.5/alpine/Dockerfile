@@ -1,5 +1,5 @@
 FROM postgres:9.4-alpine
-MAINTAINER Régis Belson <me@regisbelson.fr>
+LABEL maintainer="Régis Belson <me@regisbelson.fr>"
 
 ENV POSTGIS_VERSION 2.5.3
 ENV POSTGIS_SHA256 402323c83d97f3859bc9083345dd687f933c261efe0830e1262c20c12671f794
