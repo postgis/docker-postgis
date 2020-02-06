@@ -27,5 +27,5 @@ before_script:
   - image="appropriate/postgis:$VERSION${VARIANT:+-${VARIANT}}"
 
 script:
-  - docker build --pull -t "$image" .
+  - travis_retry docker build --pull -t "$image" .
   - ~/official-images/test/run.sh -c ~/official-images/test/config.sh -c "../${VARIANT:+../}test/postgis-config.sh" "$image"
