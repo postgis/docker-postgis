@@ -2,19 +2,21 @@
 language: bash
 services: docker
 
-dist: trusty
+dist: xenial
 
 env:
-  - VERSION=9.6-2.5
-  - VERSION=9.6-2.5 VARIANT=alpine
-  - VERSION=9.5-2.5
-  - VERSION=9.5-2.5 VARIANT=alpine
   - VERSION=9.4-2.5
   - VERSION=9.4-2.5 VARIANT=alpine
-  - VERSION=11-2.5
-  - VERSION=11-2.5 VARIANT=alpine
+  - VERSION=9.5-2.5
+  - VERSION=9.5-2.5 VARIANT=alpine
+  - VERSION=9.6-2.5
+  - VERSION=9.6-2.5 VARIANT=alpine
   - VERSION=10-2.5
   - VERSION=10-2.5 VARIANT=alpine
+  - VERSION=11-2.5
+  - VERSION=11-2.5 VARIANT=alpine
+  - VERSION=12-2.5
+  - VERSION=12-2.5 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
