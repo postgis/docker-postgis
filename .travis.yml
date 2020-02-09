@@ -22,7 +22,7 @@ install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
-  - env | sort
+  - env | grep -E "VARIANT|VERSION" | sort
   - cd "$VERSION/$VARIANT"
   - image="appropriate/postgis:$VERSION${VARIANT:+-${VARIANT}}"
 
