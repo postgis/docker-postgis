@@ -6,8 +6,8 @@ build: $(VERSIONS)
 
 define postgis-version
 $1:
-	docker build -t mdillon/postgis:$(shell echo $1 | sed -e 's/-.*//g') $1
-	docker build -t mdillon/postgis:$(shell echo $1 | sed -e 's/-.*//g')-alpine $1/alpine
+	docker build -t postgis/postgis:$(shell echo $1 | sed -e 's/-.*//g') $1
+	docker build -t postgis/postgis:$(shell echo $1 | sed -e 's/-.*//g')-alpine $1/alpine
 endef
 $(foreach version,$(VERSIONS),$(eval $(call postgis-version,$(version))))
 
