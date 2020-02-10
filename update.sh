@@ -50,6 +50,12 @@ for version in "${versions[@]}"; do
 
     postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisVersion}"
     postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
+    (
+        set -x
+        cp Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
+        mv "$version/Dockerfile.template" "$version/Dockerfile"
+        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisVersion'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g' "$version/Dockerfile"
+    )
 
     srcVersion="${postgisFullVersion%%+*}"
     srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
