@@ -27,6 +27,12 @@ declare -A alpineVersion=(
     #[9.6]='3.5'
 )
 
+defaultPostgisDebPkgNameVersionSuffix='3'
+declare -A postgisDebPkgNameVersionSuffixes=(
+    [2.5]='2.5'
+    [3.0]='3'
+)
+
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
 
 declare -A suitePackageList=() suiteArches=()
@@ -48,13 +54,13 @@ for version in "${versions[@]}"; do
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersion"'" { print $2; exit }' || true)"
     majorVersion="${postgresVersion%%.*}"
 
-    postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisVersion}"
+    postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
     postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
     (
         set -x
         cp -p Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
         mv "$version/Dockerfile.template" "$version/Dockerfile"
-        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisVersion'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g' "$version/Dockerfile"
+        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g' "$version/Dockerfile"
     )
 
     srcVersion="${postgisFullVersion%%+*}"
