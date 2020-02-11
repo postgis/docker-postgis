@@ -1,6 +1,6 @@
 # postgis/postgis
 
-[![Build Status](https://travis-ci.org/postgis/docker-postgis.svg)](https://travis-ci.org/postgis/docker-postgis) [![Join the chat at https://gitter.im/appropriate/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/appropriate/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/postgis/docker-postgis.svg)](https://travis-ci.org/postgis/docker-postgis) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 The `postgis/postgis` image provides a Docker container running Postgres with [PostGIS 2.5](http://postgis.net/) installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for each version of Postgres 9 supported by the base image (9.5-9.6), Postgres 10, Postgres 11, and Postgres 12.
 
