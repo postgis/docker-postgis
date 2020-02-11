@@ -52,7 +52,7 @@ for version in "${versions[@]}"; do
     postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
     (
         set -x
-        cp Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
+        cp -p Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
         mv "$version/Dockerfile.template" "$version/Dockerfile"
         sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisVersion'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g' "$version/Dockerfile"
     )
@@ -65,7 +65,7 @@ for version in "${versions[@]}"; do
         fi
         (
             set -x
-            cp Dockerfile.alpine.template initdb-postgis.sh update-postgis.sh "$version/$variant/"
+            cp -p Dockerfile.alpine.template initdb-postgis.sh update-postgis.sh "$version/$variant/"
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
             sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
         )
