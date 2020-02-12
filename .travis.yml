@@ -5,12 +5,20 @@ services: docker
 dist: xenial
 
 env:
+  - VERSION=12-3.0
+  - VERSION=12-3.0 VARIANT=alpine
   - VERSION=12-2.5
   - VERSION=12-2.5 VARIANT=alpine
+  - VERSION=11-3.0
+  - VERSION=11-3.0 VARIANT=alpine
   - VERSION=11-2.5
   - VERSION=11-2.5 VARIANT=alpine
+  - VERSION=10-3.0
+  - VERSION=10-3.0 VARIANT=alpine
   - VERSION=10-2.5
   - VERSION=10-2.5 VARIANT=alpine
+  - VERSION=9.6-3.0
+  - VERSION=9.6-3.0 VARIANT=alpine
   - VERSION=9.6-2.5
   - VERSION=9.6-2.5 VARIANT=alpine
   - VERSION=9.5-3.0
