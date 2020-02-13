@@ -1,4 +1,5 @@
 FROM postgres:12-alpine
+LABEL maintainer="Régis Belson <me@regisbelson.fr>"
 
 ENV POSTGIS_VERSION 3.0.0
 ENV POSTGIS_SHA256 1c83fb2fc8870d36ed49859c49a12c8c4c8ae8c5c3f912a21a951c5bcc249123
@@ -23,19 +24,18 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
+        file \
         json-c-dev \
         libtool \
         libxml2-dev \
         make \
         perl \
-    \
-    && apk add --no-cache --virtual .build-deps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+        clang-dev \
         g++ \
         gcc \
         gdal-dev \
         geos-dev \
+        llvm9-dev \
         proj-dev \
         protobuf-c-dev \
     && cd /usr/src/postgis \
@@ -48,9 +48,6 @@ RUN set -ex \
     && make install \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
-    && apk add --no-cache --virtual .postgis-rundeps-edge \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
         geos \
         gdal \
         proj \
@@ -58,7 +55,7 @@ RUN set -ex \
         protobuf-c \
     && cd / \
     && rm -rf /usr/src/postgis \
-    && apk del .fetch-deps .build-deps .build-deps-edge
+    && apk del .fetch-deps .build-deps
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
