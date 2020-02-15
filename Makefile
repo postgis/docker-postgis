@@ -8,8 +8,8 @@ build: $(VERSIONS)
 
 define postgis-version
 $1:
-	docker build -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
-	docker build -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+	docker build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+	docker build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
 endef
 $(foreach version,$(VERSIONS),$(eval $(call postgis-version,$(version))))
 
