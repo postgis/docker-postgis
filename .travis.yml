@@ -2,27 +2,37 @@
 language: bash
 services: docker
 
-dist: trusty
+dist: xenial
 
 env:
-  - VERSION=9.6-2.5
-  - VERSION=9.6-2.5 VARIANT=alpine
-  - VERSION=9.5-2.5
-  - VERSION=9.5-2.5 VARIANT=alpine
-  - VERSION=9.4-2.5
-  - VERSION=9.4-2.5 VARIANT=alpine
+  - VERSION=12-3.0
+  - VERSION=12-3.0 VARIANT=alpine
+  - VERSION=12-2.5
+  - VERSION=12-2.5 VARIANT=alpine
+  - VERSION=11-3.0
+  - VERSION=11-3.0 VARIANT=alpine
   - VERSION=11-2.5
   - VERSION=11-2.5 VARIANT=alpine
+  - VERSION=10-3.0
+  - VERSION=10-3.0 VARIANT=alpine
   - VERSION=10-2.5
   - VERSION=10-2.5 VARIANT=alpine
+  - VERSION=9.6-3.0
+  - VERSION=9.6-3.0 VARIANT=alpine
+  - VERSION=9.6-2.5
+  - VERSION=9.6-2.5 VARIANT=alpine
+  - VERSION=9.5-3.0
+  - VERSION=9.5-3.0 VARIANT=alpine
+  - VERSION=9.5-2.5
+  - VERSION=9.5-2.5 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
 
 before_script:
-  - env | sort
+  - env | grep -E "VARIANT|VERSION" | sort
   - cd "$VERSION/$VARIANT"
-  - image="appropriate/postgis:$VERSION${VARIANT:+-${VARIANT}}"
+  - image="postgis/postgis:$VERSION${VARIANT:+-${VARIANT}}"
 
 script:
   - docker build --pull -t "$image" .

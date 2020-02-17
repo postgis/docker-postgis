@@ -1,9 +1,9 @@
-FROM postgres:9.5
+FROM postgres:11
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
-ENV POSTGIS_MAJOR 2.5
-ENV POSTGIS_VERSION 2.5.3+dfsg-3.pgdg90+1
+ENV POSTGIS_MAJOR 3
+ENV POSTGIS_VERSION 3.0.0+dfsg-2~exp1.pgdg90+1
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
