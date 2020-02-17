@@ -16,7 +16,6 @@ IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 defaultDebianSuite='buster-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
-    [9.4]='stretch-slim'
     [9.5]='stretch-slim'
     [9.6]='stretch-slim'
     [10]='stretch-slim'
