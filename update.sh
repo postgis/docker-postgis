@@ -53,17 +53,34 @@ for version in "${versions[@]}"; do
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersion"'" { print $2; exit }' || true)"
     majorVersion="${postgresVersion%%.*}"
 
-    postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
-    postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
+    if [ "master" == "$postgisVersion" ]; then
+      postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/${postgisVersion} | awk '{ print $1}')"
+      postgisPackageName=""
+      postgisFullVersion="$postgisVersion"
+      postgisMajor=""
+    else
+      postgisGitHash=""
+      postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
+      postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
+      postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
+    fi
     (
         set -x
         cp -p Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
+        if [ "master" == "$postgisVersion" ]; then
+          cp -p Dockerfile.master.template "$version/Dockerfile.template"
+        fi
         mv "$version/Dockerfile.template" "$version/Dockerfile"
-        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g' "$version/Dockerfile"
+        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g;' "$version/Dockerfile"
     )
 
-    srcVersion="${postgisFullVersion%%+*}"
-    srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
+    if [ "master" == "$postgisVersion" ]; then
+      srcVersion="$postgisVersion"
+      srcSha256=""
+    else
+      srcVersion="${postgisFullVersion%%+*}"
+      srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
+    fi
     for variant in alpine; do
         if [ ! -d "$version/$variant" ]; then
             continue
@@ -71,8 +88,11 @@ for version in "${versions[@]}"; do
         (
             set -x
             cp -p Dockerfile.alpine.template initdb-postgis.sh update-postgis.sh "$version/$variant/"
+            if [ "master" == "$postgisVersion" ]; then
+              cp -p Dockerfile.master.alpine.template "$version/$variant/Dockerfile.alpine.template"
+            fi
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
-            sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
+            sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g;' "$version/$variant/Dockerfile"
         )
         travisEnv="\n  - VERSION=$version VARIANT=$variant$travisEnv"
     done
