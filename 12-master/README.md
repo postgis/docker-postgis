@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/postgis/docker-postgis.svg)](https://travis-ci.org/postgis/docker-postgis) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for both PostGIS 2.5.x and 3.0.x for each version of Postgres (9.5, 9.6, 10, 11, and 12).
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 2.5.x, 3.0.x and master branch for each version of Postgres (9.5(dropped support in master branch), 9.6, 10, 11, and 12).
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
