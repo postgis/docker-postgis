@@ -26,9 +26,11 @@ RUN set -ex \
       libboost-thread%%BOOST_VERSION%% \
       libboost-timer%%BOOST_VERSION%% \
       libcgal%%CDAL_VERSION%% \
+      libcurl3-gnutls \
       libgmp10 \
       libgmpxx4ldbl \
       libjson-c3 \
+      libmpfr6 \
       libprotobuf-c1 \
       libtiff5 \
       libxml2 \
