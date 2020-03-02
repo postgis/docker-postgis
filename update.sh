@@ -34,6 +34,12 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
 
+sfcgalGitHash="$(git ls-remote https://github.com/Oslandia/SFCGAL.git heads/master | awk '{ print $1}')"
+projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
+gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"
+geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/master | awk '{ print $1}')"
+postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/master | awk '{ print $1}')"
+
 declare -A suitePackageList=() suiteArches=()
 travisEnv=
 for version in "${versions[@]}"; do
@@ -53,13 +59,19 @@ for version in "${versions[@]}"; do
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersion"'" { print $2; exit }' || true)"
     majorVersion="${postgresVersion%%.*}"
 
+    if [ "$suite" = "stretch" ]; then
+      boostVersion="1.62.0"
+      cdalVersion="12"
+    else
+      boostVersion="1.67.0"
+      cdalVersion="13"
+    fi
+
     if [ "master" == "$postgisVersion" ]; then
-      postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/${postgisVersion} | awk '{ print $1}')"
       postgisPackageName=""
       postgisFullVersion="$postgisVersion"
       postgisMajor=""
     else
-      postgisGitHash=""
       postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
       postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
       postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
@@ -71,7 +83,7 @@ for version in "${versions[@]}"; do
           cp -p Dockerfile.master.template "$version/Dockerfile.template"
         fi
         mv "$version/Dockerfile.template" "$version/Dockerfile"
-        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g;' "$version/Dockerfile"
+        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%CDAL_VERSION%%/'"$cdalVersion"'/g;' "$version/Dockerfile"
     )
 
     if [ "master" == "$postgisVersion" ]; then
