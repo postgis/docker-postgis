@@ -60,21 +60,21 @@ for version in "${versions[@]}"; do
     majorVersion="${postgresVersion%%.*}"
 
     if [ "$suite" = "stretch" ]; then
-      boostVersion="1.62.0"
-      cdalVersion="12"
+        boostVersion="1.62.0"
+        cdalVersion="12"
     else
-      boostVersion="1.67.0"
-      cdalVersion="13"
+        boostVersion="1.67.0"
+        cdalVersion="13"
     fi
 
     if [ "master" == "$postgisVersion" ]; then
-      postgisPackageName=""
-      postgisFullVersion="$postgisVersion"
-      postgisMajor=""
+        postgisPackageName=""
+        postgisFullVersion="$postgisVersion"
+        postgisMajor=""
     else
-      postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
-      postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
-      postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
+        postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
+        postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
+        postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
     fi
     (
         set -x
@@ -87,11 +87,11 @@ for version in "${versions[@]}"; do
     )
 
     if [ "master" == "$postgisVersion" ]; then
-      srcVersion="$postgisVersion"
-      srcSha256=""
+        srcVersion=""
+        srcSha256=""
     else
-      srcVersion="${postgisFullVersion%%+*}"
-      srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
+        srcVersion="${postgisFullVersion%%+*}"
+        srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
     fi
     for variant in alpine; do
         if [ ! -d "$version/$variant" ]; then
@@ -104,7 +104,7 @@ for version in "${versions[@]}"; do
               cp -p Dockerfile.master.alpine.template "$version/$variant/Dockerfile.alpine.template"
             fi
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
-            sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g;' "$version/$variant/Dockerfile"
+            sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g;' "$version/$variant/Dockerfile"
         )
         travisEnv="\n  - VERSION=$version VARIANT=$variant$travisEnv"
     done
