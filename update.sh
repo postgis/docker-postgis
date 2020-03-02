@@ -100,11 +100,8 @@ for version in "${versions[@]}"; do
         (
             set -x
             cp -p Dockerfile.alpine.template initdb-postgis.sh update-postgis.sh "$version/$variant/"
-            if [ "master" == "$postgisVersion" ]; then
-              cp -p Dockerfile.master.alpine.template "$version/$variant/Dockerfile.alpine.template"
-            fi
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
-            sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g;' "$version/$variant/Dockerfile"
+            sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
         )
         travisEnv="\n  - VERSION=$version VARIANT=$variant$travisEnv"
     done
