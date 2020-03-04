@@ -32,7 +32,9 @@ endif
 define test-version
 test-$1: $1
 	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)
+ifneq ("$(wildcard $1/alpine)","")
 	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
+endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 
