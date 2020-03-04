@@ -4,13 +4,13 @@ LABEL maintainer="Mike Dillon <mike@appropriate.io>"
 ENV SFCGAL_VERSION master
 ENV SFCGAL_GIT_HASH b11af653fd84f5a4a959e4369019dd3962f904c3
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 0bcf2b5aaacdabce159ed96b2421d2810038e7b6
+ENV PROJ_GIT_HASH 93d3af6aecca25ee91565d9d38af67b7312c9444
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH d528bab40586f4b6ed7e03f3ada2ab6861edfaca
+ENV GDAL_GIT_HASH ddda00d922ff8014936ca7a108cabfc9e4c29fb8
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 7ad488a7334552dae774d1130559c46a921efc02
+ENV GEOS_GIT_HASH e37d04f8384b2e1fee83d64c6221adc3749a404a
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH fc5f9e4307eb9a4f8bccac1d10d63d2d8f4ab9bd
+ENV POSTGIS_GIT_HASH d1a929f3c9557156c2a4d4c1606487f4fe80b0cd
 
 RUN set -ex \
     && apt-get update \
@@ -72,7 +72,7 @@ RUN set -ex \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. \
-    && make \
+    && make -j$(nproc --ignore=1)\
     && make install \
     && rm /usr/local/lib/libSFCGAL.la \
     && cd / \
@@ -86,7 +86,7 @@ RUN set -ex \
     && git reset --hard FETCH_HEAD \
     && ./autogen.sh \
     && ./configure --disable-static \
-    && make \
+    && make -j$(nproc --ignore=1)\
     && make install \
     && cd / \
     && rm -fr /usr/src/proj \
@@ -99,7 +99,7 @@ RUN set -ex \
     && git reset --hard FETCH_HEAD \
     && ./autogen.sh \
     && ./configure --disable-static \
-    && make \
+    && make -j$(nproc --ignore=1)\
     && make install \
     && cd / \
     && rm -fr /usr/src/geos \
@@ -113,7 +113,7 @@ RUN set -ex \
     && cd gdal \
     && ./autogen.sh \
     && ./configure --disable-static \
-    && make \
+    && make -j$(nproc --ignore=1)\
     && make install \
     && cd / \
     && rm -fr /usr/src/gdal \
@@ -129,7 +129,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
-    && make \
+    && make -j$(nproc --ignore=1)\
     && make install \
     && cd / \
     && rm -rf /usr/src/postgis \
