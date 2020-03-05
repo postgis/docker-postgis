@@ -1,5 +1,6 @@
-FROM postgres:12
-LABEL maintainer="Mike Dillon <mike@appropriate.io>"
+FROM postgres:%%PG_MAJOR%%
+
+LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV SFCGAL_VERSION master
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
