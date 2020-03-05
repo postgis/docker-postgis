@@ -73,7 +73,7 @@ RUN set -ex \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. \
-    && make -j$(nproc --ignore=1)\
+    && make -j$(nproc) \
     && make install \
     && rm /usr/local/lib/libSFCGAL.la \
     && cd / \
@@ -87,7 +87,7 @@ RUN set -ex \
     && git reset --hard FETCH_HEAD \
     && ./autogen.sh \
     && ./configure --disable-static \
-    && make -j$(nproc --ignore=1)\
+    && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -fr /usr/src/proj \
@@ -100,7 +100,7 @@ RUN set -ex \
     && git reset --hard FETCH_HEAD \
     && ./autogen.sh \
     && ./configure --disable-static \
-    && make -j$(nproc --ignore=1)\
+    && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -fr /usr/src/geos \
@@ -114,7 +114,7 @@ RUN set -ex \
     && cd gdal \
     && ./autogen.sh \
     && ./configure --disable-static \
-    && make -j$(nproc --ignore=1)\
+    && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -fr /usr/src/gdal \
@@ -130,7 +130,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
-    && make -j$(nproc --ignore=1)\
+    && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -rf /usr/src/postgis \
