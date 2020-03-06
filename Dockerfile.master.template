@@ -38,7 +38,7 @@ RUN set -ex \
       sqlite3 \
       curl \
     && apt-get install -y --no-install-recommends \
-      autoconf2.13 \
+      autoconf \
       automake \
       autotools-dev \
       bison \
@@ -60,7 +60,7 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-12 \
+      postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
     # sfcgal
@@ -135,7 +135,7 @@ RUN set -ex \
     && cd / \
     && rm -rf /usr/src/postgis \
     && apt-get purge -y --autoremove \
-      autoconf2.13 \
+      autoconf \
       automake \
       autotools-dev \
       bison \
@@ -157,7 +157,7 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-12 \
+      postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
     && rm -rf /var/lib/apt/lists/*

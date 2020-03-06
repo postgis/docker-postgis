@@ -5,13 +5,13 @@ LABEL maintainer="PostGIS Project - https://postgis.net"
 ENV SFCGAL_VERSION master
 ENV SFCGAL_GIT_HASH b11af653fd84f5a4a959e4369019dd3962f904c3
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 341e0e7eb4f95de5c6ccc24ee98b7bb304964449
+ENV PROJ_GIT_HASH b8db2500285e3d4feaa5778ec7fa888bd6c6a479
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 04a8d012807a2d2dd66085e68b167e3ade164348
+ENV GDAL_GIT_HASH 0bfd1bcb38b3fe321fd15f3c485cfb91537faf0e
 ENV GEOS_VERSION master
 ENV GEOS_GIT_HASH e37d04f8384b2e1fee83d64c6221adc3749a404a
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 8eecc746627f200f0df834ca19a3aea92db3782f
+ENV POSTGIS_GIT_HASH 87922037fd09b68ad2ada409f776e06590924256
 
 RUN set -ex \
     && apt-get update \
@@ -38,7 +38,7 @@ RUN set -ex \
       sqlite3 \
       curl \
     && apt-get install -y --no-install-recommends \
-      autoconf2.13 \
+      autoconf \
       automake \
       autotools-dev \
       bison \
@@ -60,7 +60,7 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-12 \
+      postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
     # sfcgal
@@ -135,7 +135,7 @@ RUN set -ex \
     && cd / \
     && rm -rf /usr/src/postgis \
     && apt-get purge -y --autoremove \
-      autoconf2.13 \
+      autoconf \
       automake \
       autotools-dev \
       bison \
@@ -157,7 +157,7 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-12 \
+      postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
     && rm -rf /var/lib/apt/lists/*
