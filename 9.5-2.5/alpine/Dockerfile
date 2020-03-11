@@ -45,7 +45,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
-    && make \
+    && make -j$(nproc) \
     && make install \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
@@ -58,5 +58,5 @@ RUN set -ex \
     && rm -rf /usr/src/postgis \
     && apk del .fetch-deps .build-deps
 
-COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
+COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
