@@ -45,7 +45,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
-    && make \
+    && make -j$(nproc) \
     && make install \
     && apk add --no-cache --virtual .postgis-rundeps \
         json-c \
