@@ -27,14 +27,10 @@ env:
   - VERSION=9.5-2.5
   - VERSION=9.5-2.5 VARIANT=alpine
 
-install:
-  - git clone https://github.com/docker-library/official-images.git ~/official-images
-
-before_script:
-  - env | grep -E "VARIANT|VERSION" | sort
-  - cd "$VERSION/$VARIANT"
-  - image="postgis/postgis:$VERSION${VARIANT:+-${VARIANT}}"
-
 script:
-  - docker build --pull -t "$image" .
-  - ~/official-images/test/run.sh -c ~/official-images/test/config.sh -c "../${VARIANT:+../}test/postgis-config.sh" "$image"
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then
+        echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u $DOCKERHUB_USERNAME --password-stdin &&
+        make push ;
+    else
+        make test ;
+    fi
