@@ -16,6 +16,7 @@ ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
+      curl \
       libboost-atomic%%BOOST_VERSION%% \
       libboost-chrono%%BOOST_VERSION%% \
       libboost-date-time%%BOOST_VERSION%% \
@@ -28,6 +29,7 @@ RUN set -ex \
       libboost-timer%%BOOST_VERSION%% \
       libcgal%%CDAL_VERSION%% \
       libcurl3-gnutls \
+      libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
       libjson-c3 \
@@ -36,7 +38,6 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      curl \
     && apt-get install -y --no-install-recommends \
       autoconf \
       automake \
@@ -160,7 +161,14 @@ RUN set -ex \
       postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    # Minimal command line test.
+    && cs2cs \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh

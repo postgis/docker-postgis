@@ -5,17 +5,18 @@ LABEL maintainer="PostGIS Project - https://postgis.net"
 ENV SFCGAL_VERSION master
 ENV SFCGAL_GIT_HASH b11af653fd84f5a4a959e4369019dd3962f904c3
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH ca3caf0e976e95a739963567057654cb8909bfb9
+ENV PROJ_GIT_HASH d8835f1288207ba9a7e78082050ef61af3ded1e3
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 9d4d488a492510fdf3b20d8b74aba06ebeb5ba76
+ENV GDAL_GIT_HASH 24d329dfba3d160d14dc142ffd9512f09ea03f65
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH ec1419c821f3a2f2b92ab7de232f7e2ace3bdb06
+ENV GEOS_GIT_HASH 14b98cfd8fd72834f82e623910b413824ef33d7e
 ENV POSTGIS_VERSION master
 ENV POSTGIS_GIT_HASH ec43bd2afd3071bc677691ee5f2ae6dc33a47555
 
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
+      curl \
       libboost-atomic1.67.0 \
       libboost-chrono1.67.0 \
       libboost-date-time1.67.0 \
@@ -28,6 +29,7 @@ RUN set -ex \
       libboost-timer1.67.0 \
       libcgal13 \
       libcurl3-gnutls \
+      libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
       libjson-c3 \
@@ -36,7 +38,6 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      curl \
     && apt-get install -y --no-install-recommends \
       autoconf \
       automake \
@@ -160,7 +161,14 @@ RUN set -ex \
       postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    # Minimal command line test.
+    && cs2cs \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
