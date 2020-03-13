@@ -54,6 +54,7 @@ REPO_NAME  ?= postgis
 IMAGE_NAME ?= postgis
 
 DOCKER=docker
+DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:2.1.0
 
 GIT=git
 OFFIMG_LOCAL_CLONE=$(HOME)/official-images
@@ -132,6 +133,11 @@ $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
 
 push-latest: tag-latest $(PUSH_LATEST_DEP)
 	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):latest
+	@$(DOCKER) run -v "$(PWD)":/workspace \
+                      -e DOCKERHUB_USERNAME='$(DOCKERHUB_USERNAME)' \
+                      -e DOCKERHUB_PASSWORD='$(DOCKERHUB_PASSWORD)' \
+                      -e DOCKERHUB_REPOSITORY='$(REPO_NAME)/$(IMAGE_NAME)' \
+                      -e README_FILEPATH='/workspace/README.md' $(DOCKERHUB_DESC_IMG)
 
 
 .PHONY: build all update test-prepare test tag-latest push push-latest \
