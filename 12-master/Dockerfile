@@ -3,15 +3,15 @@ FROM postgres:12
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH 787e2b7eedd69d3d806432e986ac0ee51125570a
+ENV SFCGAL_GIT_HASH 929605c8ea85f2c01efa116e1ed0eb01d285ea09
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH b84c9d0cb61f3bd561da6092e15e294ae7e410e0
+ENV PROJ_GIT_HASH 0c9cf39297a24d5e56aa488820a5ba3edaace90e
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 6c491dfffa97270d922783d69a1124dcd9be3b47
+ENV GDAL_GIT_HASH ab634ff99f45ef87f2d3e862a56b2289bba653d5
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 4e9a2550a346d2052c5018909dc77eed30117772
+ENV GEOS_GIT_HASH 099e74b3127348e1f8544ab279b609e2fdc6cc74
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 93bb425c61fbfcef9d830a10b61aa74305114efc
+ENV POSTGIS_GIT_HASH 4c185f8617824a21f46569170dd16c3427e1b197
 
 RUN set -ex \
     && apt-get update \
@@ -76,7 +76,6 @@ RUN set -ex \
     && cmake .. \
     && make -j$(nproc) \
     && make install \
-    && rm /usr/local/lib/libSFCGAL.la \
     && cd / \
     && rm -fr /usr/src/sfcgal \
     # proj4

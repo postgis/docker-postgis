@@ -76,7 +76,6 @@ RUN set -ex \
     && cmake .. \
     && make -j$(nproc) \
     && make install \
-    && rm /usr/local/lib/libSFCGAL.la \
     && cd / \
     && rm -fr /usr/src/sfcgal \
     # proj4
