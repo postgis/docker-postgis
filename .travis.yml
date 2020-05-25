@@ -5,6 +5,7 @@ services: docker
 dist: xenial
 
 env:
+  - VERSION=13-master
   - VERSION=12-master
   - VERSION=12-3.0
   - VERSION=12-3.0 VARIANT=alpine
@@ -30,6 +31,7 @@ env:
 jobs:
   allow_failures:
     - env: VERSION=12-master
+    - env: VERSION=13-master
 
 script:
   - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then
