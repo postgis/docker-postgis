@@ -3,15 +3,15 @@ FROM postgres:13
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH 4ab0dcf6f36c178caefd64b7d0c443342e76b6b9
+ENV SFCGAL_GIT_HASH 7e91a52fd90ef47e2f0b8925145e59ef1043fdd4
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 0a995bb4219f5cf882503c1eb884474fdce53d12
+ENV PROJ_GIT_HASH b8fef0901bd92056b92b028476d160e0804de16b
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 39111a0fe9b174302f67102bdd849e8290472d70
+ENV GDAL_GIT_HASH 1890a2eea4615d23093734c28164b076930d352a
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 19dc3b19338c2aded5197ca0e5a5456b028defbd
+ENV GEOS_GIT_HASH 0f938979b58f9a451670032a7199ece23d52c3c1
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 3334fd0675c98c79a6a8527a05fc0e8c4c371835
+ENV POSTGIS_GIT_HASH 6700df0e2db7965458b36f973d0216ce1cada762
 
 RUN set -ex \
     && apt-get update \
@@ -68,7 +68,7 @@ RUN set -ex \
     && mkdir -p /usr/src/sfcgal \
     && cd /usr/src/sfcgal \
     && git init \
-    && git remote add origin https://github.com/Oslandia/SFCGAL.git \
+    && git remote add origin https://gitlab.com/Oslandia/SFCGAL.git \
     && git fetch --depth 1 origin :${SFCGAL_GIT_HASH} \
     && git reset --hard FETCH_HEAD \
     && mkdir cmake-build \
