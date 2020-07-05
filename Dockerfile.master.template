@@ -68,7 +68,7 @@ RUN set -ex \
     && mkdir -p /usr/src/sfcgal \
     && cd /usr/src/sfcgal \
     && git init \
-    && git remote add origin https://github.com/Oslandia/SFCGAL.git \
+    && git remote add origin https://gitlab.com/Oslandia/SFCGAL.git \
     && git fetch --depth 1 origin :${SFCGAL_GIT_HASH} \
     && git reset --hard FETCH_HEAD \
     && mkdir cmake-build \
