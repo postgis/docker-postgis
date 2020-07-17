@@ -7,7 +7,7 @@ ENV SFCGAL_GIT_HASH d2c4d5b4899620e5dbab94410403af41829d6239
 ENV PROJ_VERSION master
 ENV PROJ_GIT_HASH 062c7f160f4b1d41f82730fa6eb6653e78ade74a
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH aa6afd5454bd8f755d25ae8d10ceb3f659fdb785
+ENV GDAL_GIT_HASH 05859865e10c16d78bf84bc8af3d3c004dac49b4
 ENV GEOS_VERSION master
 ENV GEOS_GIT_HASH 0f938979b58f9a451670032a7199ece23d52c3c1
 ENV POSTGIS_VERSION master
@@ -132,6 +132,18 @@ RUN set -ex \
 #       --with-gui \
     && make -j$(nproc) \
     && make install \
+# regress check
+    && mkdir /tempdb \
+    && chown -R postgres:postgres /tempdb \
+    && su postgres -c 'pg_ctl -D /tempdb init' \
+    && su postgres -c 'pg_ctl -D /tempdb start' \
+    && ldconfig \
+    && cd regress \
+    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
+    && rm -rf /tempdb \
+    && rm -rf /tmp/pgis_reg \
+# clean
     && cd / \
     && rm -rf /usr/src/postgis \
     && apt-get purge -y --autoremove \

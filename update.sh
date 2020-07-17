@@ -20,10 +20,8 @@ declare -A debianSuite=(
     [9.6]='stretch-slim'
     [10]='stretch-slim'
     [11]='stretch-slim'
-)
-defaultAlpineVersion='3.11'
-declare -A alpineVersion=(
-    #[9.6]='3.5'
+    [12]='buster-slim'
+    [13]='buster-slim'        
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'

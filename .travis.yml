@@ -6,6 +6,8 @@ dist: xenial
 
 env:
   - VERSION=13-master
+  - VERSION=13-3.0
+  - VERSION=13-3.0 VARIANT=alpine
   - VERSION=12-master
   - VERSION=12-3.0
   - VERSION=12-3.0 VARIANT=alpine
