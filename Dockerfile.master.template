@@ -1,4 +1,4 @@
-FROM postgres:%%PG_MAJOR%%
+FROM debian:%%DEBIAN_VERSION%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -37,6 +37,7 @@ RUN set -ex \
       libprotobuf-c1 \
       libtiff5 \
       libxml2 \
+      libpq5 \
       sqlite3 \
     && apt-get install -y --no-install-recommends \
       autoconf \
@@ -54,6 +55,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpq-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -61,7 +63,6 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
     # sfcgal
@@ -118,6 +119,116 @@ RUN set -ex \
     && make install \
     && cd / \
     && rm -fr /usr/src/gdal \
+    && apt-get purge -y --autoremove \
+      autoconf \
+      automake \
+      autotools-dev \
+      bison \
+      build-essential \
+      ca-certificates \
+      cmake \
+      git \
+      g++ \
+      libboost-all-dev \
+      libcgal-dev \
+      libcurl4-gnutls-dev \
+      libgmp-dev \
+      libjson-c-dev \
+      libmpfr-dev \
+      libprotobuf-c-dev \
+      libpq-dev \
+      libsqlite3-dev \
+      libtiff-dev \
+      libtool \
+      libxml2-dev \
+      make \
+      pkg-config \
+      protobuf-c-compiler \
+      xsltproc \
+    && rm -rf /var/lib/apt/lists/* \
+    # Minimal command line test.
+    && cs2cs \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version
+
+FROM postgres:%%PG_MAJOR%%
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      curl \
+      libboost-atomic%%BOOST_VERSION%% \
+      libboost-chrono%%BOOST_VERSION%% \
+      libboost-date-time%%BOOST_VERSION%% \
+      libboost-filesystem%%BOOST_VERSION%% \
+      libboost-program-options%%BOOST_VERSION%% \
+      libboost-serialization%%BOOST_VERSION%% \
+      libboost-system%%BOOST_VERSION%% \
+      libboost-test%%BOOST_VERSION%% \
+      libboost-thread%%BOOST_VERSION%% \
+      libboost-timer%%BOOST_VERSION%% \
+      libcgal%%CDAL_VERSION%% \
+      libcurl3-gnutls \
+      libexpat1 \
+      libgmp10 \
+      libgmpxx4ldbl \
+      libjson-c3 \
+      libmpfr6 \
+      libprotobuf-c1 \
+      libtiff5 \
+      libxml2 \
+      sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /usr/local
+COPY --from=builder /usr/local .
+
+RUN set -ex \
+    && ldconfig
+
+# Minimal command line test.
+RUN set -ex \
+    && cs2cs \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version
+
+# install postgis
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      autoconf \
+      automake \
+      autotools-dev \
+      bison \
+      build-essential \
+      ca-certificates \
+      cmake \
+      git \
+      g++ \
+      libboost-all-dev \
+      libcgal-dev \
+      libcurl4-gnutls-dev \
+      libgmp-dev \
+      libjson-c-dev \
+      libmpfr-dev \
+      libprotobuf-c-dev \
+      libpq-dev \
+      libsqlite3-dev \
+      libtiff-dev \
+      libtool \
+      libxml2-dev \
+      make \
+      pkg-config \
+      postgresql-server-dev-$PG_MAJOR \
+      protobuf-c-compiler \
+      xsltproc \
+    && cd \
     # postgis
     && mkdir -p /usr/src/postgis \
     && cd /usr/src/postgis \
@@ -163,6 +274,7 @@ RUN set -ex \
       libjson-c-dev \
       libmpfr-dev \
       libprotobuf-c-dev \
+      libpq-dev \
       libsqlite3-dev \
       libtiff-dev \
       libtool \
@@ -172,14 +284,8 @@ RUN set -ex \
       postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
-    && rm -rf /var/lib/apt/lists/* \
-    # Minimal command line test.
-    && cs2cs \
-    && gdalinfo --version \
-    && geos-config --version \
-    && ogr2ogr --version \
-    && proj \
-    && sfcgal-config --version
+    && rm -rf /var/lib/apt/lists/*
+
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh

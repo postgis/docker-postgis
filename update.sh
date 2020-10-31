@@ -81,7 +81,7 @@ for version in "${versions[@]}"; do
           cp -p Dockerfile.master.template "$version/Dockerfile.template"
         fi
         mv "$version/Dockerfile.template" "$version/Dockerfile"
-        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%CDAL_VERSION%%/'"$cdalVersion"'/g;' "$version/Dockerfile"
+        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%CDAL_VERSION%%/'"$cdalVersion"'/g;  s/%%DEBIAN_VERSION%%/'"$tag"'/g;' "$version/Dockerfile"
     )
 
     if [ "master" == "$postgisVersion" ]; then
