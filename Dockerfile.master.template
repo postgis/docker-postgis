@@ -2,17 +2,9 @@ FROM postgres:%%PG_MAJOR%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
-ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
-ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
-ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
+WORKDIR /
 
+# apt-get install
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -39,7 +31,7 @@ RUN set -ex \
       libxml2 \
       libpq5 \
       sqlite3 \
-    && apt-get install -y --no-install-recommends \
+      # build dependency
       autoconf \
       automake \
       autotools-dev \
@@ -64,8 +56,13 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc \
-    # sfcgal
+      xsltproc
+
+# sfcgal
+ENV SFCGAL_VERSION master
+ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
+
+RUN set -ex \
     && mkdir -p /usr/src/sfcgal \
     && cd /usr/src/sfcgal \
     && git init \
@@ -78,8 +75,13 @@ RUN set -ex \
     && make -j$(nproc) \
     && make install \
     && cd / \
-    && rm -fr /usr/src/sfcgal \
-    # proj4
+    && rm -fr /usr/src/sfcgal
+
+# proj4
+ENV PROJ_VERSION master
+ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
+
+RUN set -ex \
     && mkdir -p /usr/src/proj \
     && cd /usr/src/proj \
     && git init \
@@ -91,8 +93,13 @@ RUN set -ex \
     && make -j$(nproc) \
     && make install \
     && cd / \
-    && rm -fr /usr/src/proj \
-    # geos
+    && rm -fr /usr/src/proj
+
+# geos
+ENV GDAL_VERSION master
+ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+
+RUN set -ex \
     && mkdir -p /usr/src/geos \
     && cd /usr/src/geos \
     && git init \
@@ -104,8 +111,13 @@ RUN set -ex \
     && make -j$(nproc) \
     && make install \
     && cd / \
-    && rm -fr /usr/src/geos \
-    # gdal
+    && rm -fr /usr/src/geos
+
+# gdal
+ENV GEOS_VERSION master
+ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
+
+RUN set -ex \
     && mkdir -p /usr/src/gdal \
     && cd /usr/src/gdal \
     && git init \
@@ -118,35 +130,14 @@ RUN set -ex \
     && make -j$(nproc) \
     && make install \
     && cd / \
-    && rm -fr /usr/src/gdal \
-    && apt-get purge -y --autoremove \
-      autoconf \
-      automake \
-      autotools-dev \
-      bison \
-      build-essential \
-      ca-certificates \
-      cmake \
-      git \
-      g++ \
-      libboost-all-dev \
-      libcgal-dev \
-      libcurl4-gnutls-dev \
-      libgmp-dev \
-      libjson-c-dev \
-      libmpfr-dev \
-      libprotobuf-c-dev \
-      libpq-dev \
-      libsqlite3-dev \
-      libtiff-dev \
-      libtool \
-      libxml2-dev \
-      make \
-      pkg-config \
-      protobuf-c-compiler \
-      xsltproc \
-    && rm -rf /var/lib/apt/lists/* \
-    # Minimal command line test.
+    && rm -fr /usr/src/gdal
+
+# run ldconfig
+RUN set -ex \
+    && ldconfig
+
+# Minimal command line test.
+RUN set -ex \
     && cs2cs \
     && gdalinfo --version \
     && geos-config --version \
@@ -155,6 +146,9 @@ RUN set -ex \
     && sfcgal-config --version
 
 FROM postgres:%%PG_MAJOR%%
+
+ENV POSTGIS_VERSION master
+ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
 
 RUN set -ex \
     && apt-get update \
@@ -284,8 +278,8 @@ RUN set -ex \
       postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
