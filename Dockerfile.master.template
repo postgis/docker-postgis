@@ -1,4 +1,4 @@
-FROM debian:%%DEBIAN_VERSION%% as builder
+FROM postgres:%%PG_MAJOR%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
