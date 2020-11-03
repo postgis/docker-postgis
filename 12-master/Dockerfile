@@ -79,7 +79,7 @@ RUN set -ex \
 
 # proj4
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH dd829c94fffba3a0b725504d5c7b42384b2e6ee7
+ENV PROJ_GIT_HASH c64c209f4abeec7ae4e8cdde8d6c5ba9921354fa
 
 RUN set -ex \
     && mkdir -p /usr/src/proj \
@@ -97,7 +97,7 @@ RUN set -ex \
 
 # geos
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 2dc2c9574496a30e5926e5ac4b41417911675ca2
+ENV GDAL_GIT_HASH 32a665eb3a82eec7d0da4caf8d7265fd5c968289
 
 RUN set -ex \
     && mkdir -p /usr/src/geos \
@@ -115,7 +115,7 @@ RUN set -ex \
 
 # gdal
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 708d32b2cd2dd3bedc38ff1d839368656b1f9626
+ENV GEOS_GIT_HASH 1b6521ef1c8ecd8098e8d27233030b689a33992f
 
 RUN set -ex \
     && mkdir -p /usr/src/gdal \
@@ -146,9 +146,6 @@ RUN set -ex \
     && sfcgal-config --version
 
 FROM postgres:12
-
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH a7ff53ff535eae8579a374a11a785ed053acd3c7
 
 RUN set -ex \
     && apt-get update \
@@ -193,6 +190,9 @@ RUN set -ex \
     && sfcgal-config --version
 
 # install postgis
+ENV POSTGIS_VERSION master
+ENV POSTGIS_GIT_HASH 13f821e5906e1a2663eb43b410bb6bd1deba88b6
+
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \

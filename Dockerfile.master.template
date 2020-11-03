@@ -147,9 +147,6 @@ RUN set -ex \
 
 FROM postgres:%%PG_MAJOR%%
 
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
-
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -193,6 +190,9 @@ RUN set -ex \
     && sfcgal-config --version
 
 # install postgis
+ENV POSTGIS_VERSION master
+ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
+
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
