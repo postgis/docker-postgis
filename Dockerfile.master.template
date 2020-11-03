@@ -96,8 +96,8 @@ RUN set -ex \
     && rm -fr /usr/src/proj
 
 # geos
-ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+ENV GEOS_VERSION master
+ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
 
 RUN set -ex \
     && mkdir -p /usr/src/geos \
@@ -114,8 +114,8 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
+ENV GDAL_VERSION master
+ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
 
 RUN set -ex \
     && mkdir -p /usr/src/gdal \
