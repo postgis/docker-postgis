@@ -110,8 +110,8 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 32a665eb3a82eec7d0da4caf8d7265fd5c968289
-#ENV GDAL_GIT_HASH 20d44a181f73b87ebb7c1660498bb9e78e572e54
+#ENV GDAL_GIT_HASH 32a665eb3a82eec7d0da4caf8d7265fd5c968289
+ENV GDAL_GIT_HASH 20d44a181f73b87ebb7c1660498bb9e78e572e54
 
 RUN set -ex \
     && cd /usr/src \
@@ -187,7 +187,6 @@ RUN set -ex \
 # install postgis
 ENV POSTGIS_VERSION master
 ENV POSTGIS_GIT_HASH 9732cf8398a56db784889bc0f91597e6f7a8e5a9
-#ENV POSTGIS_GIT_HASH 13f821e5906e1a2663eb43b410bb6bd1deba88b6
 
 RUN set -ex \
     && apt-get update \
