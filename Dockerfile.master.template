@@ -1,3 +1,5 @@
+# "experimental" ;  only for testing!
+# multi-stage dockerfile;  minimal docker version >= 17.05
 FROM postgres:%%PG_MAJOR%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
@@ -123,12 +125,9 @@ RUN set -ex \
     && cd / \
     && rm -fr /usr/src/gdal
 
-# run ldconfig
-RUN set -ex \
-    && ldconfig
-
 # Minimal command line test.
 RUN set -ex \
+    && ldconfig \
     && cs2cs \
     && gdalinfo --version \
     && geos-config --version \
@@ -165,15 +164,11 @@ RUN set -ex \
       sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/local
-COPY --from=builder /usr/local .
-WORKDIR /
-
-RUN set -ex \
-    && ldconfig
+COPY --from=builder /usr/local /usr/local
 
 # Minimal command line test.
 RUN set -ex \
+    && ldconfig \
     && cs2cs \
     && gdalinfo --version \
     && geos-config --version \

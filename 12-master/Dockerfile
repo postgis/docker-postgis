@@ -1,3 +1,5 @@
+# "experimental" ;  only for testing!
+# multi-stage dockerfile;  minimal docker version >= 17.05
 FROM postgres:12 as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
@@ -76,7 +78,7 @@ RUN set -ex \
 
 # proj4
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 848ee7b6a8bf56a9d967f104ba2ef2ad92dc48d5
+ENV PROJ_GIT_HASH d5b0ea29b694a24fb1a951f6fe557f2e1bf78e62
 
 RUN set -ex \
     && cd /usr/src \
@@ -92,7 +94,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 531b9e623107a325a87cc5cbf7c6a399217b3fdd
+ENV GEOS_GIT_HASH 03e8090d9a2019402dbb0d3c2931eac75d11030e
 
 RUN set -ex \
     && cd /usr/src \
@@ -108,7 +110,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH b721e08285213c894af240b2b90660b2e6a865e8
+ENV GDAL_GIT_HASH b08803331acdc351637501e1db8f1e03d2d741f0
 
 RUN set -ex \
     && cd /usr/src \
@@ -123,12 +125,9 @@ RUN set -ex \
     && cd / \
     && rm -fr /usr/src/gdal
 
-# run ldconfig
-RUN set -ex \
-    && ldconfig
-
 # Minimal command line test.
 RUN set -ex \
+    && ldconfig \
     && cs2cs \
     && gdalinfo --version \
     && geos-config --version \
@@ -165,15 +164,11 @@ RUN set -ex \
       sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/local
-COPY --from=builder /usr/local .
-WORKDIR /
-
-RUN set -ex \
-    && ldconfig
+COPY --from=builder /usr/local /usr/local
 
 # Minimal command line test.
 RUN set -ex \
+    && ldconfig \
     && cs2cs \
     && gdalinfo --version \
     && geos-config --version \
@@ -183,7 +178,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 5b2e3cbd52408a9870a9886e5896123e4ff86118
+ENV POSTGIS_GIT_HASH a55328fe58bfec202f12cfa0e831dc3cf5b8e665
 
 RUN set -ex \
     && apt-get update \
