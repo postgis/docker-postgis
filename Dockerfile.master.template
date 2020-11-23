@@ -1,17 +1,141 @@
-FROM postgres:%%PG_MAJOR%%
+# "experimental" ;  only for testing!
+# multi-stage dockerfile;  minimal docker version >= 17.05
+FROM postgres:%%PG_MAJOR%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
+WORKDIR /
+
+# apt-get install
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      curl \
+      libboost-atomic%%BOOST_VERSION%% \
+      libboost-chrono%%BOOST_VERSION%% \
+      libboost-date-time%%BOOST_VERSION%% \
+      libboost-filesystem%%BOOST_VERSION%% \
+      libboost-program-options%%BOOST_VERSION%% \
+      libboost-serialization%%BOOST_VERSION%% \
+      libboost-system%%BOOST_VERSION%% \
+      libboost-test%%BOOST_VERSION%% \
+      libboost-thread%%BOOST_VERSION%% \
+      libboost-timer%%BOOST_VERSION%% \
+      libcgal%%CDAL_VERSION%% \
+      libcurl3-gnutls \
+      libexpat1 \
+      libgmp10 \
+      libgmpxx4ldbl \
+      libjson-c3 \
+      libmpfr6 \
+      libprotobuf-c1 \
+      libtiff5 \
+      libxml2 \
+      sqlite3 \
+      # build dependency
+      autoconf \
+      automake \
+      autotools-dev \
+      bison \
+      build-essential \
+      ca-certificates \
+      cmake \
+      git \
+      g++ \
+      libboost-all-dev \
+      libcgal-dev \
+      libcurl4-gnutls-dev \
+      libgmp-dev \
+      libjson-c-dev \
+      libmpfr-dev \
+      libprotobuf-c-dev \
+      libsqlite3-dev \
+      libtiff-dev \
+      libtool \
+      libxml2-dev \
+      make \
+      pkg-config \
+      protobuf-c-compiler \
+      xsltproc
+
+# sfcgal
 ENV SFCGAL_VERSION master
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
+
+RUN set -ex \
+    && mkdir -p /usr/src \
+    && cd /usr/src \
+    && git clone https://gitlab.com/Oslandia/SFCGAL.git \
+    && cd SFCGAL \
+    && git checkout ${SFCGAL_GIT_HASH} \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake .. \
+    && make -j$(nproc) \
+    && make install \
+    && cd / \
+    && rm -fr /usr/src/SFCGAL
+
+# proj4
 ENV PROJ_VERSION master
 ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
-ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+
+RUN set -ex \
+    && cd /usr/src \
+    && git clone https://github.com/OSGeo/PROJ.git \
+    && cd PROJ \
+    && git checkout ${PROJ_GIT_HASH} \
+    && ./autogen.sh \
+    && ./configure --disable-static \
+    && make -j$(nproc) \
+    && make install \
+    && cd / \
+    && rm -fr /usr/src/PROJ
+
+# geos
 ENV GEOS_VERSION master
 ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
+
+RUN set -ex \
+    && cd /usr/src \
+    && git clone https://github.com/libgeos/geos.git \
+    && cd geos \
+    && git checkout ${GEOS_GIT_HASH} \
+    && ./autogen.sh \
+    && ./configure --disable-static \
+    && make -j$(nproc) \
+    && make install \
+    && cd / \
+    && rm -fr /usr/src/geos
+
+# gdal
+ENV GDAL_VERSION master
+ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+
+RUN set -ex \
+    && cd /usr/src \
+    && git clone https://github.com/OSGeo/gdal.git \
+    && cd gdal \
+    && git checkout ${GDAL_GIT_HASH} \
+    && cd gdal \
+    && ./autogen.sh \
+    && ./configure --disable-static \
+    && make -j$(nproc) \
+    && make install \
+    && cd / \
+    && rm -fr /usr/src/gdal
+
+# Minimal command line test.
+RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version
+
+FROM postgres:%%PG_MAJOR%%
 
 RUN set -ex \
     && apt-get update \
@@ -38,6 +162,26 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local /usr/local
+
+# Minimal command line test.
+RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version
+
+# install postgis
+ENV POSTGIS_VERSION master
+ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
+
+RUN set -ex \
+    && apt-get update \
     && apt-get install -y --no-install-recommends \
       autoconf \
       automake \
@@ -64,67 +208,12 @@ RUN set -ex \
       postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
-    # sfcgal
-    && mkdir -p /usr/src/sfcgal \
-    && cd /usr/src/sfcgal \
-    && git init \
-    && git remote add origin https://gitlab.com/Oslandia/SFCGAL.git \
-    && git fetch --depth 1 origin :${SFCGAL_GIT_HASH} \
-    && git reset --hard FETCH_HEAD \
-    && mkdir cmake-build \
-    && cd cmake-build \
-    && cmake .. \
-    && make -j$(nproc) \
-    && make install \
-    && cd / \
-    && rm -fr /usr/src/sfcgal \
-    # proj4
-    && mkdir -p /usr/src/proj \
-    && cd /usr/src/proj \
-    && git init \
-    && git remote add origin https://github.com/OSGeo/PROJ.git \
-    && git fetch --depth 1 origin :${PROJ_GIT_HASH} \
-    && git reset --hard FETCH_HEAD \
-    && ./autogen.sh \
-    && ./configure --disable-static \
-    && make -j$(nproc) \
-    && make install \
-    && cd / \
-    && rm -fr /usr/src/proj \
-    # geos
-    && mkdir -p /usr/src/geos \
-    && cd /usr/src/geos \
-    && git init \
-    && git remote add origin https://github.com/libgeos/geos.git \
-    && git fetch --depth 1 origin :${GEOS_GIT_HASH} \
-    && git reset --hard FETCH_HEAD \
-    && ./autogen.sh \
-    && ./configure --disable-static \
-    && make -j$(nproc) \
-    && make install \
-    && cd / \
-    && rm -fr /usr/src/geos \
-    # gdal
-    && mkdir -p /usr/src/gdal \
-    && cd /usr/src/gdal \
-    && git init \
-    && git remote add origin https://github.com/OSGeo/gdal.git \
-    && git fetch --depth 1 origin :${GDAL_GIT_HASH} \
-    && git reset --hard FETCH_HEAD \
-    && cd gdal \
-    && ./autogen.sh \
-    && ./configure --disable-static \
-    && make -j$(nproc) \
-    && make install \
-    && cd / \
-    && rm -fr /usr/src/gdal \
+    && cd \
     # postgis
-    && mkdir -p /usr/src/postgis \
-    && cd /usr/src/postgis \
-    && git init \
-    && git remote add origin https://git.osgeo.org/gitea/postgis/postgis.git \
-    && git fetch --depth 1 origin :${POSTGIS_GIT_HASH} \
-    && git reset --hard FETCH_HEAD \
+    && cd /usr/src/ \
+    && git clone https://git.osgeo.org/gitea/postgis/postgis.git \
+    && cd postgis \
+    && git checkout ${POSTGIS_GIT_HASH} \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
@@ -172,14 +261,8 @@ RUN set -ex \
       postgresql-server-dev-$PG_MAJOR \
       protobuf-c-compiler \
       xsltproc \
-    && rm -rf /var/lib/apt/lists/* \
-    # Minimal command line test.
-    && cs2cs \
-    && gdalinfo --version \
-    && geos-config --version \
-    && ogr2ogr --version \
-    && proj \
-    && sfcgal-config --version
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
