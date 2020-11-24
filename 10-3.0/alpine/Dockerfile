@@ -2,8 +2,8 @@ FROM postgres:10-alpine
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
-ENV POSTGIS_VERSION 3.0.2
-ENV POSTGIS_SHA256 2d4eb79ea9af1257320922a8a7d2663d37189c805746e975a5951ee6dc5ac4ef
+ENV POSTGIS_VERSION 3.0.3
+ENV POSTGIS_SHA256 9aae25d46dc8b124f6e8a35886edcf9bd23a3ab049090edd8335b9c7324cae74
 
 RUN set -ex \
     \

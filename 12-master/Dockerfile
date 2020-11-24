@@ -78,7 +78,7 @@ RUN set -ex \
 
 # proj4
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH d5b0ea29b694a24fb1a951f6fe557f2e1bf78e62
+ENV PROJ_GIT_HASH 28aa4f13095eb69438d47f30663f13bd8780c0c1
 
 RUN set -ex \
     && cd /usr/src \
@@ -94,7 +94,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 03e8090d9a2019402dbb0d3c2931eac75d11030e
+ENV GEOS_GIT_HASH cdbf1c938d7a89990c3c2d2e58a36b689120f9d2
 
 RUN set -ex \
     && cd /usr/src \
@@ -110,7 +110,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH b08803331acdc351637501e1db8f1e03d2d741f0
+ENV GDAL_GIT_HASH b0a16e6a601ea49a1b7e7dd2039f50b1a0a0f061
 
 RUN set -ex \
     && cd /usr/src \
@@ -178,7 +178,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH a55328fe58bfec202f12cfa0e831dc3cf5b8e665
+ENV POSTGIS_GIT_HASH 1ba9345694db6de6e648c10fe7dba2028e67a201
 
 RUN set -ex \
     && apt-get update \
