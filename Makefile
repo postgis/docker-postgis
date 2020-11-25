@@ -12,20 +12,22 @@ do_default=true
 do_alpine=true
 
 # The following logic evaluates VERSION and VARIANT variables that may have
-# been previously specified, and unsets the "do" flags depending on the values.
+# been previously specified, and modifies the "do" flags depending on the values.
 # The VERSIONS variable is also set to contain the version(s) to be processed.
 ifdef VERSION
-    VERSIONS=$(VERSION) # If a version was speciefied, VERSIONS only contains the specified version
-    ifdef VARIANT
-        do_default=false             # If a variant was specified as an environment variable, don't process the default
-        ifneq ($(VARIANT),alpine)
-            do_alpine=false          # If alpine variant was specified as an environment variable, process the alpine variant
+    VERSIONS=$(VERSION) # If a version was specified, VERSIONS only contains the specified version
+    ifdef VARIANT       # If a variant is specified, unset all do flags and allow subsequent logic to set them again where appropriate
+        do_default=false
+        do_alpine=false
+        ifeq ($(VARIANT),default)
+            do_default=true
         endif
-    else
-       do_alpine=false               # If no variant was specified, don't process the alpine variant
+        ifeq ($(VARIANT),alpine)
+            do_alpine=true
+        endif
     endif
-    ifeq ("$(wildcard $(VERSION)/alpine)","")
-        do_alpine=false              # If no alpine subdirectory exists, don't process the alpine version
+    ifeq ("$(wildcard $(VERSION)/alpine)","") # If no alpine subdirectory exists, don't process the alpine version
+        do_alpine=false
     endif
 else # If no version was specified, VERSIONS should contain all versions
     VERSIONS = $(foreach df,$(wildcard */Dockerfile),$(df:%/Dockerfile=%))
