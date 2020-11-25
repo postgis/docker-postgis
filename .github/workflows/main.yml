@@ -1,0 +1,50 @@
+name: Docker PostGIS CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '15 5 * * 1'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  make-docker-images:
+    strategy:
+      matrix:
+        postgres: [9.5, 9.6, 10, 11, 12, 13]
+        postgis: ['2.5', '3.0']
+        variant: [default, alpine]
+        exclude:
+          - postgres: 13
+            postgis: '2.5'
+        include:
+          - postgres: 12
+            postgis: master
+            variant: default
+          - postgres: 13
+            postgis: master
+            variant: default
+    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
+    runs-on: ubuntu-20.04
+    continue-on-error: ${{ matrix.postgis == 'master' }}
+    env:
+      VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
+      VARIANT: ${{ matrix.variant }}
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v2
+
+    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
+      run: make test
+
+#    - name: Push docker image to dockerhub
+#      env:
+#        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+#        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+#      run: echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u $DOCKERHUB_USERNAME --password-stdin && make push
+
