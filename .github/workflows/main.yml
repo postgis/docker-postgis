@@ -11,6 +11,7 @@ defaults:
     shell: bash
 
 jobs:
+  
   make-docker-images:
     strategy:
       matrix:
@@ -41,10 +42,18 @@ jobs:
     - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
       run: make test
 
-#    - name: Push docker image to dockerhub
-#      env:
-#        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-#        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-#        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-#      run: echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u $DOCKERHUB_USERNAME --password-stdin && make push
+    - name: Login to dockerhub
+      uses: docker/login-action@v1
+      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+    - name: Push docker image to dockerhub
+      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      run: make push
 
