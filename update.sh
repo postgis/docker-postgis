@@ -21,13 +21,14 @@ declare -A debianSuite=(
     [10]='stretch-slim'
     [11]='stretch-slim'
     [12]='buster-slim'
-    [13]='buster-slim'        
+    [13]='buster-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
 declare -A postgisDebPkgNameVersionSuffixes=(
     [2.5]='2.5'
-    [3.0]='3'
+    [3.0]='3'    
+    [3.1]='3'
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
@@ -106,7 +107,7 @@ for version in "${versions[@]}"; do
     travisEnv='\n  - VERSION='"$version$travisEnv"
 
 done
-travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
+#travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
 
 # *** TRAVIS IS DISABLED FOR NOW ***
 #echo "$travis" > .travis.yml
