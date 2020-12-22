@@ -60,7 +60,7 @@ RUN set -ex \
 
 # sfcgal
 ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH ea18c06a0f5e6b433e36cad0593c3fe730e5b055
+ENV SFCGAL_GIT_HASH e1e67b58abf0e51dcce3bbb0ebd2429cca36c945
 
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -94,7 +94,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH cdbf1c938d7a89990c3c2d2e58a36b689120f9d2
+ENV GEOS_GIT_HASH c8e3fe8ae24a47790e063d4a64a34d99b71448d7
 
 RUN set -ex \
     && cd /usr/src \
@@ -178,7 +178,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 1ba9345694db6de6e648c10fe7dba2028e67a201
+ENV POSTGIS_GIT_HASH c0a97f9f80ae7af95403213fbd55ec9829dbbfc5
 
 RUN set -ex \
     && apt-get update \
