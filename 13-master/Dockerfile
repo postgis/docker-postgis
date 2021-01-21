@@ -56,7 +56,8 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc
+      xsltproc \
+      libpcre3-dev
 
 # sfcgal
 ENV SFCGAL_VERSION master
@@ -78,7 +79,7 @@ RUN set -ex \
 
 # proj4
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 28aa4f13095eb69438d47f30663f13bd8780c0c1
+ENV PROJ_GIT_HASH db2950e56ea26a0949b71378d73559a16fc40f26
 
 RUN set -ex \
     && cd /usr/src \
@@ -94,7 +95,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH c8e3fe8ae24a47790e063d4a64a34d99b71448d7
+ENV GEOS_GIT_HASH 98641ab14e01a6b5a6339f49fa6f1bee4424c7d0
 
 RUN set -ex \
     && cd /usr/src \
@@ -110,7 +111,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH b0a16e6a601ea49a1b7e7dd2039f50b1a0a0f061
+ENV GDAL_GIT_HASH b9f6c7d3eb4fe7e21d1d158388d222b4ff6da30b
 
 RUN set -ex \
     && cd /usr/src \
@@ -133,7 +134,8 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
+    && sfcgal-config --version \
+    && pcre-config  --version
 
 FROM postgres:13
 
@@ -162,6 +164,7 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
+      libpcre3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -174,11 +177,12 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
+    && sfcgal-config --version \
+    && pcre-config  --version
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH c0a97f9f80ae7af95403213fbd55ec9829dbbfc5
+ENV POSTGIS_GIT_HASH ba2f659c001142687caf05a3999501ecd37e307a
 
 RUN set -ex \
     && apt-get update \
@@ -219,6 +223,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
+        --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
 # regress check
@@ -256,6 +261,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
