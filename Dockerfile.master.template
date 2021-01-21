@@ -207,7 +207,6 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
-      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
