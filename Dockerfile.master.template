@@ -56,7 +56,8 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc
+      xsltproc \
+      libpcre3-dev
 
 # sfcgal
 ENV SFCGAL_VERSION master
@@ -133,7 +134,8 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
+    && sfcgal-config --version \
+    && pcre-config  --version
 
 FROM postgres:%%PG_MAJOR%%
 
@@ -162,6 +164,7 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
+      libpcre3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -174,7 +177,8 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
+    && sfcgal-config --version \
+    && pcre-config  --version
 
 # install postgis
 ENV POSTGIS_VERSION master
@@ -203,6 +207,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
@@ -219,6 +224,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
+        --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
 # regress check
@@ -256,6 +262,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
