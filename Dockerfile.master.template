@@ -77,9 +77,15 @@ RUN set -ex \
     && cd / \
     && rm -fr /usr/src/SFCGAL
 
-# proj4
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
+# proj
+###ENV PROJ_VERSION master
+###ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
+
+### Issue with proj v8 not being compatible
+### see https://github.com/postgis/docker-postgis/pull/220#issuecomment-765864268
+### Below is a temp fix
+ENV PROJ_VERSION 7.2.1
+ENV PROJ_GIT_HASH 1212e9b818e4511cc9389b9bdb5daa0bec1a12bd
 
 RUN set -ex \
     && cd /usr/src \
@@ -102,8 +108,9 @@ RUN set -ex \
     && git clone https://github.com/libgeos/geos.git \
     && cd geos \
     && git checkout ${GEOS_GIT_HASH} \
-    && ./autogen.sh \
-    && ./configure --disable-static \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake -DCMAKE_BUILD_TYPE=Release .. \
     && make -j$(nproc) \
     && make install \
     && cd / \

@@ -77,9 +77,15 @@ RUN set -ex \
     && cd / \
     && rm -fr /usr/src/SFCGAL
 
-# proj4
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH db2950e56ea26a0949b71378d73559a16fc40f26
+# proj
+###ENV PROJ_VERSION master
+###ENV PROJ_GIT_HASH db2950e56ea26a0949b71378d73559a16fc40f26
+
+### Issue with proj v8 not being compatible
+### see https://github.com/postgis/docker-postgis/pull/220#issuecomment-765864268
+### Below is a temp fix
+ENV PROJ_VERSION 7.2.1
+ENV PROJ_GIT_HASH 1212e9b818e4511cc9389b9bdb5daa0bec1a12bd
 
 RUN set -ex \
     && cd /usr/src \
@@ -95,15 +101,16 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 98641ab14e01a6b5a6339f49fa6f1bee4424c7d0
+ENV GEOS_GIT_HASH b2e7efc30a979954bf7dfa8fb252473afcd509b8
 
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
     && cd geos \
     && git checkout ${GEOS_GIT_HASH} \
-    && ./autogen.sh \
-    && ./configure --disable-static \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake -DCMAKE_BUILD_TYPE=Release .. \
     && make -j$(nproc) \
     && make install \
     && cd / \
@@ -111,7 +118,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH b9f6c7d3eb4fe7e21d1d158388d222b4ff6da30b
+ENV GDAL_GIT_HASH 93395860dd62e3850ed31b4c77c51a93fe2919c8
 
 RUN set -ex \
     && cd /usr/src \
@@ -182,7 +189,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH ba2f659c001142687caf05a3999501ecd37e307a
+ENV POSTGIS_GIT_HASH dbd1425e11283d7c7b840e293073d336c6362b59
 
 RUN set -ex \
     && apt-get update \
