@@ -174,7 +174,7 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      libpcre3-dev \
+      libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -187,8 +187,7 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version \
-    && pcre-config  --version
+    && sfcgal-config --version
 
 # install postgis
 ENV POSTGIS_VERSION master
@@ -212,6 +211,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \

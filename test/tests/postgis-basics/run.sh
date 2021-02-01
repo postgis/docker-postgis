@@ -24,7 +24,7 @@ psql() {
 		"$@"
 }
 
-tries=60
+tries=10
 while ! echo 'SELECT 1' | psql &> /dev/null; do
 	(( tries-- ))
 	if [ $tries -le 0 ]; then
