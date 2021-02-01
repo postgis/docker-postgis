@@ -65,6 +65,7 @@ RUN set -ex \
         geos \
         gdal \
         proj \
+        pcre \
         libstdc++ \
         protobuf-c \
 # clean

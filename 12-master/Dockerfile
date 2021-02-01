@@ -101,7 +101,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-###ENV GEOS_GIT_HASH a01c678f25f3da061ecefa7623444c61d6a24c89
+###ENV GEOS_GIT_HASH bb9d66b073cc86faec10954ee79a208433dd51ae
 ### lock Commits on Jan 19, 2021
 ### temp fix,  see https://github.com/postgis/docker-postgis/pull/220#issuecomment-770156316
 ENV GEOS_GIT_HASH 98641ab14e01a6b5a6339f49fa6f1bee4424c7d0
@@ -174,7 +174,7 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      libpcre3-dev \
+      libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -187,8 +187,7 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version \
-    && pcre-config  --version
+    && sfcgal-config --version
 
 # install postgis
 ENV POSTGIS_VERSION master
@@ -212,6 +211,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
