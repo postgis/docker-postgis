@@ -101,7 +101,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-###ENV GEOS_GIT_HASH bb9d66b073cc86faec10954ee79a208433dd51ae
+###ENV GEOS_GIT_HASH 17ab55a55aeed3e5a0a83b05428463bf1646471f
 ### lock Commits on Jan 19, 2021
 ### temp fix,  see https://github.com/postgis/docker-postgis/pull/220#issuecomment-770156316
 ENV GEOS_GIT_HASH 98641ab14e01a6b5a6339f49fa6f1bee4424c7d0
@@ -121,7 +121,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 43e6aa8cb8a1a012bd7f925a1309d2ac96ac1ed0
+ENV GDAL_GIT_HASH ae1531a20a4079fc0739676a3c01c760f674bbf6
 
 RUN set -ex \
     && cd /usr/src \
@@ -191,7 +191,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH dbd1425e11283d7c7b840e293073d336c6362b59
+ENV POSTGIS_GIT_HASH 52f942583b5b9c975799bf8eefadc756a5f56215
 
 RUN set -ex \
     && apt-get update \
