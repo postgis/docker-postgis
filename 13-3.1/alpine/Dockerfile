@@ -39,12 +39,14 @@ RUN set -ex \
         llvm10-dev \
         proj-dev \
         protobuf-c-dev \
+        pcre-dev \
     && cd /usr/src/postgis \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
+        --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
 # regress check
@@ -63,6 +65,7 @@ RUN set -ex \
         geos \
         gdal \
         proj \
+        pcre \
         libstdc++ \
         protobuf-c \
 # clean

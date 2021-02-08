@@ -37,3 +37,15 @@ done
 
 echo 'SELECT PostGIS_Version()' | psql
 [ "$(echo 'SELECT ST_X(ST_Point(0,0))' | psql)" = 0 ]
+
+
+## test address_standardizer extension
+echo 'CREATE EXTENSION address_standardizer;' | psql
+response=$(echo $'SELECT zip FROM parse_address(\'1 Devonshire Place, Boston, MA 02109-1234\') AS a;' | psql)
+if [ $response  = 02109 ]; then 
+	echo "address_standardizer extension installed and works!"
+else 
+	echo "address_standardizer extension test failed, returned response is $response"
+	exit 1
+fi
+

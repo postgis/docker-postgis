@@ -56,7 +56,8 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc
+      xsltproc \
+      libpcre3-dev
 
 # sfcgal
 ENV SFCGAL_VERSION master
@@ -76,9 +77,15 @@ RUN set -ex \
     && cd / \
     && rm -fr /usr/src/SFCGAL
 
-# proj4
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 28aa4f13095eb69438d47f30663f13bd8780c0c1
+# proj
+###ENV PROJ_VERSION master
+###ENV PROJ_GIT_HASH db2950e56ea26a0949b71378d73559a16fc40f26
+
+### Issue with proj v8 not being compatible
+### see https://github.com/postgis/docker-postgis/pull/220#issuecomment-765864268
+### Below is a temp fix
+ENV PROJ_VERSION 7.2.1
+ENV PROJ_GIT_HASH 1212e9b818e4511cc9389b9bdb5daa0bec1a12bd
 
 RUN set -ex \
     && cd /usr/src \
@@ -94,15 +101,19 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH c8e3fe8ae24a47790e063d4a64a34d99b71448d7
+###ENV GEOS_GIT_HASH 17ab55a55aeed3e5a0a83b05428463bf1646471f
+### lock Commits on Jan 19, 2021
+### temp fix,  see https://github.com/postgis/docker-postgis/pull/220#issuecomment-770156316
+ENV GEOS_GIT_HASH 98641ab14e01a6b5a6339f49fa6f1bee4424c7d0
 
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
     && cd geos \
     && git checkout ${GEOS_GIT_HASH} \
-    && ./autogen.sh \
-    && ./configure --disable-static \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake -DCMAKE_BUILD_TYPE=Release .. \
     && make -j$(nproc) \
     && make install \
     && cd / \
@@ -110,7 +121,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH b0a16e6a601ea49a1b7e7dd2039f50b1a0a0f061
+ENV GDAL_GIT_HASH ae1531a20a4079fc0739676a3c01c760f674bbf6
 
 RUN set -ex \
     && cd /usr/src \
@@ -133,7 +144,8 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
+    && sfcgal-config --version \
+    && pcre-config  --version
 
 FROM postgres:12
 
@@ -162,6 +174,7 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
+      libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -178,7 +191,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH c0a97f9f80ae7af95403213fbd55ec9829dbbfc5
+ENV POSTGIS_GIT_HASH 52f942583b5b9c975799bf8eefadc756a5f56215
 
 RUN set -ex \
     && apt-get update \
@@ -198,6 +211,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -219,6 +233,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
+        --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
 # regress check
@@ -256,6 +271,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
