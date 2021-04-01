@@ -40,14 +40,15 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -56,8 +57,7 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc \
-      libpcre3-dev
+      xsltproc
 
 # sfcgal
 ENV SFCGAL_VERSION master
@@ -161,14 +161,19 @@ RUN set -ex \
       libgmpxx4ldbl \
       libjson-c3 \
       libmpfr6 \
+      libpcre3 \
       libprotobuf-c1 \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
+
+ENV SFCGAL_GIT_HASH e1e67b58abf0e51dcce3bbb0ebd2429cca36c945
+ENV PROJ_GIT_HASH 381d4f6ff3d18efbcd4fdb626200dddab5f2c115
+ENV GEOS_GIT_HASH 32b99ca05b99b733dcd2c274c5f14e6402e6e5a1
+ENV GDAL_GIT_HASH 9ea9b3d4c4255ea748321bf707b2cf6e3416f4bf
 
 # Minimal command line test.
 RUN set -ex \
@@ -194,8 +199,8 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
@@ -249,20 +254,20 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
       libtool \
       libxml2-dev \
-      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
