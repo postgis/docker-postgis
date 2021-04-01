@@ -170,6 +170,11 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
+ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
+ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
+ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
+ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+
 # Minimal command line test.
 RUN set -ex \
     && ldconfig \
