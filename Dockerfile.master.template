@@ -40,14 +40,15 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -56,8 +57,7 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc \
-      libpcre3-dev
+      xsltproc
 
 # sfcgal
 ENV SFCGAL_VERSION master
@@ -161,11 +161,11 @@ RUN set -ex \
       libgmpxx4ldbl \
       libjson-c3 \
       libmpfr6 \
+      libpcre3 \
       libprotobuf-c1 \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -199,8 +199,8 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
@@ -254,20 +254,20 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
       libtool \
       libxml2-dev \
-      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
