@@ -40,14 +40,15 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -56,8 +57,7 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc \
-      libpcre3-dev
+      xsltproc
 
 # sfcgal
 ENV SFCGAL_VERSION master
@@ -78,14 +78,8 @@ RUN set -ex \
     && rm -fr /usr/src/SFCGAL
 
 # proj
-###ENV PROJ_VERSION master
-###ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
-
-### Issue with proj v8 not being compatible
-### see https://github.com/postgis/docker-postgis/pull/220#issuecomment-765864268
-### Below is a temp fix
-ENV PROJ_VERSION 7.2.1
-ENV PROJ_GIT_HASH 1212e9b818e4511cc9389b9bdb5daa0bec1a12bd
+ENV PROJ_VERSION master
+ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
 
 RUN set -ex \
     && cd /usr/src \
@@ -101,10 +95,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-###ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
-### lock Commits on Jan 19, 2021
-### temp fix,  see https://github.com/postgis/docker-postgis/pull/220#issuecomment-770156316
-ENV GEOS_GIT_HASH 98641ab14e01a6b5a6339f49fa6f1bee4424c7d0
+ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
 
 RUN set -ex \
     && cd /usr/src \
@@ -170,14 +161,19 @@ RUN set -ex \
       libgmpxx4ldbl \
       libjson-c3 \
       libmpfr6 \
+      libpcre3 \
       libprotobuf-c1 \
       libtiff5 \
       libxml2 \
       sqlite3 \
-      libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
+
+ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
+ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
+ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
+ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
 
 # Minimal command line test.
 RUN set -ex \
@@ -203,8 +199,8 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
@@ -258,20 +254,20 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
-      git \
       g++ \
+      git \
       libboost-all-dev \
       libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
+      libpcre3-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
       libtool \
       libxml2-dev \
-      libpcre3-dev \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
