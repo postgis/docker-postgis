@@ -1,5 +1,5 @@
 # Using PostGIS CLIs
-The base postgis/postgis image does not have PostGIS-related CLIs enabled. To use PostGIS CLIs that are NOT enabled by default (for example `raster2pgsql`) it's necessary to extend the base image.
+The base postgis/postgis image does not have PostGIS-related CLIs installed. To use PostGIS CLIs that are NOT installed by default (for example `raster2pgsql`) it's necessary to extend the base image.
 
 ```sh
 # Create a Docker image
