@@ -187,7 +187,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH d5f7a2adc923869ebe17b5fd0a6fa299d5b9c20c
+ENV POSTGIS_GIT_HASH 7a1eb0e60f84f8fd08c87623ee83d5e5e15562c2
 
 RUN set -ex \
     && apt-get update \
