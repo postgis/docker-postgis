@@ -79,7 +79,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH abf680353d1e7088c8751eea5a429ca1ffd22303
+ENV PROJ_GIT_HASH 6a9dbe7fd9114b3f1f29df0e4a0ef332f23433c1
 
 RUN set -ex \
     && cd /usr/src \
@@ -112,7 +112,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 561ba5c11fedfde81008dfed58ac61f0250d936b
+ENV GDAL_GIT_HASH b8857cbabf90abc92e17c07789c6e567f1b7e335
 
 RUN set -ex \
     && cd /usr/src \
@@ -171,9 +171,9 @@ RUN set -ex \
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH 0beb9d6dde86467d412e70037dca0e00091e673e
-ENV PROJ_GIT_HASH abf680353d1e7088c8751eea5a429ca1ffd22303
+ENV PROJ_GIT_HASH 6a9dbe7fd9114b3f1f29df0e4a0ef332f23433c1
 ENV GEOS_GIT_HASH 47f145efda619feb439cb5a69ab0886c4e872579
-ENV GDAL_GIT_HASH 561ba5c11fedfde81008dfed58ac61f0250d936b
+ENV GDAL_GIT_HASH b8857cbabf90abc92e17c07789c6e567f1b7e335
 
 # Minimal command line test.
 RUN set -ex \
