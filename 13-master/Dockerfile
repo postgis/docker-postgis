@@ -185,9 +185,9 @@ RUN set -ex \
     && proj \
     && sfcgal-config --version
 
-# install postgis
+# install postgis ( ~ Apr 27, 2021 )
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH d5f7a2adc923869ebe17b5fd0a6fa299d5b9c20c
+ENV POSTGIS_GIT_HASH 2851cd1908dc138d6a6ec389fdbedc8fc93f5e73
 
 RUN set -ex \
     && apt-get update \
