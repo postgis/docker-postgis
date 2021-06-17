@@ -21,9 +21,21 @@ In order to run a basic container capable of serving a PostGIS-enabled database,
 
 For more detailed instructions about how to start and control your Postgres container, see the documentation for the `postgres` image [here](https://registry.hub.docker.com/_/postgres/).
 
-Once you have started a database container, you can then connect to the database as follows:
+Once you have started a database container, you can then connect to the database either directly on the running container:
 
     docker exec -ti some-postgis psql -U postgres
+    
+... or starting a new container to run as a client. In this case you can use a user-defined network to link both containers:
+
+    docker network create some-network
+    
+    # Server container
+    docker run --name some-postgis --network some-network -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
+    
+    # Client container
+    docker run -it --rm --network some-network postgis/postgis psql -h some-postgis -U postgres
+    
+Check the documentation on the [`postgres` image](https://registry.hub.docker.com/_/postgres/) and [Docker networking](https://docs.docker.com/network/) for more details and alternatives on connecting different containers.
 
 See [the PostGIS documentation](http://postgis.net/docs/postgis_installation.html#create_new_db_extensions) for more details on your options for creating and using a spatially-enabled database.
 
