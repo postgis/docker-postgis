@@ -3,7 +3,7 @@ FROM postgres:9.6-alpine
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV POSTGIS_VERSION 3.1.2
-ENV POSTGIS_SHA256 c49b6baa4afe4aed6cc7333399897aaf7540b40779a939a4d5a81d0725f6c9f8
+#ENV POSTGIS_SHA256 c49b6baa4afe4aed6cc7333399897aaf7540b40779a939a4d5a81d0725f6c9f8
 
 RUN set -ex \
     \
@@ -12,8 +12,8 @@ RUN set -ex \
         openssl \
         tar \
     \
-    && wget -O postgis.tar.gz "https://github.com/postgis/postgis/archive/$POSTGIS_VERSION.tar.gz" \
-    && echo "$POSTGIS_SHA256 *postgis.tar.gz" | sha256sum -c - \
+    && wget -O postgis.tar.gz "https://ftp.osuosl.org/pub/osgeo/download/postgis/source/postgis-$POSTGIS_VERSION.tar.gz" \
+    #&& echo "$POSTGIS_SHA256 *postgis.tar.gz" | sha256sum -c - \
     && mkdir -p /usr/src/postgis \
     && tar \
         --extract \
@@ -36,12 +36,12 @@ RUN set -ex \
         gcc \
         gdal-dev \
         geos-dev \
-        llvm10-dev \
+        llvm11-dev \
         proj-dev \
         protobuf-c-dev \
         pcre-dev \
     && cd /usr/src/postgis \
-    && ./autogen.sh \
+    #&& ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \

@@ -8,8 +8,9 @@ This image ensures that the default database created by the parent `postgres` im
 
 * `postgis`
 * `postgis_topology`
-* `fuzzystrmatch`
 * `postgis_tiger_geocoder`
+
+Note: As of PostGIS v3.x, raster has been factored out into a separate extension `postgis_raster` which must be installed separately.
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
@@ -21,10 +22,21 @@ In order to run a basic container capable of serving a PostGIS-enabled database,
 
 For more detailed instructions about how to start and control your Postgres container, see the documentation for the `postgres` image [here](https://registry.hub.docker.com/_/postgres/).
 
-Once you have started a database container, you can then connect to the database as follows:
+Once you have started a database container, you can then connect to the database either directly on the running container:
 
-    docker run -it --link some-postgis:postgres --rm postgres \
-        sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
+    docker exec -ti some-postgis psql -U postgres
+    
+... or starting a new container to run as a client. In this case you can use a user-defined network to link both containers:
+
+    docker network create some-network
+    
+    # Server container
+    docker run --name some-postgis --network some-network -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
+    
+    # Client container
+    docker run -it --rm --network some-network postgis/postgis psql -h some-postgis -U postgres
+    
+Check the documentation on the [`postgres` image](https://registry.hub.docker.com/_/postgres/) and [Docker networking](https://docs.docker.com/network/) for more details and alternatives on connecting different containers.
 
 See [the PostGIS documentation](http://postgis.net/docs/postgis_installation.html#create_new_db_extensions) for more details on your options for creating and using a spatially-enabled database.
 
