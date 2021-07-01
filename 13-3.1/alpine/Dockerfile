@@ -5,6 +5,11 @@ LABEL maintainer="PostGIS Project - https://postgis.net"
 ENV POSTGIS_VERSION 3.1.2
 ENV POSTGIS_SHA256 c49b6baa4afe4aed6cc7333399897aaf7540b40779a939a4d5a81d0725f6c9f8
 
+#Temporary fix:
+#   for PostGIS 2.* - building a special geos
+#   reason:  PostGIS 2.5.5 is not working with GEOS 3.9.*
+ENV POSTGIS2_GEOS_VERSION tags/3.8.2
+
 RUN set -eux \
     \
     && apk add --no-cache --virtual .fetch-deps \
@@ -41,26 +46,28 @@ RUN set -eux \
         proj-dev \
         protobuf-c-dev \
      \
-     # Geos setup
+# GEOS setup
      && if   [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
-            apk add --no-cache --virtual .build-deps-geos geos-dev; \
+            apk add --no-cache --virtual .build-deps-geos geos-dev cunit-dev ; \
         elif [ $(printf %.1s "$POSTGIS_VERSION") == 2 ]; then \
             apk add --no-cache --virtual .build-deps-geos cmake git ; \
             cd /usr/src ; \
             git clone https://github.com/libgeos/geos.git ; \
             cd geos ; \
-            git checkout 24650422b3982f17cc493fe92a70228f2ad624b4 ; \
+            git checkout ${POSTGIS2_GEOS_VERSION} -b geos_build ; \
             mkdir cmake-build ; \
             cd cmake-build ; \
-            cmake -DCMAKE_BUILD_TYPE=Release .. ; \
-            make -j$(nproc) ; \
-            make install ; \
+                cmake -DCMAKE_BUILD_TYPE=Release .. ; \
+                make -j$(nproc) ; \
+                make check ; \
+                make install ; \
             cd / ; \
             rm -fr /usr/src/geos ; \
         else \
-            echo ".... unknown posgis ...." ; \
+            echo ".... unknown PosGIS ...." ; \
         fi \
     \
+# build PostGIS
     \
     && cd /usr/src/postgis \
     && gettextize \
@@ -76,7 +83,9 @@ RUN set -eux \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     && su postgres -c 'pg_ctl -D /tempdb start' \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
+    #&& make -j$(nproc) check RUNTESTFLAGS=--dumprestore PGUSER=postgres \
+    #&& make garden                                      PGUSER=postgres \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \
