@@ -5,7 +5,12 @@ LABEL maintainer="PostGIS Project - https://postgis.net"
 ENV POSTGIS_VERSION 3.1.2
 ENV POSTGIS_SHA256 c49b6baa4afe4aed6cc7333399897aaf7540b40779a939a4d5a81d0725f6c9f8
 
-RUN set -ex \
+#Temporary fix:
+#   for PostGIS 2.* - building a special geos
+#   reason:  PostGIS 2.5.5 is not working with GEOS 3.9.*
+ENV POSTGIS2_GEOS_VERSION tags/3.8.2
+
+RUN set -eux \
     \
     && apk add --no-cache --virtual .fetch-deps \
         ca-certificates \
@@ -25,53 +30,81 @@ RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
-        file \
-        json-c-dev \
-        libtool \
-        libxml2-dev \
-        make \
-        perl \
         clang-dev \
+        file \
         g++ \
         gcc \
         gdal-dev \
-        geos-dev \
-        llvm10-dev \
+        gettext-dev \
+        json-c-dev \
+        libtool \
+        libxml2-dev \
+        llvm11-dev \
+        make \
+        pcre-dev \
+        perl \
         proj-dev \
         protobuf-c-dev \
-        pcre-dev \
+     \
+# GEOS setup
+     && if   [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
+            apk add --no-cache --virtual .build-deps-geos geos-dev cunit-dev ; \
+        elif [ $(printf %.1s "$POSTGIS_VERSION") == 2 ]; then \
+            apk add --no-cache --virtual .build-deps-geos cmake git ; \
+            cd /usr/src ; \
+            git clone https://github.com/libgeos/geos.git ; \
+            cd geos ; \
+            git checkout ${POSTGIS2_GEOS_VERSION} -b geos_build ; \
+            mkdir cmake-build ; \
+            cd cmake-build ; \
+                cmake -DCMAKE_BUILD_TYPE=Release .. ; \
+                make -j$(nproc) ; \
+                make check ; \
+                make install ; \
+            cd / ; \
+            rm -fr /usr/src/geos ; \
+        else \
+            echo ".... unknown PosGIS ...." ; \
+        fi \
+    \
+# build PostGIS
+    \
     && cd /usr/src/postgis \
+    && gettextize \
     && ./autogen.sh \
-# configure options taken from:
-# https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
-#       --with-gui \
         --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
+    \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     && su postgres -c 'pg_ctl -D /tempdb start' \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
+    #&& make -j$(nproc) check RUNTESTFLAGS=--dumprestore PGUSER=postgres \
+    #&& make garden                                      PGUSER=postgres \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \
 # add .postgis-rundeps
     && apk add --no-cache --virtual .postgis-rundeps \
-        json-c \
-        geos \
         gdal \
-        proj \
-        pcre \
+        json-c \
         libstdc++ \
+        pcre \
+        proj \
         protobuf-c \
+     # Geos setup
+     && if [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
+            apk add --no-cache --virtual .postgis-rundeps-geos geos ; \
+        fi \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \
-    && apk del .fetch-deps .build-deps
+    && apk del .fetch-deps .build-deps .build-deps-geos
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
