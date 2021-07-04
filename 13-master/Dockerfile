@@ -1,27 +1,71 @@
-# "experimental" ;  only for testing!
-# multi-stage dockerfile;  minimal docker version >= 17.05
-FROM postgres:13 as builder
 
-LABEL maintainer="PostGIS Project - https://postgis.net"
+# postgis v1 - internal api
+# - multi-stage dockerfile;  minimal docker version >= 17.05
+# - debian based; expected https://github.com/docker-library/postgres/ upstream
+# - status: Experimental!
+
+# API version expecting v1
+ARG PGIS_API_VERSION
+
+ARG PGIS_V1_BASE_IMAGE=postgres:13
+
+ARG PGIS_V1_SFCGAL_REPOSITORY=https://gitlab.com/Oslandia/SFCGAL.git
+ARG PGIS_V1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
+ARG PGIS_V1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
+ARG PGIS_V1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
+ARG PGIS_V1_POSTGIS_REPOSITORY=https://git.osgeo.org/gitea/postgis/postgis.git
+
+ARG PGIS_V1_SFCGAL_CHECKOUT=e4fcf6b2e166a862db568a0419fe100849d3f447
+ARG PGIS_V1_PROJ_CHECKOUT=0c9a7bb22c75229a296b8125bc486531fab8a223
+ARG PGIS_V1_GEOS_CHECKOUT=1d971b32346a9e8845beb9b80b30074213f72a68
+ARG PGIS_V1_GDAL_CHECKOUT=a7dd21943f93db1cefe6c4d0b425b43f42ebbccf
+ARG PGIS_V1_POSTGIS_CHECKOUT=7de3ba7c17844c499f5763e6492b11b544e1cf1d
+
+ARG PGIS_V1_BOOST_VERSION=1.67.0
+ARG PGIS_V1_CDAL_VERSION=13
+
+# ------------------------------------------------------
+#   build step1
+# ------------------------------------------------------
+FROM postgres:13 as pgis-v1-builder-postgres-13
+
+ARG PGIS_V1_BASE_IMAGE
+ENV PGIS_V1_BASE_IMAGE ${PGIS_V1_BASE_IMAGE}
+
+ARG PGIS_API_VERSION
+ENV PGIS_API_VERSION=${PGIS_API_VERSION}
+
+ARG PGIS_V1_BOOST_VERSION
+ENV PGIS_V1_BOOST_VERSION=${PGIS_V1_BOOST_VERSION}
+ARG PGIS_V1_CDAL_VERSION
+ENV PGIS_V1_CDAL_VERSION=${PGIS_V1_CDAL_VERSION}
 
 WORKDIR /
 
-# apt-get install
-RUN set -ex \
+RUN set -eux \
+    # Check the api version - should be "v1"
+    && echo "PGIS_API_VERSION=${PGIS_API_VERSION}" \
+    && if [ "${PGIS_API_VERSION}" = "v1" ]; then \
+         echo "::: -> expected api version = v1 --> OK  :)" ; \
+       else \
+         echo "::: -> bad api version ; expecting v1 -> please update!" ; \
+         exit 1 ; \
+       fi \
+    \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic1.67.0 \
-      libboost-chrono1.67.0 \
-      libboost-date-time1.67.0 \
-      libboost-filesystem1.67.0 \
-      libboost-program-options1.67.0 \
-      libboost-serialization1.67.0 \
-      libboost-system1.67.0 \
-      libboost-test1.67.0 \
-      libboost-thread1.67.0 \
-      libboost-timer1.67.0 \
-      libcgal13 \
+      libboost-atomic${PGIS_V1_BOOST_VERSION} \
+      libboost-chrono${PGIS_V1_BOOST_VERSION} \
+      libboost-date-time${PGIS_V1_BOOST_VERSION} \
+      libboost-filesystem${PGIS_V1_BOOST_VERSION} \
+      libboost-program-options${PGIS_V1_BOOST_VERSION} \
+      libboost-serialization${PGIS_V1_BOOST_VERSION} \
+      libboost-system${PGIS_V1_BOOST_VERSION} \
+      libboost-test${PGIS_V1_BOOST_VERSION} \
+      libboost-thread${PGIS_V1_BOOST_VERSION} \
+      libboost-timer${PGIS_V1_BOOST_VERSION} \
+      libcgal${PGIS_V1_CDAL_VERSION} \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
@@ -57,18 +101,22 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc
+      xsltproc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # sfcgal
-ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH e4fcf6b2e166a862db568a0419fe100849d3f447
+ARG PGIS_V1_SFCGAL_REPOSITORY
+ENV PGIS_V1_SFCGAL_REPOSITORY ${PGIS_V1_SFCGAL_REPOSITORY}
+ARG PGIS_V1_SFCGAL_CHECKOUT
+ENV PGIS_V1_SFCGAL_CHECKOUT ${PGIS_V1_SFCGAL_CHECKOUT}
 
-RUN set -ex \
+RUN set -eux \
     && mkdir -p /usr/src \
     && cd /usr/src \
-    && git clone https://gitlab.com/Oslandia/SFCGAL.git \
+    && git clone ${PGIS_V1_SFCGAL_REPOSITORY} \
     && cd SFCGAL \
-    && git checkout ${SFCGAL_GIT_HASH} \
+    && git checkout ${PGIS_V1_SFCGAL_CHECKOUT} \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. \
@@ -78,14 +126,15 @@ RUN set -ex \
     && rm -fr /usr/src/SFCGAL
 
 # proj
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH d41c10c9e1e787a521a3841605a2e6024649eb3f
-
-RUN set -ex \
+ARG PGIS_V1_PROJ_REPOSITORY
+ENV PGIS_V1_PROJ_REPOSITORY ${PGIS_V1_PROJ_REPOSITORY}
+ARG PGIS_V1_PROJ_CHECKOUT
+ENV PGIS_V1_PROJ_CHECKOUT ${PGIS_V1_PROJ_CHECKOUT}
+RUN set -eux \
     && cd /usr/src \
-    && git clone https://github.com/OSGeo/PROJ.git \
+    && git clone ${PGIS_V1_PROJ_REPOSITORY} \
     && cd PROJ \
-    && git checkout ${PROJ_GIT_HASH} \
+    && git checkout ${PGIS_V1_PROJ_CHECKOUT} \
     && ./autogen.sh \
     && ./configure --disable-static \
     && make -j$(nproc) \
@@ -94,14 +143,15 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH cb127eeac823c8b48364c1b437844a5b65ff4748
-
-RUN set -ex \
+ARG PGIS_V1_GEOS_REPOSITORY
+ENV PGIS_V1_GEOS_REPOSITORY ${PGIS_V1_GEOS_REPOSITORY}
+ARG PGIS_V1_GEOS_CHECKOUT
+ENV PGIS_V1_GEOS_CHECKOUT ${PGIS_V1_GEOS_CHECKOUT}
+RUN set -eux \
     && cd /usr/src \
-    && git clone https://github.com/libgeos/geos.git \
+    && git clone ${PGIS_V1_GEOS_REPOSITORY} \
     && cd geos \
-    && git checkout ${GEOS_GIT_HASH} \
+    && git checkout ${PGIS_V1_GEOS_CHECKOUT} \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake -DCMAKE_BUILD_TYPE=Release .. \
@@ -111,14 +161,15 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH d7ae1604aabf4aa7fbf955f8913a4a892927b60d
-
-RUN set -ex \
+ARG PGIS_V1_GDAL_REPOSITORY
+ENV PGIS_V1_GDAL_REPOSITORY ${PGIS_V1_GDAL_REPOSITORY}
+ARG PGIS_V1_GDAL_CHECKOUT
+ENV PGIS_V1_GDAL_CHECKOUT ${PGIS_V1_GDAL_CHECKOUT}
+RUN set -eux \
     && cd /usr/src \
-    && git clone https://github.com/OSGeo/gdal.git \
+    && git clone ${PGIS_V1_GDAL_REPOSITORY} \
     && cd gdal \
-    && git checkout ${GDAL_GIT_HASH} \
+    && git checkout ${PGIS_V1_GDAL_CHECKOUT} \
     && cd gdal \
     && ./autogen.sh \
     && ./configure --disable-static \
@@ -128,7 +179,7 @@ RUN set -ex \
     && rm -fr /usr/src/gdal
 
 # Minimal command line test.
-RUN set -ex \
+RUN set -eux \
     && ldconfig \
     && cs2cs \
     && gdalinfo --version \
@@ -138,23 +189,35 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
-FROM postgres:13
+# ------------------------------------------------------
+#   build step2
+# ------------------------------------------------------
+FROM ${PGIS_V1_BASE_IMAGE}
+LABEL maintainer="PostGIS Project - https://postgis.net"
 
-RUN set -ex \
+ARG PGIS_V1_BASE_IMAGE
+ENV PGIS_V1_BASE_IMAGE ${PGIS_V1_BASE_IMAGE}
+
+ARG PGIS_V1_BOOST_VERSION
+ENV PGIS_V1_BOOST_VERSION=${PGIS_V1_BOOST_VERSION}
+ARG PGIS_V1_CDAL_VERSION
+ENV PGIS_V1_CDAL_VERSION=${PGIS_V1_CDAL_VERSION}
+
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic1.67.0 \
-      libboost-chrono1.67.0 \
-      libboost-date-time1.67.0 \
-      libboost-filesystem1.67.0 \
-      libboost-program-options1.67.0 \
-      libboost-serialization1.67.0 \
-      libboost-system1.67.0 \
-      libboost-test1.67.0 \
-      libboost-thread1.67.0 \
-      libboost-timer1.67.0 \
-      libcgal13 \
+      libboost-atomic${PGIS_V1_BOOST_VERSION} \
+      libboost-chrono${PGIS_V1_BOOST_VERSION} \
+      libboost-date-time${PGIS_V1_BOOST_VERSION} \
+      libboost-filesystem${PGIS_V1_BOOST_VERSION} \
+      libboost-program-options${PGIS_V1_BOOST_VERSION} \
+      libboost-serialization${PGIS_V1_BOOST_VERSION} \
+      libboost-system${PGIS_V1_BOOST_VERSION} \
+      libboost-test${PGIS_V1_BOOST_VERSION} \
+      libboost-thread${PGIS_V1_BOOST_VERSION} \
+      libboost-timer${PGIS_V1_BOOST_VERSION} \
+      libcgal${PGIS_V1_CDAL_VERSION} \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
@@ -168,16 +231,32 @@ RUN set -ex \
       sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /usr/local /usr/local
+COPY --from=pgis-v1-builder-postgres-13 /usr/local /usr/local
 
-ENV SFCGAL_GIT_HASH e4fcf6b2e166a862db568a0419fe100849d3f447
-ENV PROJ_GIT_HASH d41c10c9e1e787a521a3841605a2e6024649eb3f
-ENV GEOS_GIT_HASH cb127eeac823c8b48364c1b437844a5b65ff4748
-ENV GDAL_GIT_HASH d7ae1604aabf4aa7fbf955f8913a4a892927b60d
+ARG PGIS_V1_SFCGAL_REPOSITORY
+ENV PGIS_V1_SFCGAL_REPOSITORY ${PGIS_V1_SFCGAL_REPOSITORY}
+ARG PGIS_V1_SFCGAL_CHECKOUT
+ENV PGIS_V1_SFCGAL_CHECKOUT ${PGIS_V1_SFCGAL_CHECKOUT}
+
+ARG PGIS_V1_PROJ_REPOSITORY
+ENV PGIS_V1_PROJ_REPOSITORY ${PGIS_V1_PROJ_REPOSITORY}
+ARG PGIS_V1_PROJ_CHECKOUT
+ENV PGIS_V1_PROJ_CHECKOUT ${PGIS_V1_PROJ_CHECKOUT}
+
+ARG PGIS_V1_GEOS_REPOSITORY
+ENV PGIS_V1_GEOS_REPOSITORY ${PGIS_V1_GEOS_REPOSITORY}
+ARG PGIS_V1_GEOS_CHECKOUT
+ENV PGIS_V1_GEOS_CHECKOUT ${PGIS_V1_GEOS_CHECKOUT}
+
+ARG PGIS_V1_GDAL_REPOSITORY
+ENV PGIS_V1_GDAL_REPOSITORY ${PGIS_V1_GDAL_REPOSITORY}
+ARG PGIS_V1_GDAL_CHECKOUT
+ENV PGIS_V1_GDAL_CHECKOUT ${PGIS_V1_GDAL_CHECKOUT}
 
 # Minimal command line test.
-RUN set -ex \
+RUN set -eux \
     && ldconfig \
+    \
     && cs2cs \
     && gdalinfo --version \
     && geos-config --version \
@@ -186,8 +265,10 @@ RUN set -ex \
     && sfcgal-config --version
 
 # install postgis
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH e2d34f1190d0a1de352de455fcb5352df8997ace
+ARG PGIS_V1_POSTGIS_REPOSITORY
+ENV PGIS_V1_POSTGIS_REPOSITORY ${PGIS_V1_POSTGIS_REPOSITORY}
+ARG PGIS_V1_POSTGIS_CHECKOUT
+ENV PGIS_V1_POSTGIS_CHECKOUT ${PGIS_V1_POSTGIS_CHECKOUT}
 
 RUN set -ex \
     && apt-get update \
@@ -200,6 +281,7 @@ RUN set -ex \
       ca-certificates \
       cmake \
       g++ \
+      gettext \
       git \
       libboost-all-dev \
       libcgal-dev \
@@ -215,15 +297,16 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-$PG_MAJOR \
+      postgresql-server-dev-${PG_MAJOR} \
       protobuf-c-compiler \
       xsltproc \
     && cd \
     # postgis
     && cd /usr/src/ \
-    && git clone https://git.osgeo.org/gitea/postgis/postgis.git \
+    && git clone ${PGIS_V1_POSTGIS_REPOSITORY} \
     && cd postgis \
-    && git checkout ${POSTGIS_GIT_HASH} \
+    && git checkout ${PGIS_V1_POSTGIS_CHECKOUT} \
+    && gettextize \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
@@ -255,6 +338,7 @@ RUN set -ex \
       ca-certificates \
       cmake \
       g++ \
+      gettext \
       git \
       libboost-all-dev \
       libcgal-dev \
@@ -270,7 +354,7 @@ RUN set -ex \
       libxml2-dev \
       make \
       pkg-config \
-      postgresql-server-dev-$PG_MAJOR \
+      postgresql-server-dev-${PG_MAJOR} \
       protobuf-c-compiler \
       xsltproc \
     && apt-get clean \
