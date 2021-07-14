@@ -79,7 +79,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH d41c10c9e1e787a521a3841605a2e6024649eb3f
+ENV PROJ_GIT_HASH d902272785a55e48f6b46a907a34a71a5220fccc
 
 RUN set -ex \
     && cd /usr/src \
@@ -95,7 +95,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH cb127eeac823c8b48364c1b437844a5b65ff4748
+ENV GEOS_GIT_HASH 1bfc5b27493c552fd9a28823358a4c1f4c3b65f7
 
 RUN set -ex \
     && cd /usr/src \
@@ -112,7 +112,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH d7ae1604aabf4aa7fbf955f8913a4a892927b60d
+ENV GDAL_GIT_HASH 51e564e9364243be48da5e264c0507d7a9c546d8
 
 RUN set -ex \
     && cd /usr/src \
@@ -171,9 +171,9 @@ RUN set -ex \
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH e4fcf6b2e166a862db568a0419fe100849d3f447
-ENV PROJ_GIT_HASH d41c10c9e1e787a521a3841605a2e6024649eb3f
-ENV GEOS_GIT_HASH cb127eeac823c8b48364c1b437844a5b65ff4748
-ENV GDAL_GIT_HASH d7ae1604aabf4aa7fbf955f8913a4a892927b60d
+ENV PROJ_GIT_HASH d902272785a55e48f6b46a907a34a71a5220fccc
+ENV GEOS_GIT_HASH 1bfc5b27493c552fd9a28823358a4c1f4c3b65f7
+ENV GDAL_GIT_HASH 51e564e9364243be48da5e264c0507d7a9c546d8
 
 # Minimal command line test.
 RUN set -ex \
@@ -187,7 +187,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH e2d34f1190d0a1de352de455fcb5352df8997ace
+ENV POSTGIS_GIT_HASH 54a0c748dbb165847c1d0fe3abbe22dd48b8237a
 
 RUN set -ex \
     && apt-get update \

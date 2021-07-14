@@ -21,12 +21,14 @@ declare -A debianSuite=(
     [11]='stretch-slim'
     [12]='buster-slim'
     [13]='buster-slim'
+    [14]='buster-slim'
+    [14beta2]='buster-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
 declare -A postgisDebPkgNameVersionSuffixes=(
     [2.5]='2.5'
-    [3.0]='3'    
+    [3.0]='3'
     [3.1]='3'
 )
 
@@ -35,8 +37,8 @@ packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
 sfcgalGitHash="$(git ls-remote https://gitlab.com/Oslandia/SFCGAL.git heads/master | awk '{ print $1}')"
 projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
 gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"
-geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/master | awk '{ print $1}')"
-postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/master | awk '{ print $1}')"
+geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/main | awk '{ print $1}')"
+postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/main | awk '{ print $1}')"
 
 declare -A suitePackageList=() suiteArches=()
 travisEnv=
@@ -53,8 +55,9 @@ for version in "${versions[@]}"; do
         suiteArches["$suite"]="$(curl -fsSL "${packagesBase}/${suite}-pgdg/Release" | awk -F ':[[:space:]]+' '$1 == "Architectures" { gsub(/[[:space:]]+/, "|", $2); print $2 }')"
     fi
 
-    versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${packagesBase}/${suite}-pgdg/${postgresVersion}/binary-amd64/Packages.bz2" | bunzip2)"
-    fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersion"'" { print $2; exit }' || true)"
+    postgresVersionMain="$(echo "$postgresVersion" | awk -F 'beta' '{print $1}')"
+    versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${packagesBase}/${suite}-pgdg/${postgresVersionMain}/binary-amd64/Packages.bz2" | bunzip2)"
+    fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersionMain"'" { print $2; exit }' || true)"
     majorVersion="${postgresVersion%%.*}"
 
     if [ "$suite" = "stretch" ]; then
@@ -70,7 +73,7 @@ for version in "${versions[@]}"; do
         postgisFullVersion="$postgisVersion"
         postgisMajor=""
     else
-        postgisPackageName="postgresql-${postgresVersion}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
+        postgisPackageName="postgresql-${postgresVersionMain}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
         postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
         postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
     fi
