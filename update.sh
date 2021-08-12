@@ -22,7 +22,7 @@ declare -A debianSuite=(
     [12]='buster-slim'
     [13]='buster-slim'
     [14]='buster-slim'
-    [14beta2]='buster-slim'
+    [14beta3]='buster-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
