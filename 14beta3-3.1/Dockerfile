@@ -1,4 +1,4 @@
-FROM postgres:14beta2
+FROM postgres:14beta3
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
