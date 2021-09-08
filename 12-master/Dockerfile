@@ -61,7 +61,7 @@ RUN set -ex \
 
 # sfcgal
 ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH 495719bb7969973f322fea7de1c0982c4ebbdec8
+ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
 RUN set -ex \
     && mkdir -p /usr/src \
