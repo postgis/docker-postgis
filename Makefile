@@ -4,6 +4,9 @@
 # to be the latest.
 LATEST_VERSION=13-3.1
 
+AMD_VERSION1=9.6-2.5
+AMD_VERSION2=10-2.5
+AMD_VERSION3=11-2.5
 # The following flags are set based on VERSION and VARIANT environment variables
 # that may have been specified, and are used by rules to determine which
 # versions/variants are to be processed.  If no VERSION or VARIANT environment
@@ -123,11 +126,15 @@ push: $(foreach version,$(VERSIONS),push-$(version)) $(PUSH_DEP)
 define push-version
 push-$1: test-$1
 ifeq ($(do_default),true)
+ifeq ($(VERSIONS),$(filter $(VERSIONS),$(AMD_VERSION1) $(AMD_VERSION2) $(AMD_VERSION3) ))
 	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)
+else
+	$(DOCKER) buildx build --platform linux/arm64,linux/amd64 -t $(REPO_NAME)/$(IMAGE_NAME):$(version) --push $1
+endif
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
+	$(DOCKER) buildx build --platform linux/arm64,linux/amd64 -t $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine --push $1/alpine
 endif
 endif
 endef
