@@ -19,6 +19,8 @@ jobs:
         postgis: ['2.5', '3.1']
         variant: [default, alpine]
         exclude:
+          - postgres: 12
+            postgis: '2.5'        
           - postgres: 13
             postgis: '2.5'
           - postgres: '14beta3'
