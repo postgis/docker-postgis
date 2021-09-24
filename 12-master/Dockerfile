@@ -25,7 +25,7 @@ RUN set -ex \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
-      libjson-c3 \
+      libjson-c5 \
       libmpfr6 \
       libprotobuf-c1 \
       libtiff5 \
@@ -60,7 +60,10 @@ RUN set -ex \
 
 # sfcgal
 ENV SFCGAL_VERSION master
-ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
+#current:
+#ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
+#reverted for the last working version
+ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -157,7 +160,7 @@ RUN set -ex \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
-      libjson-c3 \
+      libjson-c5 \
       libmpfr6 \
       libpcre3 \
       libprotobuf-c1 \
@@ -168,7 +171,7 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
-ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
+#ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
 ENV PROJ_GIT_HASH 35fe5da17d67f793336decbc6e9280fe8f26ca8f
 ENV GEOS_GIT_HASH d107fccbdffb127af3b571a8f238e700a725984b
 ENV GDAL_GIT_HASH d3f2a360f3f21b85df8ed4c580914248ade7cc38
