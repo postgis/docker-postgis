@@ -1,9 +1,9 @@
-FROM postgres:14beta3
+FROM postgres:14rc1-bullseye
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV POSTGIS_MAJOR 3
-ENV POSTGIS_VERSION 3.1.3+dfsg-1~exp1.pgdg100+1+b1
+ENV POSTGIS_VERSION 3.1.3+dfsg-1~exp1.pgdg110+1+b1
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \

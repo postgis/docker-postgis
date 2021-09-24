@@ -1,6 +1,6 @@
 # "experimental" ;  only for testing!
 # multi-stage dockerfile;  minimal docker version >= 17.05
-FROM postgres:%%PG_MAJOR%% as builder
+FROM postgres:%%PG_MAJOR%%-%%DEBIAN_VERSION%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -21,7 +21,6 @@ RUN set -ex \
       libboost-test%%BOOST_VERSION%% \
       libboost-thread%%BOOST_VERSION%% \
       libboost-timer%%BOOST_VERSION%% \
-      libcgal%%CDAL_VERSION%% \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
@@ -138,7 +137,7 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
-FROM postgres:%%PG_MAJOR%%
+FROM postgres:%%PG_MAJOR%%-%%DEBIAN_VERSION%%
 
 RUN set -ex \
     && apt-get update \
@@ -154,7 +153,6 @@ RUN set -ex \
       libboost-test%%BOOST_VERSION%% \
       libboost-thread%%BOOST_VERSION%% \
       libboost-timer%%BOOST_VERSION%% \
-      libcgal%%CDAL_VERSION%% \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \

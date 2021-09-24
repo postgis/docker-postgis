@@ -2,8 +2,8 @@ FROM postgres:12-alpine
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
-ENV POSTGIS_VERSION 2.5.5
-ENV POSTGIS_SHA256 24b15ee36f3af02015da0e92a18f9046ea0b4fd24896196c8e6c2aa8e4b56baa
+ENV POSTGIS_VERSION 
+ENV POSTGIS_SHA256 0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5
 
 #Temporary fix:
 #   for PostGIS 2.* - building a special geos

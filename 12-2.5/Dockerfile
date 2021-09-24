@@ -1,9 +1,9 @@
-FROM postgres:12
+FROM postgres:12-bullseye
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV POSTGIS_MAJOR 2.5
-ENV POSTGIS_VERSION 2.5.5+dfsg-1.pgdg100+2
+ENV POSTGIS_VERSION 
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \

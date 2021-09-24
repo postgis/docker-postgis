@@ -1,4 +1,4 @@
-FROM postgres:10
+FROM postgres:10-stretch
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
