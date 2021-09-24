@@ -20,16 +20,16 @@ jobs:
         variant: [default, alpine]
         exclude:
           - postgres: 12
-            postgis: '2.5'        
+            postgis: '2.5'
           - postgres: 13
             postgis: '2.5'
           - postgres: '14rc1'
             postgis: '2.5'
         include:
-          - postgres: 12
+          - postgres: 13
             postgis: master
             variant: default
-          - postgres: 13
+          - postgres: 14rc1
             postgis: master
             variant: default
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
