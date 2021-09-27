@@ -1,6 +1,6 @@
 # "experimental" ;  only for testing!
 # multi-stage dockerfile;  minimal docker version >= 17.05
-FROM postgres:12 as builder
+FROM postgres:14rc1-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -11,22 +11,21 @@ RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic1.67.0 \
-      libboost-chrono1.67.0 \
-      libboost-date-time1.67.0 \
-      libboost-filesystem1.67.0 \
-      libboost-program-options1.67.0 \
-      libboost-serialization1.67.0 \
-      libboost-system1.67.0 \
-      libboost-test1.67.0 \
-      libboost-thread1.67.0 \
-      libboost-timer1.67.0 \
-      libcgal13 \
+      libboost-atomic1.74.0 \
+      libboost-chrono1.74.0 \
+      libboost-date-time1.74.0 \
+      libboost-filesystem1.74.0 \
+      libboost-program-options1.74.0 \
+      libboost-serialization1.74.0 \
+      libboost-system1.74.0 \
+      libboost-test1.74.0 \
+      libboost-thread1.74.0 \
+      libboost-timer1.74.0 \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
-      libjson-c3 \
+      libjson-c5 \
       libmpfr6 \
       libprotobuf-c1 \
       libtiff5 \
@@ -61,6 +60,9 @@ RUN set -ex \
 
 # sfcgal
 ENV SFCGAL_VERSION master
+#current:
+#ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
+#reverted for the last working version
 ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
 RUN set -ex \
@@ -79,7 +81,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 7ea1338d8cd5a8b738c0fba69dbe8a9188ae3a95
+ENV PROJ_GIT_HASH 35fe5da17d67f793336decbc6e9280fe8f26ca8f
 
 RUN set -ex \
     && cd /usr/src \
@@ -95,7 +97,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 5bb0eba2b33b924440b356334540e64b60c86201
+ENV GEOS_GIT_HASH d107fccbdffb127af3b571a8f238e700a725984b
 
 RUN set -ex \
     && cd /usr/src \
@@ -112,7 +114,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH a54ad87bda6fcde20b158b85a40d61c5e2fd0a29
+ENV GDAL_GIT_HASH d3f2a360f3f21b85df8ed4c580914248ade7cc38
 
 RUN set -ex \
     && cd /usr/src \
@@ -138,28 +140,27 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
-FROM postgres:12
+FROM postgres:14rc1-bullseye
 
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic1.67.0 \
-      libboost-chrono1.67.0 \
-      libboost-date-time1.67.0 \
-      libboost-filesystem1.67.0 \
-      libboost-program-options1.67.0 \
-      libboost-serialization1.67.0 \
-      libboost-system1.67.0 \
-      libboost-test1.67.0 \
-      libboost-thread1.67.0 \
-      libboost-timer1.67.0 \
-      libcgal13 \
+      libboost-atomic1.74.0 \
+      libboost-chrono1.74.0 \
+      libboost-date-time1.74.0 \
+      libboost-filesystem1.74.0 \
+      libboost-program-options1.74.0 \
+      libboost-serialization1.74.0 \
+      libboost-system1.74.0 \
+      libboost-test1.74.0 \
+      libboost-thread1.74.0 \
+      libboost-timer1.74.0 \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
-      libjson-c3 \
+      libjson-c5 \
       libmpfr6 \
       libpcre3 \
       libprotobuf-c1 \
@@ -170,10 +171,10 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
-ENV SFCGAL_GIT_HASH 495719bb7969973f322fea7de1c0982c4ebbdec8
-ENV PROJ_GIT_HASH 7ea1338d8cd5a8b738c0fba69dbe8a9188ae3a95
-ENV GEOS_GIT_HASH 5bb0eba2b33b924440b356334540e64b60c86201
-ENV GDAL_GIT_HASH a54ad87bda6fcde20b158b85a40d61c5e2fd0a29
+#ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
+ENV PROJ_GIT_HASH 35fe5da17d67f793336decbc6e9280fe8f26ca8f
+ENV GEOS_GIT_HASH d107fccbdffb127af3b571a8f238e700a725984b
+ENV GDAL_GIT_HASH d3f2a360f3f21b85df8ed4c580914248ade7cc38
 
 # Minimal command line test.
 RUN set -ex \
@@ -187,7 +188,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 6f9f76b7395f5c27c69c2136c53608e44ba0d38f
+ENV POSTGIS_GIT_HASH 0568b9c6c628ac55c643cd017c8edb5315718d7c
 
 RUN set -ex \
     && apt-get update \

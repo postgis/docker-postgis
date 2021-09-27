@@ -13,16 +13,16 @@ versions=( "${versions[@]%/Dockerfile}" )
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
-defaultDebianSuite='buster-slim'
+defaultDebianSuite='bullseye-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
-    [9.6]='stretch-slim'
-    [10]='stretch-slim'
-    [11]='stretch-slim'
-    [12]='buster-slim'
-    [13]='buster-slim'
-    [14]='buster-slim'
-    [14beta3]='buster-slim'
+    [9.6]='bullseye-slim'
+    [10]='bullseye-slim'
+    [11]='bullseye-slim'
+    [12]='bullseye-slim'
+    [13]='bullseye-slim'
+    [14]='bullseye-slim'
+    [14rc1]='bullseye-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
@@ -30,6 +30,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
     [2.5]='2.5'
     [3.0]='3'
     [3.1]='3'
+    [3.2]='3'
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
@@ -45,7 +46,12 @@ travisEnv=
 for version in "${versions[@]}"; do
     IFS=- read postgresVersion postgisVersion <<< "$version"
 
-    tag="${debianSuite[$postgresVersion]:-$defaultDebianSuite}"
+    if [ "2.5" == "$postgisVersion" ]; then
+        # posgis 2.5 only in the stretch ; no bullseye version
+        tag='stretch-slim'
+    else
+        tag="${debianSuite[$postgresVersion]:-$defaultDebianSuite}"
+    fi
     suite="${tag%%-slim}"
 
     if [ -z "${suitePackageList["$suite"]:+isset}" ]; then
@@ -55,17 +61,20 @@ for version in "${versions[@]}"; do
         suiteArches["$suite"]="$(curl -fsSL "${packagesBase}/${suite}-pgdg/Release" | awk -F ':[[:space:]]+' '$1 == "Architectures" { gsub(/[[:space:]]+/, "|", $2); print $2 }')"
     fi
 
-    postgresVersionMain="$(echo "$postgresVersion" | awk -F 'beta' '{print $1}')"
+    postgresVersionMain="$(echo "$postgresVersion" | awk -F 'alpha|beta|rc' '{print $1}')"
     versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${packagesBase}/${suite}-pgdg/${postgresVersionMain}/binary-amd64/Packages.bz2" | bunzip2)"
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersionMain"'" { print $2; exit }' || true)"
     majorVersion="${postgresVersion%%.*}"
 
-    if [ "$suite" = "stretch" ]; then
-        boostVersion="1.62.0"
-        cdalVersion="12"
-    else
+    if [ "$suite" = "bullseye" ]; then
+        boostVersion="1.74.0"
+    elif [ "$suite" = "buster" ]; then
         boostVersion="1.67.0"
-        cdalVersion="13"
+    elif [ "$suite" = "stretch" ]; then
+        boostVersion="1.62.0"
+    else
+        echo "Unknown debian version; stop"
+        exit 1
     fi
 
     if [ "master" == "$postgisVersion" ]; then
@@ -84,7 +93,7 @@ for version in "${versions[@]}"; do
           cp -p Dockerfile.master.template "$version/Dockerfile.template"
         fi
         mv "$version/Dockerfile.template" "$version/Dockerfile"
-        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%CDAL_VERSION%%/'"$cdalVersion"'/g;' "$version/Dockerfile"
+        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
     )
 
     if [ "master" == "$postgisVersion" ]; then
