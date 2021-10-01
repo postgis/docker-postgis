@@ -22,7 +22,6 @@ declare -A debianSuite=(
     [12]='bullseye-slim'
     [13]='bullseye-slim'
     [14]='bullseye-slim'
-    [14rc1]='bullseye-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
