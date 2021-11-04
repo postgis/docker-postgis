@@ -7,10 +7,9 @@ The `postgis/postgis` image provides tags for running Postgres with [PostGIS](ht
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
 * `postgis`
+* `postgis_raster`
 * `postgis_topology`
 * `postgis_tiger_geocoder`
-
-Note: As of PostGIS v3.x, raster has been factored out into a separate extension `postgis_raster` which must be installed separately.
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
