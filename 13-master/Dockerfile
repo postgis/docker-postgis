@@ -81,7 +81,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH ac113a8898cded7f5359f1edd3abc17a78eee9b4
+ENV PROJ_GIT_HASH ac882266b57d04720bb645b8144901127f7427cf
 
 RUN set -ex \
     && cd /usr/src \
@@ -114,14 +114,22 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH b1915c5658c57054292f8979ae0ab52be79bee79
+ENV GDAL_GIT_HASH ab147114c2f1387447c3efc1a7ac7dfc3d7bad9a
 
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
     && cd gdal \
     && git checkout ${GDAL_GIT_HASH} \
-    && cd gdal \
+    \
+    # gdal project directory structure - has been changed !
+    && if [ -d "gdal" ] ; then \
+        echo "Directory 'gdal' dir exists -> older version!" ; \
+        cd gdal ; \
+    else \
+        echo "Directory 'gdal' does not exists! Newer version! " ; \
+    fi \
+    \
     && ./autogen.sh \
     && ./configure --disable-static \
     && make -j$(nproc) \
@@ -172,9 +180,9 @@ RUN set -ex \
 COPY --from=builder /usr/local /usr/local
 
 #ENV SFCGAL_GIT_HASH b1646552e77acccce74b26686a2e048a74caacb7
-ENV PROJ_GIT_HASH ac113a8898cded7f5359f1edd3abc17a78eee9b4
+ENV PROJ_GIT_HASH ac882266b57d04720bb645b8144901127f7427cf
 ENV GEOS_GIT_HASH 55b6cc0a6dc95194bb6eb9a1370e84a126f4ab56
-ENV GDAL_GIT_HASH b1915c5658c57054292f8979ae0ab52be79bee79
+ENV GDAL_GIT_HASH ab147114c2f1387447c3efc1a7ac7dfc3d7bad9a
 
 # Minimal command line test.
 RUN set -ex \
@@ -241,6 +249,10 @@ RUN set -ex \
     && ldconfig \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \
@@ -280,4 +292,5 @@ RUN set -ex \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
+RUN cat /_pgis_full_version.txt
 
