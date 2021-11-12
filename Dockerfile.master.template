@@ -230,7 +230,7 @@ RUN set -ex \
     && cd \
     # postgis
     && cd /usr/src/ \
-    && git clone https://git.osgeo.org/gitea/postgis/postgis.git \
+    && git clone https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
     && ./autogen.sh \
@@ -253,6 +253,7 @@ RUN set -ex \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \

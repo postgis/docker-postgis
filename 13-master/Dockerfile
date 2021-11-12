@@ -97,7 +97,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 55b6cc0a6dc95194bb6eb9a1370e84a126f4ab56
+ENV GEOS_GIT_HASH 83d16f913eac72cccbe07c18033d6c1056bfbcee
 
 RUN set -ex \
     && cd /usr/src \
@@ -181,7 +181,7 @@ COPY --from=builder /usr/local /usr/local
 
 #ENV SFCGAL_GIT_HASH b1646552e77acccce74b26686a2e048a74caacb7
 ENV PROJ_GIT_HASH ac882266b57d04720bb645b8144901127f7427cf
-ENV GEOS_GIT_HASH 55b6cc0a6dc95194bb6eb9a1370e84a126f4ab56
+ENV GEOS_GIT_HASH 83d16f913eac72cccbe07c18033d6c1056bfbcee
 ENV GDAL_GIT_HASH ab147114c2f1387447c3efc1a7ac7dfc3d7bad9a
 
 # Minimal command line test.
@@ -230,7 +230,7 @@ RUN set -ex \
     && cd \
     # postgis
     && cd /usr/src/ \
-    && git clone https://git.osgeo.org/gitea/postgis/postgis.git \
+    && git clone https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
     && ./autogen.sh \
@@ -253,6 +253,7 @@ RUN set -ex \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \
