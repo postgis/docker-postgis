@@ -61,7 +61,7 @@ RUN set -ex \
 # sfcgal
 ENV SFCGAL_VERSION master
 #current:
-#ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
+#ENV SFCGAL_GIT_HASH b1646552e77acccce74b26686a2e048a74caacb7
 #reverted for the last working version
 ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
@@ -81,7 +81,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH ef5c77acb2a6286f856b9ad6940f78013f6b3c54
+ENV PROJ_GIT_HASH ac882266b57d04720bb645b8144901127f7427cf
 
 RUN set -ex \
     && cd /usr/src \
@@ -97,7 +97,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 79f75266db60f5c69f5ae48ebc8680b2b26c9f01
+ENV GEOS_GIT_HASH 83d16f913eac72cccbe07c18033d6c1056bfbcee
 
 RUN set -ex \
     && cd /usr/src \
@@ -114,14 +114,22 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH e9fd8ce797a07df68a12298b9fd3db9ff959932d
+ENV GDAL_GIT_HASH ab147114c2f1387447c3efc1a7ac7dfc3d7bad9a
 
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
     && cd gdal \
     && git checkout ${GDAL_GIT_HASH} \
-    && cd gdal \
+    \
+    # gdal project directory structure - has been changed !
+    && if [ -d "gdal" ] ; then \
+        echo "Directory 'gdal' dir exists -> older version!" ; \
+        cd gdal ; \
+    else \
+        echo "Directory 'gdal' does not exists! Newer version! " ; \
+    fi \
+    \
     && ./autogen.sh \
     && ./configure --disable-static \
     && make -j$(nproc) \
@@ -171,10 +179,10 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
-#ENV SFCGAL_GIT_HASH 815d5097f684dbc48b22041bf2047beab36df0a1
-ENV PROJ_GIT_HASH ef5c77acb2a6286f856b9ad6940f78013f6b3c54
-ENV GEOS_GIT_HASH 79f75266db60f5c69f5ae48ebc8680b2b26c9f01
-ENV GDAL_GIT_HASH e9fd8ce797a07df68a12298b9fd3db9ff959932d
+#ENV SFCGAL_GIT_HASH b1646552e77acccce74b26686a2e048a74caacb7
+ENV PROJ_GIT_HASH ac882266b57d04720bb645b8144901127f7427cf
+ENV GEOS_GIT_HASH 83d16f913eac72cccbe07c18033d6c1056bfbcee
+ENV GDAL_GIT_HASH ab147114c2f1387447c3efc1a7ac7dfc3d7bad9a
 
 # Minimal command line test.
 RUN set -ex \
@@ -188,7 +196,7 @@ RUN set -ex \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 21c3f2351e2f8ab0ca3a95ad6fbba04378f4aece
+ENV POSTGIS_GIT_HASH 530f7c88cbebf8357650ad7f337a46f61c0dd214
 
 RUN set -ex \
     && apt-get update \
@@ -222,7 +230,7 @@ RUN set -ex \
     && cd \
     # postgis
     && cd /usr/src/ \
-    && git clone https://git.osgeo.org/gitea/postgis/postgis.git \
+    && git clone https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
     && ./autogen.sh \
@@ -241,6 +249,11 @@ RUN set -ex \
     && ldconfig \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \
@@ -280,4 +293,5 @@ RUN set -ex \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
+RUN cat /_pgis_full_version.txt
 

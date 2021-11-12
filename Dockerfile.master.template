@@ -121,7 +121,15 @@ RUN set -ex \
     && git clone https://github.com/OSGeo/gdal.git \
     && cd gdal \
     && git checkout ${GDAL_GIT_HASH} \
-    && cd gdal \
+    \
+    # gdal project directory structure - has been changed !
+    && if [ -d "gdal" ] ; then \
+        echo "Directory 'gdal' dir exists -> older version!" ; \
+        cd gdal ; \
+    else \
+        echo "Directory 'gdal' does not exists! Newer version! " ; \
+    fi \
+    \
     && ./autogen.sh \
     && ./configure --disable-static \
     && make -j$(nproc) \
@@ -222,7 +230,7 @@ RUN set -ex \
     && cd \
     # postgis
     && cd /usr/src/ \
-    && git clone https://git.osgeo.org/gitea/postgis/postgis.git \
+    && git clone https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
     && ./autogen.sh \
@@ -241,6 +249,11 @@ RUN set -ex \
     && ldconfig \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
     && rm -rf /tmp/pgis_reg \
@@ -280,4 +293,5 @@ RUN set -ex \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
+RUN cat /_pgis_full_version.txt
 
