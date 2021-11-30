@@ -1,4 +1,4 @@
-FROM postgres:13-alpine
+FROM postgres:13-alpine3.15
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -39,7 +39,7 @@ RUN set -eux \
         json-c-dev \
         libtool \
         libxml2-dev \
-        llvm11-dev \
+        llvm-dev \
         make \
         pcre-dev \
         perl \
