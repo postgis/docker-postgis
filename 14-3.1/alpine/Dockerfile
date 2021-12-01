@@ -1,4 +1,4 @@
-FROM postgres:14-alpine
+FROM postgres:14-alpine3.14
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
