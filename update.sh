@@ -27,8 +27,6 @@ declare -A debianSuite=(
 defaultPostgisDebPkgNameVersionSuffix='3'
 declare -A postgisDebPkgNameVersionSuffixes=(
     [2.5]='2.5'
-    [3.0]='3'
-    [3.1]='3'
     [3.2]='3'
 )
 
@@ -41,7 +39,6 @@ geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/main | aw
 postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/main | awk '{ print $1}')"
 
 declare -A suitePackageList=() suiteArches=()
-travisEnv=
 for version in "${versions[@]}"; do
     IFS=- read postgresVersion postgisVersion <<< "$version"
 
@@ -112,13 +109,5 @@ for version in "${versions[@]}"; do
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
             sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
         )
-        travisEnv="\n  - VERSION=$version VARIANT=$variant$travisEnv"
     done
-    travisEnv='\n  - VERSION='"$version$travisEnv"
-
 done
-#travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
-
-# *** TRAVIS IS DISABLED FOR NOW ***
-#echo "$travis" > .travis.yml
-

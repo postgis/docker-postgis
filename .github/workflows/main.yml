@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         postgres: [9.6, 10, 11, 12, 13, 14]
-        postgis: ['2.5', '3.1']
+        postgis: ['2.5', '3.2']
         variant: [default, alpine]
         exclude:
           - postgres: 12
