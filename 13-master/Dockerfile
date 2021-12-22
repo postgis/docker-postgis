@@ -97,7 +97,8 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 1470d0a439b01a0d6ce601fb718177327a06fe14
+# Commits on Dec 16, 2021
+ENV GEOS_GIT_HASH d30798e5c0c9956b5e90e4960f0c445211ed8fe6
 
 RUN set -ex \
     && cd /usr/src \
