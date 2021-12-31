@@ -1,9 +1,9 @@
-FROM postgres:11-stretch
+FROM arm64v8/postgres:11-buster
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
 ENV POSTGIS_MAJOR 2.5
-ENV POSTGIS_VERSION 2.5.5+dfsg-1.pgdg90+2
+ENV POSTGIS_VERSION 2.5.5+dfsg-1.pgdg100+2
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
