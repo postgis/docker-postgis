@@ -47,9 +47,11 @@ RUN set -euxo pipefail; \
      \
 # GEOS/PROJ/GDAL setup
      && if   [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
-            apk add --no-cache --virtual .build-deps-geos-proj-gdal geos-dev proj-dev gdal-dev ; \
+            apk add --no-cache --virtual .build-deps-geos-proj-gdal \
+                    geos-dev proj-dev gdal-dev || exit 1 ; \
         elif [ $(printf %.1s "$POSTGIS_VERSION") == 2 ]; then \
             \
+            set -eux ; \
             apk add --no-cache --virtual   .run-deps-geos-proj-gdal \
                 curl \
                 expat \
@@ -149,7 +151,8 @@ RUN set -euxo pipefail; \
         protobuf-c \
 # geos/proj/gdal setup
      && if [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
-            apk add --no-cache --virtual .postgis-rundeps-geos-proj-gdal geos proj gdal ; \
+            apk add --no-cache --virtual .postgis-rundeps-geos-proj-gdal \
+                    geos proj gdal  || exit 1 ; \
         fi \
 # clean
     && cd / \
@@ -157,7 +160,8 @@ RUN set -euxo pipefail; \
     && apk del .fetch-deps .build-deps .build-deps-geos-proj-gdal \
 # post check - if missing any libs
     && if [ $(printf %.1s "$POSTGIS_VERSION") == 2 ]; then \
-           cs2cs \
+        set -eux ; \
+        cs2cs \
         && gdalinfo --version \
         && geos-config --version \
         && ogr2ogr --version \
