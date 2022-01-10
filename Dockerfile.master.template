@@ -48,6 +48,7 @@ RUN set -ex \
       libjson-c-dev \
       libmpfr-dev \
       libpcre3-dev \
+      libpq-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
