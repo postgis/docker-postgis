@@ -195,6 +195,10 @@ RUN set -ex \
     && proj \
     && sfcgal-config --version
 
+# Testing ogr2ogr PostgreSQL driver.
+RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
+    || echo "ogr2ogr missing PostgreSQL driver" && exit 1
+
 # install postgis
 ENV POSTGIS_VERSION master
 ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
