@@ -48,6 +48,7 @@ RUN set -ex \
       libjson-c-dev \
       libmpfr-dev \
       libpcre3-dev \
+      libpq-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -193,6 +194,10 @@ RUN set -ex \
     && ogr2ogr --version \
     && proj \
     && sfcgal-config --version
+
+# Testing ogr2ogr PostgreSQL driver.
+RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
+    || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
 ENV POSTGIS_VERSION master
