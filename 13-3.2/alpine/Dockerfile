@@ -9,24 +9,32 @@ RUN set -eux \
     \
     &&  if   [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
             set -eux ; \
+            #
+            # using only v3.15
+            #
             #GEOS: https://pkgs.alpinelinux.org/packages?name=geos&branch=v3.15 \
             export GEOS_ALPINE_VER=3.10 ; \
             #GDAL: https://pkgs.alpinelinux.org/packages?name=gdal&branch=v3.15 \
             export GDAL_ALPINE_VER=3.4 ; \
             #PROJ: https://pkgs.alpinelinux.org/packages?name=proj&branch=v3.15 \
             export PROJ_ALPINE_VER=8.2 ; \
+            #
         elif [ $(printf %.1s "$POSTGIS_VERSION") == 2 ]; then \
             set -eux ; \
+            #
+            # using older branches v3.13; v3.14 for GEOS,GDAL,PROJ
+            #
             #GEOS: https://pkgs.alpinelinux.org/packages?name=geos&branch=v3.13 \
             export GEOS_ALPINE_VER=3.8 ; \
             #GDAL: https://pkgs.alpinelinux.org/packages?name=gdal&branch=v3.14 \
             export GDAL_ALPINE_VER=3.2 ; \
             #PROJ: https://pkgs.alpinelinux.org/packages?name=proj&branch=v3.14 \
             export PROJ_ALPINE_VER=7.2 ; \
+            #
             \
-            echo 'https://dl-cdn.alpinelinux.org/alpine/v3.14/main' >> /etc/apk/repositories ; \
+            echo 'https://dl-cdn.alpinelinux.org/alpine/v3.14/main'      >> /etc/apk/repositories ; \
             echo 'https://dl-cdn.alpinelinux.org/alpine/v3.14/community' >> /etc/apk/repositories ; \
-            echo 'https://dl-cdn.alpinelinux.org/alpine/v3.13/main' >> /etc/apk/repositories ; \
+            echo 'https://dl-cdn.alpinelinux.org/alpine/v3.13/main'      >> /etc/apk/repositories ; \
             echo 'https://dl-cdn.alpinelinux.org/alpine/v3.13/community' >> /etc/apk/repositories ; \
             \
         else \
@@ -93,7 +101,7 @@ RUN set -eux \
     #&& make garden                                      PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
-    && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "SELECT version();"'              >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
@@ -114,7 +122,7 @@ RUN set -eux \
     && cd / \
     && rm -rf /usr/src/postgis \
     && apk del .fetch-deps .build-deps \
-# print PostGIS_Full_Version() for the log.
+# print PostGIS_Full_Version() for the log. ( experimental & internal )
     && cat /_pgis_full_version.txt
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
