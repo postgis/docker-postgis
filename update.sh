@@ -36,7 +36,7 @@ sfcgalGitHash="$(git ls-remote https://gitlab.com/Oslandia/SFCGAL.git heads/mast
 projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
 gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"
 geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/main | awk '{ print $1}')"
-postgisGitHash="$(git ls-remote https://git.osgeo.org/gitea/postgis/postgis.git heads/main | awk '{ print $1}')"
+postgisGitHash="$(git ls-remote https://github.com/postgis/postgis.git heads/master | awk '{ print $1}')"
 
 declare -A suitePackageList=() suiteArches=()
 for version in "${versions[@]}"; do
