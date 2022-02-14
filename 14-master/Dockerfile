@@ -82,17 +82,33 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH f67c82912fde55a58d565697263306c840b3efd4
+ENV PROJ_GIT_HASH d4deb549982a16c0b7b324739af781d2779f2324
 
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
     && cd PROJ \
     && git checkout ${PROJ_GIT_HASH} \
-    && ./autogen.sh \
-    && ./configure --disable-static \
-    && make -j$(nproc) \
-    && make install \
+    # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
+    && if [ -f "autogen.sh" ] ; then \
+        set -eux \
+        && echo "autotools version: 'autogen.sh' exists! Older version!"  \
+        && ./autogen.sh \
+        && ./configure --disable-static \
+        && make -j$(nproc) \
+        && make install \
+        ; \
+    else \
+        set -eux \
+        && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
+        && mkdir build \
+        && cd build \
+        && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+        && make -j$(nproc) \
+        && make install \
+        ; \
+    fi \
+    \
     && cd / \
     && rm -fr /usr/src/PROJ
 
@@ -181,7 +197,7 @@ RUN set -ex \
 COPY --from=builder /usr/local /usr/local
 
 #ENV SFCGAL_GIT_HASH b547721ba083e98252101431e7df0015631784b0
-ENV PROJ_GIT_HASH f67c82912fde55a58d565697263306c840b3efd4
+ENV PROJ_GIT_HASH d4deb549982a16c0b7b324739af781d2779f2324
 ENV GEOS_GIT_HASH 0d9bdb0e33333d0a025874c9f257dee1c760ef25
 ENV GDAL_GIT_HASH bcf71b709183846869e64fdfccbea4b435cf463e
 
