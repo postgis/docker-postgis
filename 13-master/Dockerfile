@@ -62,7 +62,7 @@ RUN set -ex \
 # sfcgal
 ENV SFCGAL_VERSION master
 #current:
-#ENV SFCGAL_GIT_HASH cf03cf7869778f69f8baddfbd73415bf99499663
+#ENV SFCGAL_GIT_HASH b547721ba083e98252101431e7df0015631784b0
 #reverted for the last working version
 ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
@@ -82,23 +82,39 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 4ecb0abb8c3d3f5efcdd79643bc3302aa9bc6d1e
+ENV PROJ_GIT_HASH d4deb549982a16c0b7b324739af781d2779f2324
 
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
     && cd PROJ \
     && git checkout ${PROJ_GIT_HASH} \
-    && ./autogen.sh \
-    && ./configure --disable-static \
-    && make -j$(nproc) \
-    && make install \
+    # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
+    && if [ -f "autogen.sh" ] ; then \
+        set -eux \
+        && echo "autotools version: 'autogen.sh' exists! Older version!"  \
+        && ./autogen.sh \
+        && ./configure --disable-static \
+        && make -j$(nproc) \
+        && make install \
+        ; \
+    else \
+        set -eux \
+        && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
+        && mkdir build \
+        && cd build \
+        && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+        && make -j$(nproc) \
+        && make install \
+        ; \
+    fi \
+    \
     && cd / \
     && rm -fr /usr/src/PROJ
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 70d2111bd66ea848809e5738896256199d9a7cba
+ENV GEOS_GIT_HASH 0d9bdb0e33333d0a025874c9f257dee1c760ef25
 
 RUN set -ex \
     && cd /usr/src \
@@ -115,7 +131,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 642888ff9f9e1814f962d4cff5082257a47e84fd
+ENV GDAL_GIT_HASH bcf71b709183846869e64fdfccbea4b435cf463e
 
 RUN set -ex \
     && cd /usr/src \
@@ -180,10 +196,10 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
-#ENV SFCGAL_GIT_HASH cf03cf7869778f69f8baddfbd73415bf99499663
-ENV PROJ_GIT_HASH 4ecb0abb8c3d3f5efcdd79643bc3302aa9bc6d1e
-ENV GEOS_GIT_HASH 70d2111bd66ea848809e5738896256199d9a7cba
-ENV GDAL_GIT_HASH 642888ff9f9e1814f962d4cff5082257a47e84fd
+#ENV SFCGAL_GIT_HASH b547721ba083e98252101431e7df0015631784b0
+ENV PROJ_GIT_HASH d4deb549982a16c0b7b324739af781d2779f2324
+ENV GEOS_GIT_HASH 0d9bdb0e33333d0a025874c9f257dee1c760ef25
+ENV GDAL_GIT_HASH bcf71b709183846869e64fdfccbea4b435cf463e
 
 # Minimal command line test.
 RUN set -ex \
@@ -201,7 +217,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 4fa57df0b3bd726346e1fd272921a29ab888b55f
+ENV POSTGIS_GIT_HASH b044ad843deecbb704651835b4b71f7b1ac48277
 
 RUN set -ex \
     && apt-get update \
