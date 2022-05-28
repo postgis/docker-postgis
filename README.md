@@ -67,7 +67,6 @@ Recomended version for the new users: `postgis/postgis:14-3.2`
 | [postgis/postgis:13-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-master) | [Dockerfile](./13-master/Dockerfile) | debian:bullseye | 13 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:14-3.3.0alpha1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.3.0alpha1-alpine) | [Dockerfile](./14-3.3.0alpha1/alpine/Dockerfile) | alpine:3.16 | 14 | 3.3.0alpha1 |
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](./14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:15beta1-3.2.1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta1-3.2.1-alpine) | [Dockerfile](./15beta1-3.2.1/alpine/Dockerfile) | alpine:3.16 | 15beta1 | 3.2.1 |
 | [postgis/postgis:15beta1-3.3.0alpha1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta1-3.3.0alpha1-alpine) | [Dockerfile](./15beta1-3.3.0alpha1/alpine/Dockerfile) | alpine:3.16 | 15beta1 | 3.3.0alpha1 |
 | [postgis/postgis:15beta1-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta1-master) | [Dockerfile](./15beta1-master/Dockerfile) | debian:bullseye | 15beta1 | development: postgis, geos, proj, gdal |
 

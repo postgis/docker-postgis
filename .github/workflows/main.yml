@@ -36,9 +36,6 @@ jobs:
             postgis: '3.3.0alpha1'
             variant: alpine
           - postgres: '15beta1'
-            postgis: '3.2.1'
-            variant: alpine
-          - postgres: '15beta1'
             postgis: '3.3.0alpha1'
             variant: alpine
           - postgres: '15beta1'
