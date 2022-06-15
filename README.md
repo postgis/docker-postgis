@@ -14,6 +14,19 @@ Note: As of PostGIS v3.x, raster has been factored out into a separate extension
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
+## Versions
+
+This repo provides images tagged a few different ways:
+* `$version` - debian package;
+  * pro: matured; recomended for the most users; easy to extend with other debian packages
+  * con: older geos, proj, gdal
+* `$version-alpine` - alpine based.
+  * pro: minimal image size; recommended for testing.
+  * con: musl based; harder to extend.
+* `$version-master` - last "master"/"main" for posgis.geos,gdal dependencies; experimental
+  * pro: for testing;
+  * con: larger image size. experimental; not easy to extend
+
 ## Usage
 
 In order to run a basic container capable of serving a PostGIS-enabled database, start a container as follows:
