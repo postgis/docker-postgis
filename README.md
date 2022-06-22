@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/postgis/docker-postgis/workflows/Docker%20PostGIS%20CI/badge.svg)](https://github.com/postgis/docker-postgis/actions) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS both 2.5.x and 3.2.x for each supported version of Postgres (10, 11, 12, 13 and 14).  Additionally, an image version is provided which is built from the latest version of Postgres (14) with versions of PostGIS and its dependencies built from their respective master branches.
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS both 2.5.x and 3.2.x for each supported version of Postgres (10, 11, 12, 13 and 14).  Additionally, an image version is provided which is built from the latest two versions of Postgres (13, 14) with versions of PostGIS and its dependencies built from their respective master branches.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -14,7 +14,7 @@ Note: As of PostGIS v3.x, raster has been factored out into a separate extension
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2022-05-28 - )
+# Versions ( 2022-06-22 )
 
 Recomended version for the new users: `postgis/postgis:14-3.2`
 
