@@ -10,6 +10,15 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/Dockerfile}" )
 
+for optimized in debian alpine test; do
+    rm -f      _dockerlists_${optimized}.md
+    echo " " > _dockerlists_${optimized}.md
+    echo "| DockerHub image | Dockerfile | OS | Postgres | PostGIS | " >> _dockerlists_${optimized}.md
+    echo "| --------------- | ---------- | -- | -------- | ------- | " >> _dockerlists_${optimized}.md
+done
+
+dockerhublink="https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name="
+
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
@@ -22,12 +31,16 @@ declare -A debianSuite=(
     [12]='bullseye-slim'
     [13]='bullseye-slim'
     [14]='bullseye-slim'
+    [15]='bullseye-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
 declare -A postgisDebPkgNameVersionSuffixes=(
     [2.5]='2.5'
+    [3.0]='3'
+    [3.1]='3'
     [3.2]='3'
+    [3.3]='3'
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
@@ -41,6 +54,11 @@ postgisGitHash="$(git ls-remote https://github.com/postgis/postgis.git heads/mas
 declare -A suitePackageList=() suiteArches=()
 for version in "${versions[@]}"; do
     IFS=- read postgresVersion postgisVersion <<< "$version"
+
+    echo " "
+    echo "---- generate Dockerfile for $version ----"
+    echo "postgresVersion=$postgresVersion"
+    echo "postgisVersion=$postgisVersion"
 
     if [ "2.5" == "$postgisVersion" ]; then
         # posgis 2.5 only in the stretch ; no bullseye version
@@ -60,7 +78,6 @@ for version in "${versions[@]}"; do
     postgresVersionMain="$(echo "$postgresVersion" | awk -F 'alpha|beta|rc' '{print $1}')"
     versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${packagesBase}/${suite}-pgdg/${postgresVersionMain}/binary-amd64/Packages.bz2" | bunzip2)"
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersionMain"'" { print $2; exit }' || true)"
-    majorVersion="${postgresVersion%%.*}"
 
     if [ "$suite" = "bullseye" ]; then
         boostVersion="1.74.0"
@@ -73,24 +90,71 @@ for version in "${versions[@]}"; do
         exit 1
     fi
 
+
+    optimized=""
+    if [[ "$version" =~ "alpha" || "$version" =~ "beta" || "$version" =~ "rc" || "$version" =~ "master" ]];
+    then
+        optimized="test"
+    else
+        optimized="debian"
+    fi
+    echo "optimized=$optimized"
+
+    debianPostgisMajMin=""
     if [ "master" == "$postgisVersion" ]; then
         postgisPackageName=""
         postgisFullVersion="$postgisVersion"
         postgisMajor=""
+        postgisDocSrc="development: postgis, geos, proj, gdal"
     else
-        postgisPackageName="postgresql-${postgresVersionMain}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
+        postgisMajMin="$( echo "${postgisVersion}" | cut -d. -f1 ).$( echo "${postgisVersion}" | cut -d. -f2 )"
+        echo "postgisMajMin=${postgisMajMin}"
+
+        postgisPackageName="postgresql-${postgresVersionMain}-postgis-${postgisDebPkgNameVersionSuffixes[${postgisMajMin}]}"
         postgisFullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "'"$postgisPackageName"'" { print $2; exit }' || true)"
-        postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisVersion}]}"
-    fi
-    (
-        set -x
-        cp -p Dockerfile.template initdb-postgis.sh update-postgis.sh README.md "$version/"
-        if [ "master" == "$postgisVersion" ]; then
-          cp -p Dockerfile.master.template "$version/Dockerfile.template"
+        echo "postgisPackageName=${postgisPackageName}"
+        echo "postgisFullVersion=${postgisFullVersion}"
+
+        debianPostgisMajMin="$( echo "${postgisFullVersion}" | cut -d. -f1 ).$( echo "${postgisFullVersion}" | cut -d. -f2 )"
+
+        if [ "$debianPostgisMajMin" == "$postgisMajMin" ]; then
+            echo "debian postgis version is OK "
+            postgisMajor="${postgisDebPkgNameVersionSuffixes[${postgisMajMin}]}"
+            postgisDocSrc="${postgisFullVersion%%+*}"
+        else
+            echo "debian postgis is not updated, different .. "
+            postgisFullVersion=""
+            postgisMajor=""
+            postgisDocSrc=""
         fi
-        mv "$version/Dockerfile.template" "$version/Dockerfile"
-        sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
-    )
+    fi
+
+    if [ -z "$postgisFullVersion" ]
+    then
+        echo "skip debain version";
+        # debain version not found;
+        echo " # placeholder Dockerfile"                                         > "$version/Dockerfile"
+        echo " # Debian version of postgis $postgisFullVersion is not detected!">> "$version/Dockerfile"
+        echo " # This is an autogenerated message of ./update.sh "              >> "$version/Dockerfile"
+        rm -f "$version/*.sh"
+        rm -f "$version/*.md"
+        # use the default for the alpine version
+        postgisFullVersion=$postgisVersion
+        postgisDocSrc=$postgisVersion
+    else
+        (
+            set -x
+            cp -p initdb-postgis.sh update-postgis.sh "$version/"
+            if [ "master" == "$postgisVersion" ]; then
+              cat Dockerfile.master.template > "$version/Dockerfile"
+            else
+              cat Dockerfile.template        > "$version/Dockerfile"
+            fi
+            sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
+
+            echo "| [postgis/postgis:${version}](${dockerhublink}${version}) | [Dockerfile](./$version/Dockerfile) | debian:${suite} | ${postgresVersion} | ${postgisDocSrc} | " >> _dockerlists_${optimized}.md
+        )
+    fi
 
     if [ "master" == "$postgisVersion" ]; then
         srcVersion=""
@@ -105,9 +169,31 @@ for version in "${versions[@]}"; do
         fi
         (
             set -x
+            if [ "$optimized" != "test" ]; then
+              optimized="alpine"
+            fi
             cp -p Dockerfile.alpine.template initdb-postgis.sh update-postgis.sh "$version/$variant/"
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
             sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
+
+            echo "| [postgis/postgis:${version}-${variant}](${dockerhublink}${version}-${variant}) | [Dockerfile](./$version/$variant/Dockerfile) | alpine:3.16 | ${postgresVersion} | ${postgisDocSrc} | " >> _dockerlists_${optimized}.md
         )
     done
 done
+
+echo "|-------------------------|"
+echo "|-   Generated images    -|"
+echo "|-------------------------|"
+
+for optimized in debian alpine test; do
+    echo " "
+    echo "---- ${optimized} ----"
+    cat _dockerlists_${optimized}.md
+done
+
+echo " "
+echo "Postprocessing todo:"
+echo "- add the new versions to README.md ( manually )"
+ls -la  _dockerlists_*.md
+echo " "
+echo " - done - "
