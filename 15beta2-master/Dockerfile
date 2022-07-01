@@ -1,6 +1,6 @@
 # "experimental" ;  only for testing!
 # multi-stage dockerfile;  minimal docker version >= 17.05
-FROM postgres:15beta1-bullseye as builder
+FROM postgres:15beta2-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -82,7 +82,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 2aa8bc64abc5d10a47fad206fbdcc96c5e75d1d1
+ENV PROJ_GIT_HASH 19058f05df14b4a747c298473d0787235c108293
 
 RUN set -ex \
     && cd /usr/src \
@@ -114,7 +114,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH ed025b64ecbba7b97e843ad8bb3e2ee06e9e90e3
+ENV GEOS_GIT_HASH 5c7b2b5c5ef77ee991f3637c9a70975a0c5f0ee8
 
 RUN set -ex \
     && cd /usr/src \
@@ -131,7 +131,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH e690ffaab9f0e349f722decd3ed15a1a5b59316b
+ENV GDAL_GIT_HASH 104e1747748d204e8aff1945464a24b1f8c94c90
 
 RUN set -ex \
     && cd /usr/src \
@@ -165,7 +165,7 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
-FROM postgres:15beta1-bullseye
+FROM postgres:15beta2-bullseye
 
 RUN set -ex \
     && apt-get update \
@@ -197,9 +197,9 @@ RUN set -ex \
 COPY --from=builder /usr/local /usr/local
 
 #ENV SFCGAL_GIT_HASH cc4e1c1b2ac1be65fd738685137eb0d417a1599d
-ENV PROJ_GIT_HASH 2aa8bc64abc5d10a47fad206fbdcc96c5e75d1d1
-ENV GEOS_GIT_HASH ed025b64ecbba7b97e843ad8bb3e2ee06e9e90e3
-ENV GDAL_GIT_HASH e690ffaab9f0e349f722decd3ed15a1a5b59316b
+ENV PROJ_GIT_HASH 19058f05df14b4a747c298473d0787235c108293
+ENV GEOS_GIT_HASH 5c7b2b5c5ef77ee991f3637c9a70975a0c5f0ee8
+ENV GDAL_GIT_HASH 104e1747748d204e8aff1945464a24b1f8c94c90
 
 # Minimal command line test.
 RUN set -ex \
@@ -217,7 +217,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 7c69026c8c40d7c1144824098059c9f1f0216167
+ENV POSTGIS_GIT_HASH 0903120772c9017f99c51c4b83b606be14e148b7
 
 RUN set -ex \
     && apt-get update \
