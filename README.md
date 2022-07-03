@@ -14,7 +14,7 @@ Note: As of PostGIS v3.x, raster has been factored out into a separate extension
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2022-06-22 )
+# Versions ( 2022-07-03 )
 
 Recomended version for the new users: `postgis/postgis:14-3.2`
 
@@ -65,9 +65,9 @@ Recomended version for the new users: `postgis/postgis:14-3.2`
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:13-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-master) | [Dockerfile](./13-master/Dockerfile) | debian:bullseye | 13 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:14-3.3.0alpha1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.3.0alpha1-alpine) | [Dockerfile](./14-3.3.0alpha1/alpine/Dockerfile) | alpine:3.16 | 14 | 3.3.0alpha1 |
+| [postgis/postgis:14-3.3.0beta1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.3.0beta1-alpine) | [Dockerfile](./14-3.3.0beta1/alpine/Dockerfile) | alpine:3.16 | 14 | 3.3.0beta1 |
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](./14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:15beta2-3.3.0alpha1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta2-3.3.0alpha1-alpine) | [Dockerfile](./15beta2-3.3.0alpha1/alpine/Dockerfile) | alpine:3.16 | 15beta2 | 3.3.0alpha1 |
+| [postgis/postgis:15beta2-3.3.0beta1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta2-3.3.0beta1-alpine) | [Dockerfile](./15beta2-3.3.0beta1/alpine/Dockerfile) | alpine:3.16 | 15beta2 | 3.3.0beta1 |
 | [postgis/postgis:15beta2-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta2-master) | [Dockerfile](./15beta2-master/Dockerfile) | debian:bullseye | 15beta2 | development: postgis, geos, proj, gdal |
 
 ## Usage
