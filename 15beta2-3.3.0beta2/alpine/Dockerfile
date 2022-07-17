@@ -1,9 +1,9 @@
-FROM postgres:14-alpine3.16
+FROM postgres:15beta2-alpine3.16
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
-ENV POSTGIS_VERSION 3.3.0beta1
-ENV POSTGIS_SHA256 256807c72bae89ea955b5a5d56fa01b96982608c8aaa11903ea239376b0833e8
+ENV POSTGIS_VERSION 3.3.0beta2
+ENV POSTGIS_SHA256 6134085b57ffaf9c27888534cdc4234bc8eadf3ab1ff71ee8da4c4ff1828e8fb
 
 RUN set -eux \
     \
