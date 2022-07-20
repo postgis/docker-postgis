@@ -13,11 +13,12 @@ versions=( "${versions[@]%/Dockerfile}" )
 for optimized in debian alpine test; do
     rm -f      _dockerlists_${optimized}.md
     echo " " > _dockerlists_${optimized}.md
-    echo "| DockerHub image | Dockerfile | OS | Postgres | PostGIS | " >> _dockerlists_${optimized}.md
-    echo "| --------------- | ---------- | -- | -------- | ------- | " >> _dockerlists_${optimized}.md
+    echo "| DockerHub image | Dockerfile | OS | Postgres | PostGIS |" >> _dockerlists_${optimized}.md
+    echo "| --------------- | ---------- | -- | -------- | ------- |" >> _dockerlists_${optimized}.md
 done
 
 dockerhublink="https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name="
+githubrepolink="https://github.com/postgis/docker-postgis/blob/master"
 
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
@@ -152,7 +153,7 @@ for version in "${versions[@]}"; do
             fi
             sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
 
-            echo "| [postgis/postgis:${version}](${dockerhublink}${version}) | [Dockerfile](./$version/Dockerfile) | debian:${suite} | ${postgresVersion} | ${postgisDocSrc} | " >> _dockerlists_${optimized}.md
+            echo "| [postgis/postgis:${version}](${dockerhublink}${version}) | [Dockerfile](${githubrepolink}/${version}/Dockerfile) | debian:${suite} | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
         )
     fi
 
@@ -176,7 +177,7 @@ for version in "${versions[@]}"; do
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
             sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
 
-            echo "| [postgis/postgis:${version}-${variant}](${dockerhublink}${version}-${variant}) | [Dockerfile](./$version/$variant/Dockerfile) | alpine:3.16 | ${postgresVersion} | ${postgisDocSrc} | " >> _dockerlists_${optimized}.md
+            echo "| [postgis/postgis:${version}-${variant}](${dockerhublink}${version}-${variant}) | [Dockerfile](${githubrepolink}/${version}/${variant}/Dockerfile) | alpine:3.16 | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
         )
     done
 done
