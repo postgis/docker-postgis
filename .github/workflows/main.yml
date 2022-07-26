@@ -15,7 +15,7 @@ jobs:
   make-docker-images:
     strategy:
       matrix:
-        postgres: [10, 11, 12, 13, 14]
+        postgres: [10, 11, 12, 13, 14, 15beta2]
         postgis: ['2.5', '3.2']
         variant: [default, alpine]
         exclude:
@@ -24,6 +24,8 @@ jobs:
           - postgres: 13
             postgis: '2.5'
           - postgres: 14
+            postgis: '2.5'
+          - postgres: 15beta2
             postgis: '2.5'
         include:
           - postgres: 13
