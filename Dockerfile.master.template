@@ -147,8 +147,21 @@ RUN set -ex \
         echo "Directory 'gdal' does not exists! Newer version! " ; \
     fi \
     \
-    && ./autogen.sh \
-    && ./configure --disable-static \
+    && if [ -f "./autogen.sh:" ]; then \
+        # Building with autoconf ( old/deprecated )
+        set -eux \
+        && ./autogen.sh \
+        && ./configure --disable-static \
+        ; \
+    else \
+        # Building with cmake
+        set -eux \
+        && mkdir build \
+        && cd build \
+        && cmake -DCMAKE_BUILD_TYPE=Release .. \
+        ; \
+    fi \
+    \
     && make -j$(nproc) \
     && make install \
     && cd / \
