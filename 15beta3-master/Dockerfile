@@ -82,7 +82,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 990ecba85f9ab1fefadb9a4f6135686f0f4a7d66
+ENV PROJ_GIT_HASH 1384b90602a6d2d51ed5ca0d2e28c8b4ada47aea
 
 RUN set -ex \
     && cd /usr/src \
@@ -131,7 +131,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH db4c08da00dc445079db909ca59b0f56c7345e7b
+ENV GDAL_GIT_HASH 581246a1ccaf62438e20be371f82453c19d54394
 
 RUN set -ex \
     && cd /usr/src \
@@ -147,8 +147,21 @@ RUN set -ex \
         echo "Directory 'gdal' does not exists! Newer version! " ; \
     fi \
     \
-    && ./autogen.sh \
-    && ./configure --disable-static \
+    && if [ -f "./autogen.sh:" ]; then \
+        # Building with autoconf ( old/deprecated )
+        set -eux \
+        && ./autogen.sh \
+        && ./configure --disable-static \
+        ; \
+    else \
+        # Building with cmake
+        set -eux \
+        && mkdir build \
+        && cd build \
+        && cmake -DCMAKE_BUILD_TYPE=Release .. \
+        ; \
+    fi \
+    \
     && make -j$(nproc) \
     && make install \
     && cd / \
@@ -197,9 +210,9 @@ RUN set -ex \
 COPY --from=builder /usr/local /usr/local
 
 #ENV SFCGAL_GIT_HASH 8675662a2725976642d0ecffd4efcfe68e484483
-ENV PROJ_GIT_HASH 990ecba85f9ab1fefadb9a4f6135686f0f4a7d66
+ENV PROJ_GIT_HASH 1384b90602a6d2d51ed5ca0d2e28c8b4ada47aea
 ENV GEOS_GIT_HASH 848bce44d308a05d082766da21ea5d9db2e79b8e
-ENV GDAL_GIT_HASH db4c08da00dc445079db909ca59b0f56c7345e7b
+ENV GDAL_GIT_HASH 581246a1ccaf62438e20be371f82453c19d54394
 
 # Minimal command line test.
 RUN set -ex \
@@ -217,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 4b9b65fd05b5421baa0a6e32e06dec3466f260a3
+ENV POSTGIS_GIT_HASH 2fca9d65ced41fe2cbe36d0f9d05d109b39d70db
 
 RUN set -ex \
     && apt-get update \
