@@ -62,7 +62,7 @@ RUN set -ex \
 # sfcgal
 ENV SFCGAL_VERSION master
 #current:
-#ENV SFCGAL_GIT_HASH 8675662a2725976642d0ecffd4efcfe68e484483
+#ENV SFCGAL_GIT_HASH 9801868bad3f8b97083dce24224fb2346f2f8c1f
 #reverted for the last working version
 ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
@@ -82,7 +82,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 1384b90602a6d2d51ed5ca0d2e28c8b4ada47aea
+ENV PROJ_GIT_HASH 4cc46f72bf6943592ce7c55f147a5a51a0a2992b
 
 RUN set -ex \
     && cd /usr/src \
@@ -114,7 +114,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 848bce44d308a05d082766da21ea5d9db2e79b8e
+ENV GEOS_GIT_HASH 7135b0014e554fa1ec3a35309920c077355a77d0
 
 RUN set -ex \
     && cd /usr/src \
@@ -131,7 +131,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 581246a1ccaf62438e20be371f82453c19d54394
+ENV GDAL_GIT_HASH 1ad37e7f93d357cc9370261fbd709765bac43dde
 
 RUN set -ex \
     && cd /usr/src \
@@ -209,10 +209,10 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
-#ENV SFCGAL_GIT_HASH 8675662a2725976642d0ecffd4efcfe68e484483
-ENV PROJ_GIT_HASH 1384b90602a6d2d51ed5ca0d2e28c8b4ada47aea
-ENV GEOS_GIT_HASH 848bce44d308a05d082766da21ea5d9db2e79b8e
-ENV GDAL_GIT_HASH 581246a1ccaf62438e20be371f82453c19d54394
+#ENV SFCGAL_GIT_HASH 9801868bad3f8b97083dce24224fb2346f2f8c1f
+ENV PROJ_GIT_HASH 4cc46f72bf6943592ce7c55f147a5a51a0a2992b
+ENV GEOS_GIT_HASH 7135b0014e554fa1ec3a35309920c077355a77d0
+ENV GDAL_GIT_HASH 1ad37e7f93d357cc9370261fbd709765bac43dde
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 2fca9d65ced41fe2cbe36d0f9d05d109b39d70db
+ENV POSTGIS_GIT_HASH 2428842e84fc6b6ce8a15fcfe9a17d888cd0eaa5
 
 RUN set -ex \
     && apt-get update \
@@ -294,13 +294,17 @@ RUN set -ex \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \
+    \
+    #
+    # We keep ca-certificates: for accessing remote raster files
+    #    https://github.com/postgis/docker-postgis/issues/307
+    #
     && apt-get purge -y --autoremove \
       autoconf \
       automake \
       autotools-dev \
       bison \
       build-essential \
-      ca-certificates \
       cmake \
       g++ \
       git \

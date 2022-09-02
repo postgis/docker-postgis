@@ -294,13 +294,17 @@ RUN set -ex \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \
+    \
+    #
+    # We keep ca-certificates: for accessing remote raster files
+    #    https://github.com/postgis/docker-postgis/issues/307
+    #
     && apt-get purge -y --autoremove \
       autoconf \
       automake \
       autotools-dev \
       bison \
       build-essential \
-      ca-certificates \
       cmake \
       g++ \
       git \
