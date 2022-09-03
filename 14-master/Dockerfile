@@ -131,7 +131,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 1ad37e7f93d357cc9370261fbd709765bac43dde
+ENV GDAL_GIT_HASH 0592a219d11e8da539f1bc0cc9c4ce8865a08818
 
 RUN set -ex \
     && cd /usr/src \
@@ -212,7 +212,7 @@ COPY --from=builder /usr/local /usr/local
 #ENV SFCGAL_GIT_HASH 9801868bad3f8b97083dce24224fb2346f2f8c1f
 ENV PROJ_GIT_HASH 4cc46f72bf6943592ce7c55f147a5a51a0a2992b
 ENV GEOS_GIT_HASH 7135b0014e554fa1ec3a35309920c077355a77d0
-ENV GDAL_GIT_HASH 1ad37e7f93d357cc9370261fbd709765bac43dde
+ENV GDAL_GIT_HASH 0592a219d11e8da539f1bc0cc9c4ce8865a08818
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 2428842e84fc6b6ce8a15fcfe9a17d888cd0eaa5
+ENV POSTGIS_GIT_HASH 22708b56de39cb6d2c53278e6a2262e487119b2f
 
 RUN set -ex \
     && apt-get update \
@@ -294,11 +294,6 @@ RUN set -ex \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \
-    \
-    #
-    # We keep ca-certificates: for accessing remote raster files
-    #    https://github.com/postgis/docker-postgis/issues/307
-    #
     && apt-get purge -y --autoremove \
       autoconf \
       automake \
@@ -331,5 +326,11 @@ RUN set -ex \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
-RUN cat /_pgis_full_version.txt
 
+RUN set -ex \
+    # Is the "ca-certificates" package installed? (for accessing remote raster files)
+    #   https://github.com/postgis/docker-postgis/issues/307
+    dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
+    \
+    # list postgresql, postgis version
+    && cat /_pgis_full_version.txt

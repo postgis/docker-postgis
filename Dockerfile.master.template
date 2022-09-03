@@ -294,11 +294,6 @@ RUN set -ex \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \
-    \
-    #
-    # We keep ca-certificates: for accessing remote raster files
-    #    https://github.com/postgis/docker-postgis/issues/307
-    #
     && apt-get purge -y --autoremove \
       autoconf \
       automake \
@@ -331,5 +326,11 @@ RUN set -ex \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
-RUN cat /_pgis_full_version.txt
 
+RUN set -ex \
+    # Is the "ca-certificates" package installed? (for accessing remote raster files)
+    #   https://github.com/postgis/docker-postgis/issues/307
+    dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
+    \
+    # list postgresql, postgis version
+    && cat /_pgis_full_version.txt
