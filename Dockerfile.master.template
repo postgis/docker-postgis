@@ -330,7 +330,7 @@ COPY ./update-postgis.sh /usr/local/bin
 RUN set -ex \
     # Is the "ca-certificates" package installed? (for accessing remote raster files)
     #   https://github.com/postgis/docker-postgis/issues/307
-    dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
+    && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
     # list postgresql, postgis version
     && cat /_pgis_full_version.txt

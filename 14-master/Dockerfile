@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 22708b56de39cb6d2c53278e6a2262e487119b2f
+ENV POSTGIS_GIT_HASH d31888c038285d36b460e34773e5dddece27d585
 
 RUN set -ex \
     && apt-get update \
@@ -330,7 +330,7 @@ COPY ./update-postgis.sh /usr/local/bin
 RUN set -ex \
     # Is the "ca-certificates" package installed? (for accessing remote raster files)
     #   https://github.com/postgis/docker-postgis/issues/307
-    dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
+    && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
     # list postgresql, postgis version
     && cat /_pgis_full_version.txt
