@@ -118,6 +118,10 @@ RUN set -eux \
         libstdc++ \
         pcre \
         protobuf-c \
+        \
+        # ca-certificates: for accessing remote raster files
+        #   fix https://github.com/postgis/docker-postgis/issues/307
+        ca-certificates \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \

@@ -62,7 +62,7 @@ RUN set -ex \
 # sfcgal
 ENV SFCGAL_VERSION master
 #current:
-#ENV SFCGAL_GIT_HASH 8675662a2725976642d0ecffd4efcfe68e484483
+#ENV SFCGAL_GIT_HASH 9801868bad3f8b97083dce24224fb2346f2f8c1f
 #reverted for the last working version
 ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
 
@@ -82,7 +82,7 @@ RUN set -ex \
 
 # proj
 ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 1384b90602a6d2d51ed5ca0d2e28c8b4ada47aea
+ENV PROJ_GIT_HASH 4cc46f72bf6943592ce7c55f147a5a51a0a2992b
 
 RUN set -ex \
     && cd /usr/src \
@@ -114,7 +114,7 @@ RUN set -ex \
 
 # geos
 ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 848bce44d308a05d082766da21ea5d9db2e79b8e
+ENV GEOS_GIT_HASH 7135b0014e554fa1ec3a35309920c077355a77d0
 
 RUN set -ex \
     && cd /usr/src \
@@ -131,7 +131,7 @@ RUN set -ex \
 
 # gdal
 ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 581246a1ccaf62438e20be371f82453c19d54394
+ENV GDAL_GIT_HASH 0592a219d11e8da539f1bc0cc9c4ce8865a08818
 
 RUN set -ex \
     && cd /usr/src \
@@ -209,10 +209,10 @@ RUN set -ex \
 
 COPY --from=builder /usr/local /usr/local
 
-#ENV SFCGAL_GIT_HASH 8675662a2725976642d0ecffd4efcfe68e484483
-ENV PROJ_GIT_HASH 1384b90602a6d2d51ed5ca0d2e28c8b4ada47aea
-ENV GEOS_GIT_HASH 848bce44d308a05d082766da21ea5d9db2e79b8e
-ENV GDAL_GIT_HASH 581246a1ccaf62438e20be371f82453c19d54394
+#ENV SFCGAL_GIT_HASH 9801868bad3f8b97083dce24224fb2346f2f8c1f
+ENV PROJ_GIT_HASH 4cc46f72bf6943592ce7c55f147a5a51a0a2992b
+ENV GEOS_GIT_HASH 7135b0014e554fa1ec3a35309920c077355a77d0
+ENV GDAL_GIT_HASH 0592a219d11e8da539f1bc0cc9c4ce8865a08818
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
 
 # install postgis
 ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH 2fca9d65ced41fe2cbe36d0f9d05d109b39d70db
+ENV POSTGIS_GIT_HASH d31888c038285d36b460e34773e5dddece27d585
 
 RUN set -ex \
     && apt-get update \
@@ -300,7 +300,6 @@ RUN set -ex \
       autotools-dev \
       bison \
       build-essential \
-      ca-certificates \
       cmake \
       g++ \
       git \
@@ -327,5 +326,11 @@ RUN set -ex \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
-RUN cat /_pgis_full_version.txt
 
+RUN set -ex \
+    # Is the "ca-certificates" package installed? (for accessing remote raster files)
+    #   https://github.com/postgis/docker-postgis/issues/307
+    && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
+    \
+    # list postgresql, postgis version
+    && cat /_pgis_full_version.txt
