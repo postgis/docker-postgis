@@ -59,8 +59,6 @@ Recomended version for the new users: `postgis/postgis:14-3.3`
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:13-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-master/Dockerfile) | debian:bullseye | 13 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:15beta3-3.3](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta3-3.3) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15beta3-3.3/Dockerfile) | debian:bullseye | 15beta3 | 3.3.1 |
-| [postgis/postgis:15beta3-3.3-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta3-3.3-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15beta3-3.3/alpine/Dockerfile) | alpine:3.16 | 15beta3 | 3.3.1 |
 
 ## Usage
 
