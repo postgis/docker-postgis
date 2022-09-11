@@ -14,7 +14,7 @@ Note: As of PostGIS v3.x, raster has been factored out into a separate extension
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2022-09-10 )
+# Versions ( 2022-09-11 )
 
 Recomended version for the new users: `postgis/postgis:14-3.3`
 
@@ -61,7 +61,6 @@ Recomended version for the new users: `postgis/postgis:14-3.3`
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:15beta3-3.2](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta3-3.2) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15beta3-3.2/Dockerfile) | debian:bullseye | 15beta3 | 3.2.3 |
 | [postgis/postgis:15beta3-3.2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta3-3.2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15beta3-3.2/alpine/Dockerfile) | alpine:3.16 | 15beta3 | 3.2.3 |
-| [postgis/postgis:15beta3-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15beta3-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15beta3-master/Dockerfile) | debian:bullseye | 15beta3 | development: postgis, geos, proj, gdal |
 
 ## Usage
 

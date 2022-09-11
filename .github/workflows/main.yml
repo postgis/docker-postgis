@@ -41,10 +41,6 @@ jobs:
             postgis: '3.2'
             variant: default
 
-          - postgres: '15beta3'
-            postgis: master
-            variant: default
-
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
     runs-on: ubuntu-20.04
     continue-on-error: ${{ matrix.postgis == 'master' }}
