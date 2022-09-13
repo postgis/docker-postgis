@@ -1,6 +1,6 @@
 # "experimental" ;  only for testing!
 # multi-stage dockerfile;  minimal docker version >= 17.05
-FROM postgres:14-bullseye as builder
+FROM postgres:15beta4-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -178,7 +178,7 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
-FROM postgres:14-bullseye
+FROM postgres:15beta4-bullseye
 
 RUN set -ex \
     && apt-get update \
