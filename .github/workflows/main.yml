@@ -34,7 +34,7 @@ jobs:
             variant: default
           - postgres: '15beta4'
             postgis: master
-            variant: default            
+            variant: default
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
     runs-on: ubuntu-20.04
