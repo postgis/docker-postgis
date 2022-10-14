@@ -76,11 +76,11 @@ update:
 define build-version
 build-$1:
 ifeq ($(do_default),true)
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+	$(DOCKER) buildx build --pull --platform=linux/amd64,linux/arm64 -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+	$(DOCKER) buildx build --pull --platform=linux/amd64,linux/arm64 -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
 endif
 endif
 endef
