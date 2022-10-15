@@ -11,6 +11,17 @@ LATEST_VERSION=15-3.3
 do_default=true
 do_alpine=true
 
+# There are multiple workflows in the  .github/workflows/*
+# The default WORKFLOW is the main.yml ( amd64 ) but can be overriden via environment variables.
+
+WORKFLOW ?= main
+TAG_POSTFIX=
+
+# IF this is not the 'main' workflow THEN We add special image tag postfix. ( -experimental )
+ifneq ($(WORKFLOW),main)
+   TAG_POSTFIX=-experimental
+endif
+
 # The following logic evaluates VERSION and VARIANT variables that may have
 # been previously specified, and modifies the "do" flags depending on the values.
 # The VERSIONS variable is also set to contain the version(s) to be processed.
@@ -76,11 +87,11 @@ update:
 define build-version
 build-$1:
 ifeq ($(do_default),true)
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)$(TAG_POSTFIX) $1
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine$(TAG_POSTFIX) $1/alpine
 endif
 endif
 endef
@@ -99,11 +110,11 @@ test: $(foreach version,$(VERSIONS),test-$(version))
 define test-version
 test-$1: test-prepare build-$1
 ifeq ($(do_default),true)
-	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)
+	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)$(TAG_POSTFIX)
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
+	$(OFFIMG_LOCAL_CLONE)/test/run.sh -c $(OFFIMG_LOCAL_CLONE)/test/config.sh -c test/postgis-config.sh $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine$(TAG_POSTFIX)
 endif
 endif
 endef
@@ -113,7 +124,7 @@ $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 ### RULES FOR TAGGING ###
 
 tag-latest: $(BUILD_LATEST_DEP)
-	$(DOCKER) image tag $(REPO_NAME)/$(IMAGE_NAME):$(LATEST_VERSION) $(REPO_NAME)/$(IMAGE_NAME):latest
+	$(DOCKER) image tag $(REPO_NAME)/$(IMAGE_NAME):$(LATEST_VERSION) $(REPO_NAME)/$(IMAGE_NAME):latest$(TAG_POSTFIX)
 
 
 ### RULES FOR PUSHING ###
@@ -123,24 +134,26 @@ push: $(foreach version,$(VERSIONS),push-$(version)) $(PUSH_DEP)
 define push-version
 push-$1: test-$1
 ifeq ($(do_default),true)
-	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)$(TAG_POSTFIX)
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):$(version)-alpine$(TAG_POSTFIX)
 endif
 endif
 endef
 $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
 
 push-latest: tag-latest $(PUSH_LATEST_DEP)
-	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):latest
-	@$(DOCKER) run -v "$(PWD)":/workspace \
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):latest$(TAG_POSTFIX)
+
+    ifeq ($(WORKFLOW),main)
+	    @$(DOCKER) run -v "$(PWD)":/workspace \
                       -e DOCKERHUB_USERNAME='$(DOCKERHUB_USERNAME)' \
                       -e DOCKERHUB_PASSWORD='$(DOCKERHUB_ACCESS_TOKEN)' \
                       -e DOCKERHUB_REPOSITORY='$(REPO_NAME)/$(IMAGE_NAME)' \
                       -e README_FILEPATH='/workspace/README.md' $(DOCKERHUB_DESC_IMG)
-
+    endif
 
 .PHONY: build all update test-prepare test tag-latest push push-latest \
         $(foreach version,$(VERSIONS),build-$(version)) \

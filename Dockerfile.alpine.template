@@ -90,11 +90,31 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install \
     \
+# buildx platform check for debug.
+    && uname -a \
+    && uname -m \
+    && cat /proc/cpuinfo \
+    \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
-    && su postgres -c 'pg_ctl -D /tempdb start' \
+    \
+    &&  if [ "%%PG_MAJOR%%" == "10" ]; then \
+            set -eux \
+            # pg ==10 : testing with huge_pages=off ---> for the buildx/qemu workflow
+            && su postgres -c 'pg_ctl -o "--huge_pages=off"  -D /tempdb start' \
+            && su postgres -c 'psql -c "SHOW HUGE_PAGES;"' \
+            ; \
+        else \
+            set -eux \
+            # pg >=11 : testing with jit=off , huge_pages=off ---> for the buildx/qemu workflow
+            && su postgres -c 'pg_ctl -o "--huge_pages=off" -o "--jit=off" -D /tempdb start' \
+            && su postgres -c 'psql -c "SHOW HUGE_PAGES;"' \
+            && su postgres -c 'psql -c "SHOW JIT;"' \
+            ; \
+        fi \
+    \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
     #&& make -j$(nproc) check RUNTESTFLAGS=--dumprestore PGUSER=postgres \

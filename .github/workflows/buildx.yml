@@ -1,0 +1,122 @@
+name: buildx-qemu-experimental-build
+
+# This workflow is a QEMU-BUILDX based.
+# - Not for the platform='linux/amd64' see --> `main.yml' !
+# - Not for the `*-master``building.   Emulation takes a lot of times!
+#
+# Expecting: upstream "postgres" docker images for OS/ARCH=platforms
+#   [ check https://hub.docker.com/_/postgres/tags ]
+#
+# Comments: 2022-09-07  ( with QEMU 7.00 )
+#   'linux/arm64'    Postgres JIT is not working; ( SET JIT=OFF under the alpine test )
+#   'linux/arm/v7' - debian: Unable to locate package postgresql-??-postgis-3;
+#   'linux/arm/v6' - debian: Unable to locate package postgresql-??-postgis-3;
+#   'linux/s390x'    [alpine|debian] failed test.
+#   'linux/mips64le' [alpine|debian] failed test.
+#
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '15 6 * * 1'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  make-docker-images:
+    strategy:
+      # allowing fails ..
+      fail-fast: false
+      matrix:
+        # succesful tests matrix:
+        platforms: ['linux/arm64','linux/arm/v7','linux/arm/v6','linux/386','linux/ppc64le']
+        postgres: [ 15 ]
+        postgis: ['3.3']
+        variant: [alpine]
+        include:
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'default'
+            platforms: 'linux/arm64'
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'default'
+            platforms: 'linux/ppc64le'
+
+    name: ${{ matrix.platforms }} ${{ matrix.postgres }}-${{ matrix.postgis }} ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+
+    env:
+      VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
+      VARIANT: ${{ matrix.variant }}
+      # Not the default (main) workflow!
+      WORKFLOW: buildx
+      # Docker image tag postfix
+      TAG_POSTFIX: '-experimental'
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: "debug: docker buildx inspect --bootstrap"
+        run:  docker buildx inspect --bootstrap
+
+      - name: "debug: docker buildx ls"
+        run: docker buildx ls
+
+      - name: "Inspect the base alpine image postgres:${{ matrix.postgres }}-alpine3.16"
+        if: ${{ env.VARIANT == 'alpine' }}
+        run: docker pull --platform=${{ matrix.platforms }} postgres:${{ matrix.postgres }}-alpine3.16 && docker inspect postgres:${{ matrix.postgres }}-alpine3.16
+        env:
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
+          PLATFORM: ${{ matrix.platforms }}
+
+      - name: "Build/Test: ${{ env.VERSION }} ${{ env.VARIANT }}${{env.TAG_POSTFIX}} ${{ env.DOCKER_DEFAULT_PLATFORM }}"
+        run: make test
+        env:
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
+          PLATFORM: ${{ matrix.platforms }}
+          # Buildx/qemu test need more time
+          POSTGRES_TEST_TRIES: 42
+          POSTGRES_TEST_SLEEP: 2
+
+      - name: "debug: docker images"
+        run: docker images
+
+      - name: "debug: docker inspect postgis/postgis:${{ env.VERSION }}${{ env.TAG_POSTFIX }}"
+        if: ${{ env.VARIANT == 'default' }}
+        run: docker inspect postgis/postgis:${{ env.VERSION }}${{ env.TAG_POSTFIX }}
+
+      - name: "debug: docker inspect postgis/postgis:${{ env.VERSION }}-${{ env.VARIANT }}${{ env.TAG_POSTFIX }}"
+        if: ${{ env.VARIANT == 'alpine' }}
+        run: docker inspect postgis/postgis:${{ env.VERSION }}-${{ env.VARIANT }}${{ env.TAG_POSTFIX }}
+
+      - name: Login to dockerhub
+        uses: docker/login-action@v1
+        if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Push docker image to dockerhub - ${{ matrix.platforms }}
+        if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+        env:
+          # platform is important!
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
+          PLATFORM: ${{ matrix.platforms }}
+          #
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: make push
