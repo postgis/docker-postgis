@@ -1,4 +1,11 @@
 
+# Used environmnet variables:
+#      VERSION:     15-3.3,14-3.3,13-3.3, ...
+#      VARIANT:     <<empty>>, alpine             ( debian or alpine )
+#      WORKFLOW:    main,buildx                   ( workflow id )
+#      TAG_POSTFIX: <<empty>>,'-experimental'     ( Docker image tag postfix )
+#
+
 # When processing the rules for tagging and pushing container images with the
 # "latest" tag, the following variable will be the version that is considered
 # to be the latest.
@@ -13,13 +20,14 @@ do_alpine=true
 
 # There are multiple workflows in the  .github/workflows/*
 # The default WORKFLOW is the main.yml ( amd64 ) but can be overriden via environment variables.
-
 WORKFLOW ?= main
-TAG_POSTFIX=
 
-# IF this is not the 'main' workflow THEN We add special image tag postfix. ( -experimental )
-ifneq ($(WORKFLOW),main)
-   TAG_POSTFIX=-experimental
+# IF this is NOT the 'main' workflow THEN we add special image tag postfix.
+#  ( -experimental ; it can be overriden via environment variables. )
+ifeq ($(WORKFLOW),main)
+   TAG_POSTFIX ?=
+else
+   TAG_POSTFIX ?= -experimental
 endif
 
 # The following logic evaluates VERSION and VARIANT variables that may have

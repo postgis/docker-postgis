@@ -7,9 +7,9 @@ name: buildx-qemu-experimental-build
 # Expecting: upstream "postgres" docker images for OS/ARCH=platforms
 #   [ check https://hub.docker.com/_/postgres/tags ]
 #
-# Comments: 2022-09-07  ( with QEMU 7.0 )
-#   'linux/arm64'    Postgres JIT is not working; ( SET JIT=OFF under the alpine test )
-#   'linux/ppc64le'  Postgres JIT is not working; ( SET JIT=OFF under the alpine test ) 
+# Comments: ( with QEMU 7.0 / 2022-october )
+#   'linux/arm64'    Postgres JIT is not working; ( SET JIT=OFF under the alpine test ; see alpine template )
+#   'linux/ppc64le'  Postgres JIT is not working; ( SET JIT=OFF under the alpine test ; see alpine template )
 #   'linux/arm/v7' - debian: Unable to locate package postgresql-??-postgis-3;
 #   'linux/arm/v6' - debian: Unable to locate package postgresql-??-postgis-3;
 #   'linux/s390x'    [alpine|debian] failed test.
@@ -35,7 +35,7 @@ jobs:
       matrix:
         # succesful tests matrix:
         platforms: ['linux/arm64','linux/arm/v7','linux/arm/v6','linux/386','linux/ppc64le']
-        postgres: [ 15 ]
+        postgres: [ 10, 15 ]
         postgis: ['3.3']
         variant: [alpine]
         include:
@@ -47,6 +47,15 @@ jobs:
             postgis: '3.3'
             variant: 'default'
             platforms: 'linux/ppc64le'
+          - postgres: 10
+            postgis: '3.3'
+            variant: 'default'
+            platforms: 'linux/arm64'
+          - postgres: 10
+            postgis: '3.3'
+            variant: 'default'
+            platforms: 'linux/ppc64le'
+
 
     name: ${{ matrix.platforms }} ${{ matrix.postgres }}-${{ matrix.postgis }} ${{ matrix.variant }}
     runs-on: ubuntu-latest
@@ -57,7 +66,7 @@ jobs:
       # Not the default (main) workflow!
       WORKFLOW: buildx
       # Docker image tag postfix
-      TAG_POSTFIX: '-experimental'
+      TAG_POSTFIX: '-buildx'
 
     steps:
 
