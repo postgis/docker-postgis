@@ -6,11 +6,8 @@ ENV POSTGIS_MAJOR %%POSTGIS_MAJOR%%
 ENV POSTGIS_VERSION %%POSTGIS_VERSION%%
 
 RUN apt-get update \
-      \
       # buildx debug info
-      && uname -a \
-      && uname -m \
-      && lscpu \
+      && uname -a && uname -m && lscpu \
       \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       && apt-get install -y --no-install-recommends \

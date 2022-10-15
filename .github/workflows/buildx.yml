@@ -7,8 +7,9 @@ name: buildx-qemu-experimental-build
 # Expecting: upstream "postgres" docker images for OS/ARCH=platforms
 #   [ check https://hub.docker.com/_/postgres/tags ]
 #
-# Comments: 2022-09-07  ( with QEMU 7.00 )
+# Comments: 2022-09-07  ( with QEMU 7.0 )
 #   'linux/arm64'    Postgres JIT is not working; ( SET JIT=OFF under the alpine test )
+#   'linux/ppc64le'  Postgres JIT is not working; ( SET JIT=OFF under the alpine test ) 
 #   'linux/arm/v7' - debian: Unable to locate package postgresql-??-postgis-3;
 #   'linux/arm/v6' - debian: Unable to locate package postgresql-??-postgis-3;
 #   'linux/s390x'    [alpine|debian] failed test.

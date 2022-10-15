@@ -91,27 +91,26 @@ RUN set -eux \
     && make install \
     \
 # buildx platform check for debug.
-    && uname -a \
-    && uname -m \
-    && cat /proc/cpuinfo \
+    && uname -a && uname -m && cat /proc/cpuinfo \
     \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     \
-    &&  if [ "%%PG_MAJOR%%" == "10" ]; then \
+    # QEMU7.0/BUILDX - JIT workaround
+    &&  if [ "aarch64 ppc64le" =~ "$(uname -m)" ] && [ "%%PG_MAJOR%%" != "10" ]; then \
             set -eux \
-            # pg ==10 : testing with huge_pages=off ---> for the buildx/qemu workflow
-            && su postgres -c 'pg_ctl -o "--huge_pages=off"  -D /tempdb start' \
-            && su postgres -c 'psql -c "SHOW HUGE_PAGES;"' \
+            # for the buildx/qemu workflow
+            #   with (aarch64 ppc64le) and PG>10 .. we are testing with JIT=OFF to avoid QEMU7.0/BUILDX error
+            && echo "WARNING: JIT=OFF testing (aarch64 ppc64le)!" \
+            && su postgres -c 'pg_ctl -o "--jit=off" -D /tempdb start' \
+            && su postgres -c 'psql -c "SHOW JIT;"' \
             ; \
         else \
             set -eux \
-            # pg >=11 : testing with jit=off , huge_pages=off ---> for the buildx/qemu workflow
-            && su postgres -c 'pg_ctl -o "--huge_pages=off" -o "--jit=off" -D /tempdb start' \
-            && su postgres -c 'psql -c "SHOW HUGE_PAGES;"' \
-            && su postgres -c 'psql -c "SHOW JIT;"' \
+            # default test .. no problem expected.
+            && su postgres -c 'pg_ctl -D /tempdb start' \
             ; \
         fi \
     \
