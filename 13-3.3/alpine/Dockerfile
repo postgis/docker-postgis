@@ -99,7 +99,8 @@ RUN set -eux \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     \
     # QEMU7.0/BUILDX - JIT workaround
-    &&  if [ "aarch64 ppc64le" =~ "$(uname -m)" ] && [ "13" != "10" ]; then \
+    && if [[ "$(uname -m)" == "aarch64" && "13" != "10" ]] || \
+          [[ "$(uname -m)" == "ppc64le" && "13" != "10" ]]; then \
             set -eux \
             # for the buildx/qemu workflow
             #   with (aarch64 ppc64le) and PG>10 .. we are testing with JIT=OFF to avoid QEMU7.0/BUILDX error
