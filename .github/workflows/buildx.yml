@@ -35,7 +35,7 @@ jobs:
       matrix:
         # succesful tests matrix:
         platforms: ['linux/arm64','linux/arm/v7','linux/arm/v6','linux/386','linux/ppc64le']
-        postgres: [ 10, 15 ]
+        postgres: [ 11, 15 ]
         postgis: ['3.3']
         variant: [alpine]
         include:
@@ -47,15 +47,35 @@ jobs:
             postgis: '3.3'
             variant: 'default'
             platforms: 'linux/ppc64le'
+
           - postgres: 10
-            postgis: '3.3'
+            postgis: '3.2'
             variant: 'default'
             platforms: 'linux/arm64'
           - postgres: 10
-            postgis: '3.3'
+            postgis: '3.2'
             variant: 'default'
             platforms: 'linux/ppc64le'
-
+          - postgres: 10
+            postgis: '3.2'
+            variant: 'alpine'
+            platforms: 'linux/arm64'
+          - postgres: 10
+            postgis: '3.2'
+            variant: 'alpine'
+            platforms: 'linux/arm/v7'
+          - postgres: 10
+            postgis: '3.2'
+            variant: 'alpine'
+            platforms: 'linux/arm/v6'
+          - postgres: 10
+            postgis: '3.2'
+            variant: 'alpine'
+            platforms: 'linux/386'
+          - postgres: 10
+            postgis: '3.2'
+            variant: 'alpine'
+            platforms: 'linux/ppc64le'
 
     name: ${{ matrix.platforms }} ${{ matrix.postgres }}-${{ matrix.postgis }} ${{ matrix.variant }}
     runs-on: ubuntu-latest
