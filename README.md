@@ -18,7 +18,7 @@ Unless `-e POSTGRES_DB` is passed to the container at startup time, this databas
 
 Recomended version for the new users: `postgis/postgis:15-3.3`
 
-### Debian based ( recomended ):
+### Debian based : linux/amd64 (X86-64) ( recomended ):
 
  * It's conservative in its release cycle to ensure high stability.
    * *"conservative"* ~= not the latest geos, proj, gdal packages.
@@ -35,7 +35,7 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 | [postgis/postgis:13-3.3](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.3) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.3/Dockerfile) | debian:bullseye | 13 | 3.3.1 |
 | [postgis/postgis:14-3.3](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.3) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.3/Dockerfile) | debian:bullseye | 14 | 3.3.1 |
 | [postgis/postgis:15-3.3](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.3) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.3/Dockerfile) | debian:bullseye | 15 | 3.3.1 |
-### Alpine based
+### Alpine based : linux/amd64 (X86-64)
 
 * base os = [Alpine linux](https://alpinelinux.org/): designed to be small, simple and secure ; [musl libc](https://musl.libc.org/) based
 * alpine:3.16; geos=3.10; gdal=3.5; proj=9.0
@@ -51,7 +51,7 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 | [postgis/postgis:14-3.3-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.3-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.3/alpine/Dockerfile) | alpine:3.16 | 14 | 3.3.1 |
 | [postgis/postgis:15-3.3-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.3-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.3/alpine/Dockerfile) | alpine:3.16 | 15 | 3.3.1 |
 
-### Test images
+### Test images : linux/amd64 (X86-64)
 
 * alpha, beta, rc and development ( ~master ) versions
 * the template for `*-master` images is updated manually, so sometimes there is a delay of a few weeks.
@@ -60,6 +60,36 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:15-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-master/Dockerfile) | debian:bullseye | 15 | development: postgis, geos, proj, gdal |
+
+### Experimental linux/arm64 images
+
+* buildx/qemu based images
+* the arm64 - alpine version tested with JIT=OFF ( BUILDX/QEMU7.0 problem ! )
+* generated from the default Dockerfile just added an `-experimental` tag postfix!
+
+| Platform     | DockerHub image                              |PG | PostGIS |  OS             |
+| ------------ | ---------------------------------------------|-- |---------| --------------- |
+|`linux/arm64` | `postgis/postgis:10-3.2-experimental`        |10 |     3.2 | debian:bullseye |
+|`linux/arm64` | `postgis/postgis:11-3.3-experimental`        |11 |     3.3 | debian:bullseye |
+|`linux/arm64` | `postgis/postgis:12-3.3-experimental`        |12 |     3.3 | debian:bullseye |
+|`linux/arm64` | `postgis/postgis:13-3.3-experimental`        |13 |     3.3 | debian:bullseye |
+|`linux/arm64` | `postgis/postgis:14-3.3-experimental`        |14 |     3.3 | debian:bullseye |
+|`linux/arm64` | `postgis/postgis:15-3.3-experimental`        |15 |     3.3 | debian:bullseye |
+|`linux/arm64` | `postgis/postgis:15-3.3-alpine-experimental` |15 |     3.3 | alpine:3.16     |
+
+### Other Experimental images
+
+* buildx/qemu based images
+* the ppc64le - alpine version tested with JIT=OFF ( BUILDX/QEMU7.0 problem ! )
+* generated from the default Dockerfile just added an `-experimental` tag postfix!
+
+| Platform        | DockerHub image                              |PG | PostGIS |  OS             |
+| --------------- | ---------------------------------------------|-- |---------| --------------- |
+| `linux/arm/v7 ` | `postgis/postgis:15-3.3-alpine-experimental` | 15| 3.3     | alpine:3.16     |
+| `linux/arm/v6 ` | `postgis/postgis:15-3.3-alpine-experimental` | 15| 3.3     | alpine:3.16     |
+| `linux/386    ` | `postgis/postgis:15-3.3-alpine-experimental` | 15| 3.3     | alpine:3.16     |
+| `linux/ppc64le` | `postgis/postgis:15-3.3-alpine-experimental` | 15| 3.3     | alpine:3.16     |
+| `linux/ppc64le` | `postgis/postgis:15-3.3-experimental`        | 15| 3.3     | debian:bullseye |
 
 ## Usage
 
