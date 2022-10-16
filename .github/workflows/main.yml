@@ -1,5 +1,7 @@
 name: Docker PostGIS CI
 
+# for building linux/amd64 ( x86-64 ) images !
+
 on:
   push:
   pull_request:
@@ -39,13 +41,27 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
+      WORKFLOW: main
+      # NO Docker image tag postfix!
+      TAG_POSTFIX: ''
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
+    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}${{ env.TAG_POSTFIX }}
       run: make test
+
+    - name: "debug: docker images"
+      run: docker images
+
+    - name: "debug: docker inspect postgis/postgis:${{ env.VERSION }}${{ env.TAG_POSTFIX }}"
+      if: ${{ env.VARIANT == 'default' }}
+      run: docker inspect postgis/postgis:${{ env.VERSION }}${{ env.TAG_POSTFIX }}
+
+    - name: "debug: docker inspect postgis/postgis:${{ env.VERSION }}-${{ env.VARIANT }}${{ env.TAG_POSTFIX }}"
+      if: ${{ env.VARIANT == 'alpine' }}
+      run: docker inspect postgis/postgis:${{ env.VERSION }}-${{ env.VARIANT }}${{ env.TAG_POSTFIX }}
 
     - name: Login to dockerhub
       uses: docker/login-action@v1
