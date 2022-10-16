@@ -1,6 +1,6 @@
-name: buildx-qemu-experimental-build
+name: buildx-experimental
 
-# This workflow is a QEMU-BUILDX based.
+# This workflow is QEMU/BUILDX based!
 # - Not for the platform='linux/amd64' see --> `main.yml' !
 # - Not for the `*-master``building.   Emulation takes a lot of times!
 #
@@ -33,48 +33,43 @@ jobs:
       # allowing fails ..
       fail-fast: false
       matrix:
-        # succesful tests matrix:
-        platforms: ['linux/arm64','linux/arm/v7','linux/arm/v6','linux/386','linux/ppc64le']
-        postgres: [ 11, 15 ]
+        # -3.3 debian for linux/arm64
+        postgres: [11, 12, 13, 14, 15]
         postgis: ['3.3']
-        variant: [alpine]
+        variant: [default]
+        platforms: ['linux/arm64']
         include:
-          - postgres: 15
-            postgis: '3.3'
-            variant: 'default'
+          - postgres: 10
+            postgis: '3.2'
+            variant: default
             platforms: 'linux/arm64'
-          - postgres: 15
-            postgis: '3.3'
-            variant: 'default'
-            platforms: 'linux/ppc64le'
 
-          - postgres: 10
-            postgis: '3.2'
-            variant: 'default'
-            platforms: 'linux/arm64'
-          - postgres: 10
-            postgis: '3.2'
-            variant: 'default'
-            platforms: 'linux/ppc64le'
-          - postgres: 10
-            postgis: '3.2'
+        # 15-3.3-alpine for every platforms
+          - postgres: 15
+            postgis: '3.3'
             variant: 'alpine'
             platforms: 'linux/arm64'
-          - postgres: 10
-            postgis: '3.2'
+          - postgres: 15
+            postgis: '3.3'
             variant: 'alpine'
             platforms: 'linux/arm/v7'
-          - postgres: 10
-            postgis: '3.2'
+          - postgres: 15
+            postgis: '3.3'
             variant: 'alpine'
             platforms: 'linux/arm/v6'
-          - postgres: 10
-            postgis: '3.2'
+          - postgres: 15
+            postgis: '3.3'
             variant: 'alpine'
             platforms: 'linux/386'
-          - postgres: 10
-            postgis: '3.2'
+          - postgres: 15
+            postgis: '3.3'
             variant: 'alpine'
+            platforms: 'linux/ppc64le'
+
+         # 15-3.3 debian for linux/ppc64le
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'default'
             platforms: 'linux/ppc64le'
 
     name: ${{ matrix.platforms }} ${{ matrix.postgres }}-${{ matrix.postgis }} ${{ matrix.variant }}
@@ -86,7 +81,7 @@ jobs:
       # Not the default (main) workflow!
       WORKFLOW: buildx
       # Docker image tag postfix
-      TAG_POSTFIX: '-buildx'
+      TAG_POSTFIX: '-experimental'
 
     steps:
 
@@ -105,7 +100,7 @@ jobs:
       - name: "debug: docker buildx ls"
         run: docker buildx ls
 
-      - name: "Inspect the base alpine image postgres:${{ matrix.postgres }}-alpine3.16"
+      - name: "debug: Inspect the base alpine image postgres:${{ matrix.postgres }}-alpine3.16"
         if: ${{ env.VARIANT == 'alpine' }}
         run: docker pull --platform=${{ matrix.platforms }} postgres:${{ matrix.postgres }}-alpine3.16 && docker inspect postgres:${{ matrix.postgres }}-alpine3.16
         env:
