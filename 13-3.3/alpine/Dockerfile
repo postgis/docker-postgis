@@ -105,6 +105,7 @@ RUN set -eux \
             # for the buildx/qemu workflow
             #   with (aarch64 ppc64le) and PG>10 .. we are testing with JIT=OFF to avoid QEMU7.0/BUILDX error
             && echo "WARNING: JIT=OFF testing (aarch64 ppc64le)!" \
+            && echo "## WARNING: tested with JIT=OFF (aarch64 ppc64le)!" >> /_pgis_full_version.txt \
             && su postgres -c 'pg_ctl -o "--jit=off" -D /tempdb start' \
             && su postgres -c 'psql -c "SHOW JIT;"' \
             ; \
