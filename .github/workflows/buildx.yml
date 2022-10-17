@@ -109,7 +109,7 @@ jobs:
 
       - name: "debug: Inspect the base alpine image postgres:${{ matrix.postgres }}-alpine${{ env.ALPINE_VERSION }} "
         if: ${{ env.VARIANT == 'alpine' }}
-        run: docker pull postgres:${{ matrix.postgres }}-alpine{{ env.ALPINE_VERSION }} && docker inspect postgres:${{ matrix.postgres }}-alpine{{ env.ALPINE_VERSION }}
+        run: docker pull postgres:${{ matrix.postgres }}-alpine${{ env.ALPINE_VERSION }} && docker inspect postgres:${{ matrix.postgres }}-alpine${{ env.ALPINE_VERSION }}
         env:
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
           PLATFORM: ${{ matrix.platforms }}
