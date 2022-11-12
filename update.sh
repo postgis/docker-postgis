@@ -23,6 +23,7 @@ githubrepolink="https://github.com/postgis/docker-postgis/blob/master"
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
+defaultAlpineSuite='3.16'
 defaultDebianSuite='bullseye-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
@@ -177,7 +178,7 @@ for version in "${versions[@]}"; do
             mv "$version/$variant/Dockerfile.alpine.template" "$version/$variant/Dockerfile"
             sed -i 's/%%PG_MAJOR%%/'"$postgresVersion"'/g; s/%%POSTGIS_VERSION%%/'"$srcVersion"'/g; s/%%POSTGIS_SHA256%%/'"$srcSha256"'/g' "$version/$variant/Dockerfile"
 
-            echo "| [postgis/postgis:${version}-${variant}](${dockerhublink}${version}-${variant}) | [Dockerfile](${githubrepolink}/${version}/${variant}/Dockerfile) | alpine:3.16 | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
+            echo "| [postgis/postgis:${version}-${variant}](${dockerhublink}${version}-${variant}) | [Dockerfile](${githubrepolink}/${version}/${variant}/Dockerfile) | alpine:${defaultAlpineSuite} | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
         )
     done
 done

@@ -1,0 +1,154 @@
+name: buildx-experimental
+
+# This workflow is QEMU/BUILDX based!
+# - Not for the platform='linux/amd64' see --> `main.yml' !
+# - Not for the `*-master``building.   Emulation takes a lot of times!
+#
+# Expecting: upstream "postgres" docker images for OS/ARCH=platforms
+#   [ check https://hub.docker.com/_/postgres/tags ]
+#
+# Comments: ( with QEMU 7.0 / 2022-october )
+#   'linux/arm64'    Postgres JIT is not working; ( SET JIT=OFF under the alpine test ; see alpine template )
+#   'linux/ppc64le'  Postgres JIT is not working; ( SET JIT=OFF under the alpine test ; see alpine template )
+#   'linux/arm/v7' - debian: Unable to locate package postgresql-??-postgis-3;
+#   'linux/arm/v6' - debian: Unable to locate package postgresql-??-postgis-3;
+#   'linux/s390x'    [alpine|debian] failed test.
+#   'linux/mips64le' [alpine|debian] failed test.
+#
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '15 6 * * 1'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  make-docker-images:
+    strategy:
+      # allowing fails ..
+      fail-fast: false
+      matrix:
+        # -3.3 debian for linux/arm64
+        postgres: [11, 12, 13, 14, 15]
+        postgis: ['3.3']
+        variant: [default]
+        platforms: ['linux/arm64']
+        include:
+          - postgres: 10
+            postgis: '3.2'
+            variant: default
+            platforms: 'linux/arm64'
+
+        # 15-3.3-alpine for every platforms
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'alpine'
+            platforms: 'linux/arm64'
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'alpine'
+            platforms: 'linux/arm/v7'
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'alpine'
+            platforms: 'linux/arm/v6'
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'alpine'
+            platforms: 'linux/386'
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'alpine'
+            platforms: 'linux/ppc64le'
+
+         # 15-3.3 debian for linux/ppc64le
+          - postgres: 15
+            postgis: '3.3'
+            variant: 'default'
+            platforms: 'linux/ppc64le'
+
+    name: ${{ matrix.platforms }} ${{ matrix.postgres }}-${{ matrix.postgis }} ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+
+    env:
+      # Alpine image version
+      ALPINE_VERSION: '3.16'
+      # Workflow name for internal logic;
+      # We are NOT the default ('main') workflow!
+      WORKFLOW: buildx
+      # Docker image Repo and Image name
+      REPO_NAME: postgis
+      IMAGE_NAME: postgis
+      # Docker image version and variant
+      VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
+      VARIANT: ${{ matrix.variant }}
+      # Docker image tag postfix
+      TAG_POSTFIX: '-experimental'
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: "debug: docker buildx inspect --bootstrap"
+        run:  docker buildx inspect --bootstrap
+
+      - name: "debug: docker buildx ls"
+        run: docker buildx ls
+
+      - name: "debug: Inspect the base alpine image postgres:${{ matrix.postgres }}-alpine${{ env.ALPINE_VERSION }} "
+        if: ${{ env.VARIANT == 'alpine' }}
+        run: docker pull postgres:${{ matrix.postgres }}-alpine${{ env.ALPINE_VERSION }} && docker inspect postgres:${{ matrix.postgres }}-alpine${{ env.ALPINE_VERSION }}
+        env:
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
+          PLATFORM: ${{ matrix.platforms }}
+
+      - name: "Build/Test: ${{ env.VERSION }} ${{ env.VARIANT }}${{env.TAG_POSTFIX}} ${{ env.DOCKER_DEFAULT_PLATFORM }}"
+        run: make test
+        env:
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
+          PLATFORM: ${{ matrix.platforms }}
+          # Buildx/qemu test need more time
+          POSTGRES_TEST_TRIES: 42
+          POSTGRES_TEST_SLEEP: 2
+
+      - name: "debug: docker images"
+        run: docker images
+
+      - name: "debug: docker inspect ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}${{ env.TAG_POSTFIX }}"
+        if: ${{ env.VARIANT == 'default' }}
+        run: docker inspect ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}${{ env.TAG_POSTFIX }}
+
+      - name: "debug: docker inspect ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ env.VARIANT }}${{ env.TAG_POSTFIX }}"
+        if: ${{ env.VARIANT == 'alpine' }}
+        run: docker inspect ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ env.VARIANT }}${{ env.TAG_POSTFIX }}
+
+      - name: Login to dockerhub
+        uses: docker/login-action@v1
+        if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Push docker image to dockerhub - ${{ matrix.platforms }}
+        if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+        env:
+          # platform is important!
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platforms }}
+          PLATFORM: ${{ matrix.platforms }}
+          #
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: make push

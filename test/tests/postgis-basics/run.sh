@@ -3,6 +3,11 @@ set -e
 
 image="$1"
 
+# buildx debug:
+uname -a
+uname -m
+cat /proc/cpuinfo
+
 export POSTGRES_USER='my cool postgres user'
 export POSTGRES_PASSWORD='my cool postgres password'
 export POSTGRES_DB='my cool postgres database'
@@ -24,7 +29,10 @@ psql() {
 		"$@"
 }
 
-tries=10
+: ${POSTGRES_TEST_TRIES:=10}
+: ${POSTGRES_TEST_SLEEP:=2}
+
+tries="$POSTGRES_TEST_TRIES"
 while ! echo 'SELECT 1' | psql &> /dev/null; do
 	(( tries-- ))
 	if [ $tries -le 0 ]; then
@@ -32,7 +40,7 @@ while ! echo 'SELECT 1' | psql &> /dev/null; do
 		echo 'SELECT 1' | psql # to hopefully get a useful error message
 		false
 	fi
-	sleep 2
+	sleep "$POSTGRES_TEST_SLEEP"
 done
 
 echo 'SELECT PostGIS_Version()' | psql

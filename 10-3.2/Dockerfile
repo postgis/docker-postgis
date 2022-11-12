@@ -6,6 +6,9 @@ ENV POSTGIS_MAJOR 3
 ENV POSTGIS_VERSION 3.2.3+dfsg-1.pgdg110+1
 
 RUN apt-get update \
+      # buildx debug info
+      && uname -a && uname -m && lscpu \
+      \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       && apt-get install -y --no-install-recommends \
            # ca-certificates: for accessing remote raster files;
