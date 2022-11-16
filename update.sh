@@ -26,8 +26,6 @@ IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 defaultDebianSuite='bullseye-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
-    [9.6]='bullseye-slim'
-    [10]='bullseye-slim'
     [11]='bullseye-slim'
     [12]='bullseye-slim'
     [13]='bullseye-slim'
@@ -37,7 +35,6 @@ declare -A debianSuite=(
 
 defaultPostgisDebPkgNameVersionSuffix='3'
 declare -A postgisDebPkgNameVersionSuffixes=(
-    [2.5]='2.5'
     [3.0]='3'
     [3.1]='3'
     [3.2]='3'
@@ -82,10 +79,6 @@ for version in "${versions[@]}"; do
 
     if [ "$suite" = "bullseye" ]; then
         boostVersion="1.74.0"
-    elif [ "$suite" = "buster" ]; then
-        boostVersion="1.67.0"
-    elif [ "$suite" = "stretch" ]; then
-        boostVersion="1.62.0"
     else
         echo "Unknown debian version; stop"
         exit 1
