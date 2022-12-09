@@ -1,4 +1,4 @@
-FROM postgres:11-alpine3.16
+FROM postgres:11-alpine3.17
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
 
@@ -10,14 +10,14 @@ RUN set -eux \
     &&  if   [ $(printf %.1s "$POSTGIS_VERSION") == 3 ]; then \
             set -eux ; \
             #
-            # using only v3.16
+            # using only v3.17
             #
-            #GEOS: https://pkgs.alpinelinux.org/packages?name=geos&branch=v3.16 \
-            export GEOS_ALPINE_VER=3.10 ; \
-            #GDAL: https://pkgs.alpinelinux.org/packages?name=gdal&branch=v3.16 \
+            #GEOS: https://pkgs.alpinelinux.org/packages?name=geos&branch=v3.17 \
+            export GEOS_ALPINE_VER=3.11 ; \
+            #GDAL: https://pkgs.alpinelinux.org/packages?name=gdal&branch=v3.17 \
             export GDAL_ALPINE_VER=3.5 ; \
-            #PROJ: https://pkgs.alpinelinux.org/packages?name=proj&branch=v3.16 \
-            export PROJ_ALPINE_VER=9.0 ; \
+            #PROJ: https://pkgs.alpinelinux.org/packages?name=proj&branch=v3.17 \
+            export PROJ_ALPINE_VER=9.1 ; \
             #
         elif [ $(printf %.1s "$POSTGIS_VERSION") == 2 ]; then \
             set -eux ; \
