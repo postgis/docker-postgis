@@ -147,7 +147,7 @@ RUN set -ex \
         echo "Directory 'gdal' does not exists! Newer version! " ; \
     fi \
     \
-    && if [ -f "./autogen.sh:" ]; then \
+    && if [ -f "./autogen.sh" ]; then \
         # Building with autoconf ( old/deprecated )
         set -eux \
         && ./autogen.sh \
