@@ -72,6 +72,7 @@ RUN set -ex \
     && git clone https://gitlab.com/Oslandia/SFCGAL.git \
     && cd SFCGAL \
     && git checkout ${SFCGAL_GIT_HASH} \
+    && git log -1 > /_pgis_sfcgal_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DCGAL_DIR=/usr/src/cgal \
@@ -87,6 +88,7 @@ RUN set -ex \
     && git clone https://github.com/OSGeo/PROJ.git \
     && cd PROJ \
     && git checkout ${PROJ_GIT_HASH} \
+    && git log -1 > /_pgis_proj_last_commit.txt \
     # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
     && if [ -f "autogen.sh" ] ; then \
         set -eux \
@@ -116,6 +118,7 @@ RUN set -ex \
     && git clone https://github.com/libgeos/geos.git \
     && cd geos \
     && git checkout ${GEOS_GIT_HASH} \
+    && git log -1 > /_pgis_geos_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake -DCMAKE_BUILD_TYPE=Release .. \
@@ -125,12 +128,13 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 1fb96da6301d83bb79af28121c97eee1787e7cb2
+ENV GDAL_GIT_HASH 437b59d300f3a2d7f07901dccd9bccb83084eb33
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
     && cd gdal \
     && git checkout ${GDAL_GIT_HASH} \
+    && git log -1 > /_pgis_gdal_last_commit.txt \
     \
     # gdal project directory structure - has been changed !
     && if [ -d "gdal" ] ; then \
@@ -171,6 +175,9 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
+# -------------------------------------------
+# STAGE  final
+# -------------------------------------------
 FROM postgres:15-bullseye
 
 RUN set -ex \
@@ -206,7 +213,7 @@ COPY --from=builder /usr/local /usr/local
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
 ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
 ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
-ENV GDAL_GIT_HASH 1fb96da6301d83bb79af28121c97eee1787e7cb2
+ENV GDAL_GIT_HASH 437b59d300f3a2d7f07901dccd9bccb83084eb33
 
 # Minimal command line test.
 RUN set -ex \
@@ -259,6 +266,7 @@ RUN set -ex \
     && git clone https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
+    && git log -1 > /_pgis_last_commit.txt \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
@@ -277,6 +285,9 @@ RUN set -ex \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     \
@@ -323,5 +334,5 @@ RUN set -ex \
     #   https://github.com/postgis/docker-postgis/issues/307
     && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
-    # list postgresql, postgis version
-    && cat /_pgis_full_version.txt
+    # list postgresql, postgis version and last commits.
+    && find /_pgis_*.txt -type f -print -exec cat {} \;

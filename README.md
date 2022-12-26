@@ -54,6 +54,7 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 
 * alpha, beta, rc and development ( ~master ) versions
 * the template for `*-master` images is updated manually, so sometimes there is a delay of a few weeks.
+* SFCGAL >= 1.4 ; cgal locked on 5.5 branch
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
