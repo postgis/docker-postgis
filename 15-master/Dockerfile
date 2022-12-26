@@ -42,7 +42,6 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
-      libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
@@ -59,31 +58,30 @@ RUN set -ex \
       protobuf-c-compiler \
       xsltproc
 
-# sfcgal
-ENV SFCGAL_VERSION master
-#current:
-#ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-#reverted for the last working version
-ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
-
+# cgal & sfcgal
+# "Since Version 5.0, CGAL is a header-only library, hence it is not needed to build it."
+ENV CGAL_GIT_BRANCH 5.5.x-branch
+ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
 RUN set -ex \
     && mkdir -p /usr/src \
+    && cd /usr/src \
+    && git clone --depth 1 --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
+    && cd cgal \
+    && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && git clone https://gitlab.com/Oslandia/SFCGAL.git \
     && cd SFCGAL \
     && git checkout ${SFCGAL_GIT_HASH} \
     && mkdir cmake-build \
     && cd cmake-build \
-    && cmake .. \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCGAL_DIR=/usr/src/cgal \
     && make -j$(nproc) \
     && make install \
-    && cd / \
-    && rm -fr /usr/src/SFCGAL
+    && rm -fr /usr/src/SFCGAL \
+    && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 94be2c69c2cd0d0e1db332755ec105c9c65737c5
-
+ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -109,13 +107,10 @@ RUN set -ex \
         ; \
     fi \
     \
-    && cd / \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH 4f427203bcc578fee24a4d76f59adc1c086349b0
-
+ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -130,9 +125,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH bc0948f8773feab1ecf81fb0be782c548af5f089
-
+ENV GDAL_GIT_HASH 1fb96da6301d83bb79af28121c97eee1787e7cb2
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -147,7 +140,7 @@ RUN set -ex \
         echo "Directory 'gdal' does not exists! Newer version! " ; \
     fi \
     \
-    && if [ -f "./autogen.sh:" ]; then \
+    && if [ -f "./autogen.sh" ]; then \
         # Building with autoconf ( old/deprecated )
         set -eux \
         && ./autogen.sh \
@@ -207,12 +200,13 @@ RUN set -ex \
       sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
-#ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH 94be2c69c2cd0d0e1db332755ec105c9c65737c5
-ENV GEOS_GIT_HASH 4f427203bcc578fee24a4d76f59adc1c086349b0
-ENV GDAL_GIT_HASH bc0948f8773feab1ecf81fb0be782c548af5f089
+ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
+ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
+ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
+ENV GDAL_GIT_HASH 1fb96da6301d83bb79af28121c97eee1787e7cb2
 
 # Minimal command line test.
 RUN set -ex \
@@ -229,8 +223,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
     || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH c2a0b202492a235002deaf3fd4a82cbeb659ea1a
+ENV POSTGIS_GIT_HASH 732064a157813018763ce97a1ad68409c420a1e7
 
 RUN set -ex \
     && apt-get update \
@@ -245,7 +238,6 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
-      libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
@@ -304,7 +296,6 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
-      libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
