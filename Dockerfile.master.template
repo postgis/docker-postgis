@@ -61,12 +61,14 @@ RUN set -ex \
 
 # sfcgal
 ENV SFCGAL_VERSION master
-#current:
-#ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
-#reverted for the last working version
-ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
+# SCFGAL 1.4.1 tag (latest stable release: needs libcgal-dev >= 5.3)
+ENV SFCGAL_GIT_HASH 2d6a1a89552f14fe2926038b7237686bb9e5472e
 
 RUN set -ex \
+    # Fetch libcgal-dev from Debian testing (sid)
+    && echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends libcgal-dev \
     && mkdir -p /usr/src \
     && cd /usr/src \
     && git clone https://gitlab.com/Oslandia/SFCGAL.git \
