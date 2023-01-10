@@ -82,7 +82,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
+ENV PROJ_GIT_HASH 08e123182f5a1404e7f1f9ef30e19f5af8bde1d4
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -112,7 +112,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
+ENV GEOS_GIT_HASH a8514a36f7a6ca3e1eccc2a9b53d3d711342d2bf
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -128,7 +128,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 437b59d300f3a2d7f07901dccd9bccb83084eb33
+ENV GDAL_GIT_HASH 6bdeb5623b5e7febde1fcfb932ee9214db9594dc
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -211,9 +211,9 @@ COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
-ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
-ENV GDAL_GIT_HASH 437b59d300f3a2d7f07901dccd9bccb83084eb33
+ENV PROJ_GIT_HASH 08e123182f5a1404e7f1f9ef30e19f5af8bde1d4
+ENV GEOS_GIT_HASH a8514a36f7a6ca3e1eccc2a9b53d3d711342d2bf
+ENV GDAL_GIT_HASH 6bdeb5623b5e7febde1fcfb932ee9214db9594dc
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
     || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 732064a157813018763ce97a1ad68409c420a1e7
+ENV POSTGIS_GIT_HASH ba3baf669bbeb972319fd44d4f860bdbbdc0d664
 
 RUN set -ex \
     && apt-get update \
