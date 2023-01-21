@@ -82,7 +82,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH a44d84de52a9bf1b6ec86275500117cd46b66350
+ENV PROJ_GIT_HASH b23965ed195f868bde0c875593b8f9fa33153aa7
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -112,7 +112,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 0dae497cb39c7f9ec96868e0b9eee81975c5908b
+ENV GEOS_GIT_HASH d7420a56b0fde70954b2d5432d7fae659c887dd2
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -128,7 +128,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 034c83632cfe67215e1728c6725736cabcdbbf8e
+ENV GDAL_GIT_HASH edde63a70cc777e4dad62d5156da1987b679b14e
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -211,9 +211,9 @@ COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH a44d84de52a9bf1b6ec86275500117cd46b66350
-ENV GEOS_GIT_HASH 0dae497cb39c7f9ec96868e0b9eee81975c5908b
-ENV GDAL_GIT_HASH 034c83632cfe67215e1728c6725736cabcdbbf8e
+ENV PROJ_GIT_HASH b23965ed195f868bde0c875593b8f9fa33153aa7
+ENV GEOS_GIT_HASH d7420a56b0fde70954b2d5432d7fae659c887dd2
+ENV GDAL_GIT_HASH edde63a70cc777e4dad62d5156da1987b679b14e
 
 # Minimal command line test.
 RUN set -ex \
