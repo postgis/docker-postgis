@@ -82,7 +82,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 8f9b77def945d87567660071122981a3a9b7c330
+ENV PROJ_GIT_HASH f6107a546f61a25aa3589ee5942d0a6e5ba0d944
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -112,7 +112,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH c5c626127246adfed191bf4be6c9be1f3bc4c066
+ENV GEOS_GIT_HASH 0edd0a7f76fd06139595eeec80204c50e304c0ec
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -128,7 +128,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH edde63a70cc777e4dad62d5156da1987b679b14e
+ENV GDAL_GIT_HASH f1981ff5ea8ed23451f4919e41c3ab111a974676
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -211,9 +211,9 @@ COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH 8f9b77def945d87567660071122981a3a9b7c330
-ENV GEOS_GIT_HASH c5c626127246adfed191bf4be6c9be1f3bc4c066
-ENV GDAL_GIT_HASH edde63a70cc777e4dad62d5156da1987b679b14e
+ENV PROJ_GIT_HASH f6107a546f61a25aa3589ee5942d0a6e5ba0d944
+ENV GEOS_GIT_HASH 0edd0a7f76fd06139595eeec80204c50e304c0ec
+ENV GDAL_GIT_HASH f1981ff5ea8ed23451f4919e41c3ab111a974676
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
     || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH d03aa1b80f8c0cb04cf37ee8186e29a94feb2abe
+ENV POSTGIS_GIT_HASH 708a686b295ee25d8b2a4b8990e87e6a542512a4
 
 RUN set -ex \
     && apt-get update \
@@ -275,6 +275,10 @@ RUN set -ex \
         --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
+# refresh proj
+    # temporary workarounds: https://trac.osgeo.org/postgis/ticket/5316
+    && projsync --system-directory --source-id us_noaa \
+    && projsync --system-directory --source-id ch_swisstopo \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \

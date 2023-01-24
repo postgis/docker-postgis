@@ -275,6 +275,10 @@ RUN set -ex \
         --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
+# refresh proj
+    # temporary workarounds: https://trac.osgeo.org/postgis/ticket/5316
+    && projsync --system-directory --source-id us_noaa \
+    && projsync --system-directory --source-id ch_swisstopo \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
