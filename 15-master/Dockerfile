@@ -82,7 +82,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH f6107a546f61a25aa3589ee5942d0a6e5ba0d944
+ENV PROJ_GIT_HASH c3c276b06d94b05b496cceb2c98587819283e3ac
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -112,7 +112,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 0edd0a7f76fd06139595eeec80204c50e304c0ec
+ENV GEOS_GIT_HASH 1030e83c45894905170dd645ae6ac9fa1c26a5e9
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -128,7 +128,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH f1981ff5ea8ed23451f4919e41c3ab111a974676
+ENV GDAL_GIT_HASH c77b3603c287c660c61774b72f674bc2573a8d21
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -211,9 +211,9 @@ COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH f6107a546f61a25aa3589ee5942d0a6e5ba0d944
-ENV GEOS_GIT_HASH 0edd0a7f76fd06139595eeec80204c50e304c0ec
-ENV GDAL_GIT_HASH f1981ff5ea8ed23451f4919e41c3ab111a974676
+ENV PROJ_GIT_HASH c3c276b06d94b05b496cceb2c98587819283e3ac
+ENV GEOS_GIT_HASH 1030e83c45894905170dd645ae6ac9fa1c26a5e9
+ENV GDAL_GIT_HASH c77b3603c287c660c61774b72f674bc2573a8d21
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +230,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
     || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 708a686b295ee25d8b2a4b8990e87e6a542512a4
+ENV POSTGIS_GIT_HASH 50bb5edd95ac430689597ed8b1a12efaa06526b6
 
 RUN set -ex \
     && apt-get update \
@@ -275,10 +275,11 @@ RUN set -ex \
         --with-pcredir="$(pcre-config --prefix)" \
     && make -j$(nproc) \
     && make install \
-# refresh proj
-    # temporary workarounds: https://trac.osgeo.org/postgis/ticket/5316
-    && projsync --system-directory --source-id us_noaa \
-    && projsync --system-directory --source-id ch_swisstopo \
+# refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
+    && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
+    && projsync --system-directory --file us_noaa_eshpgn \
+    && projsync --system-directory --file us_noaa_prvi \
+    && projsync --system-directory --file us_noaa_wmhpgn \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
