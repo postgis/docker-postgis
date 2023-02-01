@@ -14,7 +14,7 @@ Note: As of PostGIS v3.x, raster has been factored out into a separate extension
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2023-01-27 )
+# Versions ( 2023-02-01 )
 
 Recomended version for the new users: `postgis/postgis:15-3.3`
 
@@ -54,7 +54,7 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 
 * alpha, beta, rc and development ( ~master ) versions
 * the template for `*-master` images is updated manually, so sometimes there is a delay of a few weeks.
-* SFCGAL >= 1.4 ; cgal locked on 5.5 branch
+* SFCGAL >= 1.4 ; cgal locked on [5.5.x-branch](https://github.com/CGAL/cgal/tree/5.5.x-branch)
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
