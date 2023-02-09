@@ -1,5 +1,9 @@
 # "experimental" ;  only for testing!
 # multi-stage dockerfile;  minimal docker version >= 17.05
+
+ARG DOCKER_CMAKE_BUILD_TYPE=Release
+#ARG DOCKER_CMAKE_BUILD_TYPE=MinSizeRel
+
 FROM postgres:14-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
@@ -58,6 +62,9 @@ RUN set -ex \
       protobuf-c-compiler \
       xsltproc
 
+ARG DOCKER_CMAKE_BUILD_TYPE
+ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
+
 # cgal & sfcgal
 # "Since Version 5.0, CGAL is a header-only library, hence it is not needed to build it."
 ENV CGAL_GIT_BRANCH 5.5.x-branch
@@ -75,14 +82,25 @@ RUN set -ex \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
-    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCGAL_DIR=/usr/src/cgal \
+    && cmake .. \
+       -DCGAL_DIR=/usr/src/cgal \
+       -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} \
+       -DSFCGAL_BUILD_BENCH=OFF \
+       -DSFCGAL_BUILD_EXAMPLES=OFF \
+       -DSFCGAL_BUILD_TESTS=OFF \
+       -DSFCGAL_WITH_OSG=OFF \
     && make -j$(nproc) \
     && make install \
+    #
+    # testing .. with -DSFCGAL_BUILD_TESTS=ON
+    # && CTEST_OUTPUT_ON_FAILURE=TRUE ctest \
+    #
+    # clean
     && rm -fr /usr/src/SFCGAL \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 29eaa0de9bac27ec0e86eab016ab08d69a72d41c
+ENV PROJ_GIT_HASH 7704c3e1d5eb8bb370fd03007b4e33273316dd2a
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -103,7 +121,7 @@ RUN set -ex \
         && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
         && mkdir build \
         && cd build \
-        && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+        && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
         && make -j$(nproc) \
         && make install \
         ; \
@@ -112,7 +130,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH b1708dd6d3650587448817a7cfcdfbe9eaa34e9f
+ENV GEOS_GIT_HASH 7942a49209199d05d7e7228ca37758a79e61375d
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -121,14 +139,14 @@ RUN set -ex \
     && git log -1 > /_pgis_geos_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
-    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
     && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH fe6847327b8c62625cae34b73c033ef5044f6b1d
+ENV GDAL_GIT_HASH 3a60aa339d36239f5f5eb5447cbf34a008ecf361
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -155,7 +173,7 @@ RUN set -ex \
         set -eux \
         && mkdir build \
         && cd build \
-        && cmake -DCMAKE_BUILD_TYPE=Release .. \
+        && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
         ; \
     fi \
     \
@@ -179,6 +197,9 @@ RUN set -ex \
 # STAGE  final
 # -------------------------------------------
 FROM postgres:14-bullseye
+
+ARG DOCKER_CMAKE_BUILD_TYPE
+ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
 RUN set -ex \
     && apt-get update \
@@ -211,9 +232,9 @@ COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH 29eaa0de9bac27ec0e86eab016ab08d69a72d41c
-ENV GEOS_GIT_HASH b1708dd6d3650587448817a7cfcdfbe9eaa34e9f
-ENV GDAL_GIT_HASH fe6847327b8c62625cae34b73c033ef5044f6b1d
+ENV PROJ_GIT_HASH 7704c3e1d5eb8bb370fd03007b4e33273316dd2a
+ENV GEOS_GIT_HASH 7942a49209199d05d7e7228ca37758a79e61375d
+ENV GDAL_GIT_HASH 3a60aa339d36239f5f5eb5447cbf34a008ecf361
 
 # Minimal command line test.
 RUN set -ex \
@@ -230,7 +251,7 @@ RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
     || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 6c3242de1f80cfcc196d6268c67b9ae8caf3a919
+ENV POSTGIS_GIT_HASH dd3d8a4cd8595dac230f49a272f9b403fe4ee6fb
 
 RUN set -ex \
     && apt-get update \
@@ -273,6 +294,7 @@ RUN set -ex \
     && ./configure \
 #       --with-gui \
         --with-pcredir="$(pcre-config --prefix)" \
+        --with-lto \
     && make -j$(nproc) \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
@@ -287,14 +309,19 @@ RUN set -ex \
     && su postgres -c 'pg_ctl -D /tempdb start' \
     && ldconfig \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    && CTEST_OUTPUT_ON_FAILURE=TRUE make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
@@ -339,5 +366,7 @@ RUN set -ex \
     #   https://github.com/postgis/docker-postgis/issues/307
     && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
-    # list postgresql, postgis version and last commits.
-    && find /_pgis_*.txt -type f -print -exec cat {} \;
+    # list last commits.
+    && find /_pgis_*_last_commit.txt -type f -print -exec cat {} \;  \
+    # list postgresql, postgis version
+    && cat _pgis_full_version.txt
