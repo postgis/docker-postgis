@@ -44,6 +44,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
 
+cgal55GitHash="$(git ls-remote https://github.com/CGAL/cgal.git heads/5.5.x-branch | awk '{ print $1}')"
 sfcgalGitHash="$(git ls-remote https://gitlab.com/Oslandia/SFCGAL.git heads/master | awk '{ print $1}')"
 projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
 gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"
@@ -145,7 +146,7 @@ for version in "${versions[@]}"; do
             else
               cat Dockerfile.template        > "$version/Dockerfile"
             fi
-            sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
+            sed -i 's/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%CGAL55_GIT_HASH%%/'$cgal55GitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
 
             echo "| [postgis/postgis:${version}](${dockerhublink}${version}) | [Dockerfile](${githubrepolink}/${version}/Dockerfile) | debian:${suite} | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
         )

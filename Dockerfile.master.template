@@ -68,14 +68,16 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 # By utilizing the latest commit of the CGAL 5.5.x-branch and implementing a header-only build for SFCGAL,
 # one can benefit from the latest CGAL patches while avoiding compatibility issues.
-# In the /_pgis_cgal_last_commit.txt you can find the actual commit.
+# In the /_pgis_cgal_last_commit.txt and /_pgis_sfcgal_last_commit.txt  you can find the actual commit.
 ENV CGAL_GIT_BRANCH 5.5.x-branch
+ENV CGAL55_GIT_HASH %%CGAL55_GIT_HASH%%
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
-    && git clone --depth 1 --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
+    && git clone --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
     && cd cgal \
+    && git checkout ${CGAL55_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && git clone https://gitlab.com/Oslandia/SFCGAL.git \
@@ -233,6 +235,8 @@ RUN set -ex \
 COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
+ENV CGAL_GIT_BRANCH 5.5.x-branch
+ENV CGAL55_GIT_HASH %%CGAL55_GIT_HASH%%
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
 ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
 ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
