@@ -66,7 +66,9 @@ ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
 # cgal & sfcgal
-# "Since Version 5.0, CGAL is a header-only library, hence it is not needed to build it."
+# By utilizing the latest commit of the CGAL 5.5.x-branch and implementing a header-only build for SFCGAL,
+# one can benefit from the latest CGAL patches while avoiding compatibility issues.
+# In the /_pgis_cgal_last_commit.txt you can find the actual commit.
 ENV CGAL_GIT_BRANCH 5.5.x-branch
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
 RUN set -ex \
@@ -92,7 +94,7 @@ RUN set -ex \
     && make -j$(nproc) \
     && make install \
     #
-    # testing .. with -DSFCGAL_BUILD_TESTS=ON
+    ## testing with -DSFCGAL_BUILD_TESTS=ON
     # && CTEST_OUTPUT_ON_FAILURE=TRUE ctest \
     #
     # clean
@@ -244,11 +246,11 @@ RUN set -ex \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
-
-# Testing ogr2ogr PostgreSQL driver.
-RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
-    || echo "ogr2ogr missing PostgreSQL driver" && exit 1
+    && sfcgal-config --version \
+    \
+    # Testing ogr2ogr PostgreSQL driver.
+    && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
+            || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
 ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
