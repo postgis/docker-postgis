@@ -60,7 +60,20 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc
+      xsltproc \
+      # gdal+
+      libblosc-dev \
+      libcfitsio-dev \
+      libfreexl-dev \
+      libfyba-dev \
+      libhdf5-dev \
+      libkml-dev \
+      liblz4-dev \
+      liblzma-dev \
+      libopenjp2-7-dev \
+      libqhull-dev \
+      libwebp-dev \
+      libzstd-dev
 
 ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
@@ -104,7 +117,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 049e8d46ae18d85943fbe55eb957948fcc49f17e
+ENV PROJ_GIT_HASH c85596492960d390ce28136b453742c36e529d93
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -150,7 +163,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 3231cdfcf44929a6287433695b6a725a020ae6c9
+ENV GDAL_GIT_HASH 06d99ac6348ce33dd28fc7b91b1b5ab5811b4807
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -177,7 +190,40 @@ RUN set -ex \
         set -eux \
         && mkdir build \
         && cd build \
+        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
         && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+			-DBUILD_DOCS=OFF \
+            \
+			-DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
+			-DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
+			-DGDAL_USE_BLOSC=ON \
+			-DGDAL_USE_CFITSIO=ON \
+			-DGDAL_USE_CURL=ON \
+			-DGDAL_USE_DEFLATE=ON \
+			-DGDAL_USE_EXPAT=ON \
+			-DGDAL_USE_FREEXL=ON \
+			-DGDAL_USE_FYBA=ON \
+			-DGDAL_USE_GEOS=ON \
+			-DGDAL_USE_HDF5=ON \
+			-DGDAL_USE_JSONC=ON \
+			-DGDAL_USE_LERC_INTERNAL=ON \
+			-DGDAL_USE_LIBKML=ON \
+			-DGDAL_USE_LIBLZMA=ON \
+			-DGDAL_USE_LZ4=ON \
+			-DGDAL_USE_OPENJPEG=ON \
+			-DGDAL_USE_POSTGRESQL=ON \
+			-DGDAL_USE_QHULL=ON \
+			-DGDAL_USE_SQLITE3=ON \
+			-DGDAL_USE_TIFF=ON \
+			-DGDAL_USE_WEBP=ON \
+			-DGDAL_USE_ZSTD=ON \
+            \
+            # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
+#			-DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
+			-DGDAL_USE_ECW=OFF \
+			-DGDAL_USE_GEOTIFF=OFF \
+			-DGDAL_USE_HEIF=OFF \
+			-DGDAL_USE_SPATIALITE=OFF \
         ; \
     fi \
     \
@@ -190,6 +236,7 @@ RUN set -ex \
 RUN set -ex \
     && ldconfig \
     && cs2cs \
+    && ldd $(which gdalinfo) \
     && gdalinfo --version \
     && geos-config --version \
     && ogr2ogr --version \
@@ -230,6 +277,18 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
+      # gdal+
+      libblosc1 \
+      libcfitsio9 \
+      libfreexl1 \
+      libfyba0 \
+      libhdf5-103-1 \
+      libkmlbase1 \
+      libkmldom1 \
+      libkmlengine1 \
+      libopenjp2-7 \
+      libqhull-r8.0 \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /_pgis*.* /
@@ -238,15 +297,17 @@ COPY --from=builder /usr/local /usr/local
 ENV CGAL_GIT_BRANCH 5.5.x-branch
 ENV CGAL55_GIT_HASH 82e0cf33aaf760cd51bd24ace9357acc181acab1
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH 049e8d46ae18d85943fbe55eb957948fcc49f17e
+ENV PROJ_GIT_HASH c85596492960d390ce28136b453742c36e529d93
 ENV GEOS_GIT_HASH 7942a49209199d05d7e7228ca37758a79e61375d
-ENV GDAL_GIT_HASH 3231cdfcf44929a6287433695b6a725a020ae6c9
+ENV GDAL_GIT_HASH 06d99ac6348ce33dd28fc7b91b1b5ab5811b4807
 
-# Minimal command line test.
+# Minimal command line test ( fail fast )
 RUN set -ex \
     && ldconfig \
     && cs2cs \
+    && ldd $(which gdalinfo) \
     && gdalinfo --version \
+    && gdal-config --formats \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
@@ -367,7 +428,18 @@ RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 
+# last final test
 RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && ldd $(which gdalinfo) \
+    && gdalinfo --version \
+    && gdal-config --formats \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version \
+    \
     # Is the "ca-certificates" package installed? (for accessing remote raster files)
     #   https://github.com/postgis/docker-postgis/issues/307
     && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
