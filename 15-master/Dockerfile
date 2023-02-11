@@ -1,12 +1,15 @@
-# "experimental" ;  only for testing!
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
+# "experimental" ;  only for testing! Changes expected!
 # multi-stage dockerfile;  minimal docker version >= 17.05
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-#ARG DOCKER_CMAKE_BUILD_TYPE=MinSizeRel
-
 FROM postgres:15-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
+LABEL org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
 
@@ -81,7 +84,6 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 # By utilizing the latest commit of the CGAL 5.5.x-branch and implementing a header-only build for SFCGAL,
 # one can benefit from the latest CGAL patches while avoiding compatibility issues.
-# In the /_pgis_cgal_last_commit.txt and /_pgis_sfcgal_last_commit.txt  you can find the actual commit.
 ENV CGAL_GIT_BRANCH 5.5.x-branch
 ENV CGAL55_GIT_HASH 82e0cf33aaf760cd51bd24ace9357acc181acab1
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
@@ -192,38 +194,38 @@ RUN set -ex \
         && cd build \
         # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
         && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
-			-DBUILD_DOCS=OFF \
+            -DBUILD_DOCS=OFF \
             \
-			-DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
-			-DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
-			-DGDAL_USE_BLOSC=ON \
-			-DGDAL_USE_CFITSIO=ON \
-			-DGDAL_USE_CURL=ON \
-			-DGDAL_USE_DEFLATE=ON \
-			-DGDAL_USE_EXPAT=ON \
-			-DGDAL_USE_FREEXL=ON \
-			-DGDAL_USE_FYBA=ON \
-			-DGDAL_USE_GEOS=ON \
-			-DGDAL_USE_HDF5=ON \
-			-DGDAL_USE_JSONC=ON \
-			-DGDAL_USE_LERC_INTERNAL=ON \
-			-DGDAL_USE_LIBKML=ON \
-			-DGDAL_USE_LIBLZMA=ON \
-			-DGDAL_USE_LZ4=ON \
-			-DGDAL_USE_OPENJPEG=ON \
-			-DGDAL_USE_POSTGRESQL=ON \
-			-DGDAL_USE_QHULL=ON \
-			-DGDAL_USE_SQLITE3=ON \
-			-DGDAL_USE_TIFF=ON \
-			-DGDAL_USE_WEBP=ON \
-			-DGDAL_USE_ZSTD=ON \
+            -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
+            -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
+            -DGDAL_USE_BLOSC=ON \
+            -DGDAL_USE_CFITSIO=ON \
+            -DGDAL_USE_CURL=ON \
+            -DGDAL_USE_DEFLATE=ON \
+            -DGDAL_USE_EXPAT=ON \
+            -DGDAL_USE_FREEXL=ON \
+            -DGDAL_USE_FYBA=ON \
+            -DGDAL_USE_GEOS=ON \
+            -DGDAL_USE_HDF5=ON \
+            -DGDAL_USE_JSONC=ON \
+            -DGDAL_USE_LERC_INTERNAL=ON \
+            -DGDAL_USE_LIBKML=ON \
+            -DGDAL_USE_LIBLZMA=ON \
+            -DGDAL_USE_LZ4=ON \
+            -DGDAL_USE_OPENJPEG=ON \
+            -DGDAL_USE_POSTGRESQL=ON \
+            -DGDAL_USE_QHULL=ON \
+            -DGDAL_USE_SQLITE3=ON \
+            -DGDAL_USE_TIFF=ON \
+            -DGDAL_USE_WEBP=ON \
+            -DGDAL_USE_ZSTD=ON \
             \
             # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
-#			-DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
-			-DGDAL_USE_ECW=OFF \
-			-DGDAL_USE_GEOTIFF=OFF \
-			-DGDAL_USE_HEIF=OFF \
-			-DGDAL_USE_SPATIALITE=OFF \
+            # -DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
+            -DGDAL_USE_ECW=OFF \
+            -DGDAL_USE_GEOTIFF=OFF \
+            -DGDAL_USE_HEIF=OFF \
+            -DGDAL_USE_SPATIALITE=OFF \
         ; \
     fi \
     \
@@ -376,7 +378,7 @@ RUN set -ex \
     && su postgres -c 'pg_ctl -D /tempdb start' \
     && ldconfig \
     && cd regress \
-    && CTEST_OUTPUT_ON_FAILURE=TRUE make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
