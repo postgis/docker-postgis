@@ -1,3 +1,7 @@
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
 FROM postgres:13-bullseye
 
 LABEL maintainer="PostGIS Project - https://postgis.net"

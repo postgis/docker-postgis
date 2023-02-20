@@ -1,8 +1,15 @@
-# "experimental" ;  only for testing!
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
+# "experimental" ;  only for testing! Changes expected!
 # multi-stage dockerfile;  minimal docker version >= 17.05
+
+ARG DOCKER_CMAKE_BUILD_TYPE=Release
 FROM postgres:15-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net"
+LABEL org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
 
@@ -42,7 +49,6 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
-      libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
@@ -57,38 +63,69 @@ RUN set -ex \
       make \
       pkg-config \
       protobuf-c-compiler \
-      xsltproc
+      xsltproc \
+      # gdal+
+      libblosc-dev \
+      libcfitsio-dev \
+      libfreexl-dev \
+      libfyba-dev \
+      libhdf5-dev \
+      libkml-dev \
+      liblz4-dev \
+      liblzma-dev \
+      libopenjp2-7-dev \
+      libqhull-dev \
+      libwebp-dev \
+      libzstd-dev
 
-# sfcgal
-ENV SFCGAL_VERSION master
-#current:
-#ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-#reverted for the last working version
-ENV SFCGAL_GIT_HASH e1f5cd801f8796ddb442c06c11ce8c30a7eed2c5
+ARG DOCKER_CMAKE_BUILD_TYPE
+ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
+# cgal & sfcgal
+# By utilizing the latest commit of the CGAL 5.5.x-branch and implementing a header-only build for SFCGAL,
+# one can benefit from the latest CGAL patches while avoiding compatibility issues.
+ENV CGAL_GIT_BRANCH 5.5.x-branch
+ENV CGAL55_GIT_HASH ec00fa30b2f0d1eeb5bc7f3064e4817e9c3d6135
+ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
 RUN set -ex \
     && mkdir -p /usr/src \
+    && cd /usr/src \
+    && git clone --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
+    && cd cgal \
+    && git checkout ${CGAL55_GIT_HASH} \
+    && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && git clone https://gitlab.com/Oslandia/SFCGAL.git \
     && cd SFCGAL \
     && git checkout ${SFCGAL_GIT_HASH} \
+    && git log -1 > /_pgis_sfcgal_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. \
+       -DCGAL_DIR=/usr/src/cgal \
+       -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} \
+       -DSFCGAL_BUILD_BENCH=OFF \
+       -DSFCGAL_BUILD_EXAMPLES=OFF \
+       -DSFCGAL_BUILD_TESTS=OFF \
+       -DSFCGAL_WITH_OSG=OFF \
     && make -j$(nproc) \
     && make install \
-    && cd / \
-    && rm -fr /usr/src/SFCGAL
+    #
+    ## testing with -DSFCGAL_BUILD_TESTS=ON
+    # && CTEST_OUTPUT_ON_FAILURE=TRUE ctest \
+    #
+    # clean
+    && rm -fr /usr/src/SFCGAL \
+    && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_VERSION master
-ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
-
+ENV PROJ_GIT_HASH 23a8eccf9e9feebe7bb4cc700baef58ffef59f5d
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
     && cd PROJ \
     && git checkout ${PROJ_GIT_HASH} \
+    && git log -1 > /_pgis_proj_last_commit.txt \
     # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
     && if [ -f "autogen.sh" ] ; then \
         set -eux \
@@ -103,41 +140,38 @@ RUN set -ex \
         && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
         && mkdir build \
         && cd build \
-        && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+        && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
         && make -j$(nproc) \
         && make install \
         ; \
     fi \
     \
-    && cd / \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_VERSION master
-ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
-
+ENV GEOS_GIT_HASH a36676e3a0467dc6bdbfb426a4d369ded8f677d4
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
     && cd geos \
     && git checkout ${GEOS_GIT_HASH} \
+    && git log -1 > /_pgis_geos_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
-    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
     && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_VERSION master
-ENV GDAL_GIT_HASH 12c1c58435d025a97ecec0dffd39bb793b332b11
-
+ENV GDAL_GIT_HASH a9a159afc9589b28d1d30ec010a5b9f33d389f7a
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
     && cd gdal \
     && git checkout ${GDAL_GIT_HASH} \
+    && git log -1 > /_pgis_gdal_last_commit.txt \
     \
     # gdal project directory structure - has been changed !
     && if [ -d "gdal" ] ; then \
@@ -158,7 +192,40 @@ RUN set -ex \
         set -eux \
         && mkdir build \
         && cd build \
-        && cmake -DCMAKE_BUILD_TYPE=Release .. \
+        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
+        && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+            -DBUILD_DOCS=OFF \
+            \
+            -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
+            -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
+            -DGDAL_USE_BLOSC=ON \
+            -DGDAL_USE_CFITSIO=ON \
+            -DGDAL_USE_CURL=ON \
+            -DGDAL_USE_DEFLATE=ON \
+            -DGDAL_USE_EXPAT=ON \
+            -DGDAL_USE_FREEXL=ON \
+            -DGDAL_USE_FYBA=ON \
+            -DGDAL_USE_GEOS=ON \
+            -DGDAL_USE_HDF5=ON \
+            -DGDAL_USE_JSONC=ON \
+            -DGDAL_USE_LERC_INTERNAL=ON \
+            -DGDAL_USE_LIBKML=ON \
+            -DGDAL_USE_LIBLZMA=ON \
+            -DGDAL_USE_LZ4=ON \
+            -DGDAL_USE_OPENJPEG=ON \
+            -DGDAL_USE_POSTGRESQL=ON \
+            -DGDAL_USE_QHULL=ON \
+            -DGDAL_USE_SQLITE3=ON \
+            -DGDAL_USE_TIFF=ON \
+            -DGDAL_USE_WEBP=ON \
+            -DGDAL_USE_ZSTD=ON \
+            \
+            # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
+            # -DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
+            -DGDAL_USE_ECW=OFF \
+            -DGDAL_USE_GEOTIFF=OFF \
+            -DGDAL_USE_HEIF=OFF \
+            -DGDAL_USE_SPATIALITE=OFF \
         ; \
     fi \
     \
@@ -171,6 +238,7 @@ RUN set -ex \
 RUN set -ex \
     && ldconfig \
     && cs2cs \
+    && ldd $(which gdalinfo) \
     && gdalinfo --version \
     && geos-config --version \
     && ogr2ogr --version \
@@ -178,7 +246,13 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre-config  --version
 
+# -------------------------------------------
+# STAGE  final
+# -------------------------------------------
 FROM postgres:15-bullseye
+
+ARG DOCKER_CMAKE_BUILD_TYPE
+ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
 RUN set -ex \
     && apt-get update \
@@ -205,32 +279,48 @@ RUN set -ex \
       libtiff5 \
       libxml2 \
       sqlite3 \
+      # gdal+
+      libblosc1 \
+      libcfitsio9 \
+      libfreexl1 \
+      libfyba0 \
+      libhdf5-103-1 \
+      libkmlbase1 \
+      libkmldom1 \
+      libkmlengine1 \
+      libopenjp2-7 \
+      libqhull-r8.0 \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
-#ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
-ENV PROJ_GIT_HASH 23ffb4ba179a9b3bf1debd2749e92f1862b51536
-ENV GEOS_GIT_HASH dd31eb17c6b5283bfee0c3c513192cd257b015cc
-ENV GDAL_GIT_HASH 12c1c58435d025a97ecec0dffd39bb793b332b11
+ENV CGAL_GIT_BRANCH 5.5.x-branch
+ENV CGAL55_GIT_HASH ec00fa30b2f0d1eeb5bc7f3064e4817e9c3d6135
+ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
+ENV PROJ_GIT_HASH 23a8eccf9e9feebe7bb4cc700baef58ffef59f5d
+ENV GEOS_GIT_HASH a36676e3a0467dc6bdbfb426a4d369ded8f677d4
+ENV GDAL_GIT_HASH a9a159afc9589b28d1d30ec010a5b9f33d389f7a
 
-# Minimal command line test.
+# Minimal command line test ( fail fast )
 RUN set -ex \
     && ldconfig \
     && cs2cs \
+    && ldd $(which gdalinfo) \
     && gdalinfo --version \
+    && gdal-config --formats \
     && geos-config --version \
     && ogr2ogr --version \
     && proj \
-    && sfcgal-config --version
-
-# Testing ogr2ogr PostgreSQL driver.
-RUN ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
-    || echo "ogr2ogr missing PostgreSQL driver" && exit 1
+    && sfcgal-config --version \
+    \
+    # Testing ogr2ogr PostgreSQL driver.
+    && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
+            || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_VERSION master
-ENV POSTGIS_GIT_HASH ee06f41209c87366494b454f33179f56788cabc5
+ENV POSTGIS_GIT_HASH 256dd5e0e1bf8a576df6856eebf0828054d42faf
 
 RUN set -ex \
     && apt-get update \
@@ -245,7 +335,6 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
-      libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
@@ -267,14 +356,21 @@ RUN set -ex \
     && git clone https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
+    && git log -1 > /_pgis_last_commit.txt \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
 #       --with-gui \
         --with-pcredir="$(pcre-config --prefix)" \
+        --with-lto \
     && make -j$(nproc) \
     && make install \
+# refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
+    && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
+    && projsync --system-directory --file us_noaa_eshpgn \
+    && projsync --system-directory --file us_noaa_prvi \
+    && projsync --system-directory --file us_noaa_wmhpgn \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
@@ -285,8 +381,16 @@ RUN set -ex \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
@@ -304,7 +408,6 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
-      libcgal-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
@@ -327,10 +430,23 @@ RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 
+# last final test
 RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && ldd $(which gdalinfo) \
+    && gdalinfo --version \
+    && gdal-config --formats \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version \
+    \
     # Is the "ca-certificates" package installed? (for accessing remote raster files)
     #   https://github.com/postgis/docker-postgis/issues/307
     && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
+    # list last commits.
+    && find /_pgis_*_last_commit.txt -type f -print -exec cat {} \;  \
     # list postgresql, postgis version
-    && cat /_pgis_full_version.txt
+    && cat _pgis_full_version.txt
