@@ -12,15 +12,15 @@ This image ensures that the default database created by the parent `postgres` im
 | `postgis_topology`  | yes |
 | `postgis_tiger_geocoder` | yes |
 | `postgis_raster` | |
-| `postgis_sfcgal` ( except the alpine version) | |
+| `postgis_sfcgal` ( except the alpine versions) | |
 | `address_standardizer`| |
 | `address_standardizer_data_us`| |
-
-
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
 # Versions ( 2023-04-22 )
+
+Supported architecture: `amd64`
 
 Recomended version for the new users: `postgis/postgis:15-3.3`
 
@@ -97,13 +97,13 @@ See [the PostGIS documentation](http://postgis.net/docs/postgis_installation.htm
 
 Since the docker-postgis repository is an extension of the official Docker PostgreSQL repository, all environment variables supported there are also supported here:
 
-- `POSTGRES_PASSWORD`
-- `POSTGRES_USER`
-- `POSTGRES_DB`
-- `POSTGRES_INITDB_ARGS`
-- `POSTGRES_INITDB_WALDIR`
-- `POSTGRES_HOST_AUTH_METHOD`
-- `PGDATA`
+* `POSTGRES_PASSWORD`
+* `POSTGRES_USER`
+* `POSTGRES_DB`
+* `POSTGRES_INITDB_ARGS`
+* `POSTGRES_INITDB_WALDIR`
+* `POSTGRES_HOST_AUTH_METHOD`
+* `PGDATA`
 
 Read more:  https://github.com/docker-library/docs/blob/master/postgres/README.md
 
@@ -115,18 +115,21 @@ It's important to note that the environment variables for the Docker image are d
 ## Troubleshooting tips:
 
 Troubleshooting can often be challenging. It's important to know that the docker-postgis repository is an extension of the official Docker PostgreSQL repository. Therefore, if you encounter any issues, it's worth testing whether the problem can be reproduced with the [official PostgreSQL Docker images](https://hub.docker.com/_/postgres). If so, it's recommended to search for solutions based on this. The following websites are suggested:
-- Upstream docker postgres repo: https://github.com/docker-library/postgres
-  - search for the open or closed issues !
-- Docker Community Forums https://forums.docker.com/ 
-- Docker Community Slack, https://dockr.ly/slack
-- Stack Overflow https://stackoverflow.com/questions/tagged/docker+postgresql
+
+* Upstream docker postgres repo: https://github.com/docker-library/postgres
+  * search for the open or closed issues !
+* Docker Community Forums: https://forums.docker.com
+* Docker Community Slack: https://dockr.ly/slack
+* Stack Overflow: https://stackoverflow.com/questions/tagged/docker+postgresql
 
 If your problem is Postgis related:
-- Stack Overflow : docker + postgis https://stackoverflow.com/questions/tagged/docker+postgis
-- Postgis issue tracker: https://trac.osgeo.org/postgis/report 
+
+* Stack Overflow : docker + postgis https://stackoverflow.com/questions/tagged/docker+postgis
+* Postgis issue tracker: https://trac.osgeo.org/postgis/report
 
 And if you don't have a postgres docker experience - read this blog post:
-- https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/
+
+* https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/
 
 
 ## Security
@@ -135,7 +138,7 @@ It's crucial to be aware that in a cloud environment, with default settings, the
 * Note that ports which are not bound to the host (i.e., `-p 5432:5432` instead of `-p 127.0.0.1:5432:5432`) will be accessible from the outside. This also applies if you configured UFW to block this specific port, as Docker manages its own iptables rules. ( [Read More](https://docs.docker.com/network/iptables/) )
 
 Recomendations:
-* You can add options for using SSL  ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
+* You can add options for using SSL ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
   - `-c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key`
 * Or you can use [SSH Tunnels](https://www.postgresql.org/docs/15/ssh-tunnels.html) with `-p 127.0.0.1:5432:5432`
 
