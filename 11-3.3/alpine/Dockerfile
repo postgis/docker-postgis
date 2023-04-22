@@ -73,10 +73,12 @@ RUN set -eux \
         autoconf \
         automake \
         clang-dev \
+        cunit-dev \
         file \
         g++ \
         gcc \
         gettext-dev \
+        git \
         json-c-dev \
         libtool \
         libxml2-dev \
