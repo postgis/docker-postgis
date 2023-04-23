@@ -336,6 +336,7 @@ RUN set -ex \
       g++ \
       git \
       libboost-all-dev \
+      libcunit1-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
       libjson-c-dev \
@@ -364,7 +365,7 @@ RUN set -ex \
     && ./configure \
 #       --with-gui \
         --with-pcredir="$(pcre-config --prefix)" \
-        --with-lto \
+        --enable-lto \
     && make -j$(nproc) \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
