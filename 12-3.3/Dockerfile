@@ -4,7 +4,9 @@
 
 FROM postgres:12-bullseye
 
-LABEL maintainer="PostGIS Project - https://postgis.net"
+LABEL maintainer="PostGIS Project - https://postgis.net" \
+      org.opencontainers.image.description="PostGIS 3.3.2+dfsg-1.pgdg110+1 spatial database extension with PostgreSQL 12 bullseye" \
+      org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
 ENV POSTGIS_VERSION 3.3.2+dfsg-1.pgdg110+1

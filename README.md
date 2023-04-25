@@ -6,19 +6,25 @@ The `postgis/postgis` image provides tags for running Postgres with [PostGIS](ht
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
-* `postgis`
-* `postgis_topology`
-* `postgis_tiger_geocoder`
-
-Note: As of PostGIS v3.x, raster has been factored out into a separate extension `postgis_raster` which must be installed separately.
+| installed extensions | [initializated](https://github.com/postgis/docker-postgis/blob/master/initdb-postgis.sh)|
+|---------------------|-----|
+| `postgis`           | yes |
+| `postgis_topology`  | yes |
+| `postgis_tiger_geocoder` | yes |
+| `postgis_raster` | |
+| `postgis_sfcgal` ( except the alpine versions) | |
+| `address_standardizer`| |
+| `address_standardizer_data_us`| |
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2023-03-18 )
+# Versions ( 2023-04-22 )
+
+Supported architecture: `amd64`
 
 Recomended version for the new users: `postgis/postgis:15-3.3`
 
-### Debian based ( recomended ):
+### Debian based ( recomended )
 
  * It's conservative in its release cycle to ensure high stability.
    * *"conservative"* ~= not the latest geos, proj, gdal packages.
@@ -86,6 +92,55 @@ Once you have started a database container, you can then connect to the database
 Check the documentation on the [`postgres` image](https://registry.hub.docker.com/_/postgres/) and [Docker networking](https://docs.docker.com/network/) for more details and alternatives on connecting different containers.
 
 See [the PostGIS documentation](http://postgis.net/docs/postgis_installation.html#create_new_db_extensions) for more details on your options for creating and using a spatially-enabled database.
+
+## Supported Environment Variables:
+
+Since the docker-postgis repository is an extension of the official Docker PostgreSQL repository, all environment variables supported there are also supported here:
+
+* `POSTGRES_PASSWORD`
+* `POSTGRES_USER`
+* `POSTGRES_DB`
+* `POSTGRES_INITDB_ARGS`
+* `POSTGRES_INITDB_WALDIR`
+* `POSTGRES_HOST_AUTH_METHOD`
+* `PGDATA`
+
+Read more:  https://github.com/docker-library/docs/blob/master/postgres/README.md
+
+Warning: **the Docker specific variables will only have an effect if you start the container with a data directory that is empty;** any pre-existing database will be left untouched on container startup.
+
+It's important to note that the environment variables for the Docker image are different from those of the [libpq — C Library](https://www.postgresql.org/docs/current/libpq-envars.html)  (`PGDATABASE`,`PGUSER`,`PGPASSWORD` )
+
+
+## Troubleshooting tips:
+
+Troubleshooting can often be challenging. It's important to know that the docker-postgis repository is an extension of the official Docker PostgreSQL repository. Therefore, if you encounter any issues, it's worth testing whether the problem can be reproduced with the [official PostgreSQL Docker images](https://hub.docker.com/_/postgres). If so, it's recommended to search for solutions based on this. The following websites are suggested:
+
+* Upstream docker postgres repo: https://github.com/docker-library/postgres
+  * search for the open or closed issues !
+* Docker Community Forums: https://forums.docker.com
+* Docker Community Slack: https://dockr.ly/slack
+* Stack Overflow: https://stackoverflow.com/questions/tagged/docker+postgresql
+
+If your problem is Postgis related:
+
+* Stack Overflow : docker + postgis https://stackoverflow.com/questions/tagged/docker+postgis
+* Postgis issue tracker: https://trac.osgeo.org/postgis/report
+
+And if you don't have a postgres docker experience - read this blog post:
+
+* https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/
+
+
+## Security
+
+It's crucial to be aware that in a cloud environment, with default settings, these images are vulnerable, and there's a high risk of cryptominer infection if the ports are left open. ( [Read More](https://github.com/docker-library/postgres/issues/770#issuecomment-704460980) )
+* Note that ports which are not bound to the host (i.e., `-p 5432:5432` instead of `-p 127.0.0.1:5432:5432`) will be accessible from the outside. This also applies if you configured UFW to block this specific port, as Docker manages its own iptables rules. ( [Read More](https://docs.docker.com/network/iptables/) )
+
+Recomendations:
+* You can add options for using SSL ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
+  - `-c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key`
+* Or you can use [SSH Tunnels](https://www.postgresql.org/docs/15/ssh-tunnels.html) with `-p 127.0.0.1:5432:5432`
 
 ## Known Issues / Errors
 
