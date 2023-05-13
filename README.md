@@ -18,7 +18,7 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2023-05-12 )
+# Versions ( 2023-05-13 )
 
 Supported architecture: `amd64`
 
@@ -26,11 +26,11 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 
 ### Debian based ( recomended )
 
- * It's conservative in its release cycle to ensure high stability.
-   * *"conservative"* ~= not the latest geos, proj, gdal packages.
- * Postgis, geos, proj, gdal packages from debian repository
-   * debian:bullseye: geos=3.9; gdal=3.2; proj=7.2
-* Easy to extend, matured
+* This Docker-PostGIS version has a cautious release cycle to guarantee high stability.
+  * By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
+* We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
+  * In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
+* This version is easy to extend and has matured over time.
 
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
@@ -43,9 +43,9 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 
 ### Alpine based
 
-* base os = [Alpine linux](https://alpinelinux.org/): designed to be small, simple and secure ; [musl libc](https://musl.libc.org/) based
-* alpine:3.18; geos=3.11; gdal=3.6; proj=9.2; sfcgal=1.4
-* Postgis has been compiled from source; harder to extend
+* The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
+* In the Alpine 3.18 version, the package versions are: geos=3.11, gdal=3.6, proj=9.2, and sfcgal=1.4.
+* PostGIS is compiled from source, making it a bit more challenging to extend.
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
@@ -57,9 +57,9 @@ Recomended version for the new users: `postgis/postgis:15-3.3`
 
 ### Test images
 
-* alpha, beta, rc and development ( ~master ) versions
-* the template for `*-master` images is updated manually, so sometimes there is a delay of a few weeks.
-* SFCGAL >= 1.4 ; cgal locked on [5.5.x-branch](https://github.com/CGAL/cgal/tree/5.5.x-branch)
+* We provide alpha, beta, release candidate (rc), and development (identified as ~master) versions.
+* The template for the `*-master` images is updated manually, which might lead to a delay of a few weeks sometimes.
+* SFCGAL version is 1.4 or higher. The cgal version is locked on the [5.5.x-branch](https://github.com/CGAL/cgal/tree/5.5.x-branch).
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
