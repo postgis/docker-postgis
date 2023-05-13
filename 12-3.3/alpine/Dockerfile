@@ -61,13 +61,13 @@ RUN set -eux \
     && gettextize \
     && ./autogen.sh \
     && ./configure \
-        --with-pcredir="$(pcre2-config --prefix)" \
         --enable-lto \
     && make -j$(nproc) \
     && make install \
     \
 # This section is for refreshing the proj data for the regression tests.
-# It serves as a workaround for an issue documented at https://trac.osgeo.org/postgis/ticket/5316.
+# It serves as a workaround for an issue documented at https://trac.osgeo.org/postgis/ticket/5316
+# This increases the Docker image size by about 1 MB.
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
     && projsync --system-directory --file us_noaa_eshpgn \
     && projsync --system-directory --file us_noaa_prvi \
