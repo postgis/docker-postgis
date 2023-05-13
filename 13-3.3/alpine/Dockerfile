@@ -35,9 +35,13 @@ RUN set -eux \
         proj-util \
         sfcgal-dev \
         \
+        # The upstream variable, '$DOCKER_PG_LLVM_DEPS' contains
+        #  the correct versions of 'llvm-dev' and 'clang' for the current version of PostgreSQL.
+        # This improvement has been discussed in https://github.com/docker-library/postgres/pull/1077
+        $DOCKER_PG_LLVM_DEPS \
+        \
         autoconf \
         automake \
-        clang-dev \
         cunit-dev \
         file \
         g++ \
@@ -47,14 +51,12 @@ RUN set -eux \
         json-c-dev \
         libtool \
         libxml2-dev \
-        llvm-dev \
         make \
         pcre2-dev \
         perl \
         protobuf-c-dev \
     \
-# build PostGIS
-    \
+# build PostGIS - with Link Time Optimization (LTO) enabled
     && cd /usr/src/postgis \
     && gettextize \
     && ./autogen.sh \
@@ -64,24 +66,17 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install \
     \
-# refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
+# This section is for refreshing the proj data for the regression tests.
+# It serves as a workaround for an issue documented at https://trac.osgeo.org/postgis/ticket/5316.
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
     && projsync --system-directory --file us_noaa_eshpgn \
     && projsync --system-directory --file us_noaa_prvi \
     && projsync --system-directory --file us_noaa_wmhpgn \
-# regress check
+# This section performs a regression check.
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
-    \
-    # && su postgres -c 'pg_ctl -D /tempdb start' \
-    # \
-    # temporary disable jit for "development" \
-    # https://github.com/docker-library/postgres/issues/1076#issuecomment-1545209600  \
-    # DO NOT USE IN PRODUCTION; PLEASE NOT MERGE TO MASTER! \
-    #
-    && su postgres -c 'pg_ctl -o "--jit=off" -D /tempdb start' \
-    \
+    && su postgres -c 'pg_ctl -D /tempdb start' \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
     \
@@ -120,7 +115,8 @@ RUN set -eux \
     && cd / \
     && rm -rf /usr/src/postgis \
     && apk del .fetch-deps .build-deps \
-# print PostGIS_Full_Version() for the log. ( experimental & internal )
+# At the end of the build, we print the collected information
+# from the '/_pgis_full_version.txt' file. This is for experimental and internal purposes.
     && cat /_pgis_full_version.txt
 
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh

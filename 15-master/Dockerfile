@@ -150,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 59d9f5073e49db96ab93ddddbcfb4de67c151e48
+ENV GEOS_GIT_HASH 2cac99d49fef48d4054f4d74bfc3cbd7bc8bcdcf
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -301,7 +301,7 @@ ENV CGAL_GIT_BRANCH 5.5.x-branch
 ENV CGAL55_GIT_HASH f93ccadc282d09774c4a22914f71723ceadbd7ce
 ENV SFCGAL_GIT_HASH df3c2ccc015d4a85ac672fc307d2c7c324cccca7
 ENV PROJ_GIT_HASH 9d3737bd59c4750f0e695cb8aed2e4f83bb565ce
-ENV GEOS_GIT_HASH 59d9f5073e49db96ab93ddddbcfb4de67c151e48
+ENV GEOS_GIT_HASH 2cac99d49fef48d4054f4d74bfc3cbd7bc8bcdcf
 ENV GDAL_GIT_HASH 1e23a32efcba827e591d6a198bbb2af609a22ca8
 
 # Minimal command line test ( fail fast )
@@ -321,7 +321,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 08ede3e3f105c4e0116125d47a4d34c83487a5ff
+ENV POSTGIS_GIT_HASH 6080076af801c1b13f1a6bafa88d5ef41b1cf0a3
 
 RUN set -ex \
     && apt-get update \
