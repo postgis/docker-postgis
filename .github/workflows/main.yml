@@ -25,6 +25,12 @@ jobs:
           - postgres: 15
             postgis: master
             variant: default
+          - postgres: 16beta1
+            postgis: master
+            variant: default
+          - postgres: 16beta1
+            postgis: 3.3.3
+            variant: alpine
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
     runs-on: ubuntu-20.04
