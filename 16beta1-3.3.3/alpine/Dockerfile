@@ -5,7 +5,7 @@ ARG BASE_IMAGE=postgres:16beta1-alpine3.18
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.3 spatial database extension with PostgreSQL 16beta1 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.3.3 spatial database extension with PostgreSQL 16beta1 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_VERSION 3.3.3

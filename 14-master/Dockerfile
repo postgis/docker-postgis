@@ -150,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 68c588bf96e07f17ddf1495c67f9e2c06f9ddd83
+ENV GEOS_GIT_HASH 335cf85d0a66540bcf4474a00f9f39c1084976b3
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -301,7 +301,7 @@ ENV CGAL_GIT_BRANCH 5.5.x-branch
 ENV CGAL55_GIT_HASH 0c17d17f62216319809ed3d259355bc9b35bb12e
 ENV SFCGAL_GIT_HASH ae0a12da1e7a32d163930789e62874ca6ff0792c
 ENV PROJ_GIT_HASH 4c3b4264056b641de9a6baeb6aabbb69aaacbb09
-ENV GEOS_GIT_HASH 68c588bf96e07f17ddf1495c67f9e2c06f9ddd83
+ENV GEOS_GIT_HASH 335cf85d0a66540bcf4474a00f9f39c1084976b3
 ENV GDAL_GIT_HASH da9dd6dbc6b6b3773c56da87245118ae2120eb9c
 
 # Minimal command line test ( fail fast )
