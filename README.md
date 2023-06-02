@@ -6,7 +6,7 @@ The `postgis/postgis` image provides tags for running Postgres with [PostGIS](ht
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
-| installed extensions | [initializated](https://github.com/postgis/docker-postgis/blob/master/initdb-postgis.sh)|
+| installed extensions | [initialized](https://github.com/postgis/docker-postgis/blob/master/initdb-postgis.sh)|
 |---------------------|-----|
 | `postgis`           | yes |
 | `postgis_topology`  | yes |
@@ -18,13 +18,13 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions ( 2023-05-31 )
+# Versions (2023-05-31)
 
 Supported architecture: `amd64`
 
-Recomended version for the new users: `postgis/postgis:15-3.3`
+Recommended version for new users: `postgis/postgis:15-3.3`
 
-### Debian based ( recomended )
+### Debian based (recommended)
 
 * This Docker-PostGIS version has a cautious release cycle to guarantee high stability.
   * By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
