@@ -2,10 +2,11 @@
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-# "experimental" ;  only for testing! Changes expected!
-# multi-stage dockerfile;  minimal docker version >= 17.05
+# "Experimental"; solely for testing purposes. Anticipate frequent changes!
+# This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
+ARG CGAL_GIT_BRANCH=5.6.x-branch
 FROM postgres:15-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
@@ -83,17 +84,18 @@ ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
 # cgal & sfcgal
-# By utilizing the latest commit of the CGAL 5.5.x-branch and implementing a header-only build for SFCGAL,
+# By utilizing the latest commit of the CGAL 5.x.x-branch and implementing a header-only build for SFCGAL,
 # one can benefit from the latest CGAL patches while avoiding compatibility issues.
-ENV CGAL_GIT_BRANCH 5.5.x-branch
-ENV CGAL55_GIT_HASH 0c17d17f62216319809ed3d259355bc9b35bb12e
+ARG CGAL_GIT_BRANCH
+ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
+ENV CGAL5X_GIT_HASH ad130ba0e0603c06c2a3de887c2570b131ed206f
 ENV SFCGAL_GIT_HASH ae0a12da1e7a32d163930789e62874ca6ff0792c
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
     && git clone --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
     && cd cgal \
-    && git checkout ${CGAL55_GIT_HASH} \
+    && git checkout ${CGAL5X_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && git clone https://gitlab.com/Oslandia/SFCGAL.git \
@@ -120,7 +122,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 4c3b4264056b641de9a6baeb6aabbb69aaacbb09
+ENV PROJ_GIT_HASH 7e10ddc628e014c317c18d4bf464ea8947ce082b
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -150,7 +152,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 335cf85d0a66540bcf4474a00f9f39c1084976b3
+ENV GEOS_GIT_HASH afcb31885fb206d2e3093ead943aa320a991370a
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +168,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH da9dd6dbc6b6b3773c56da87245118ae2120eb9c
+ENV GDAL_GIT_HASH 9b77dcc88edf71da468e6e29e26b17df2cf76e5f
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -297,12 +299,13 @@ RUN set -ex \
 COPY --from=builder /_pgis*.* /
 COPY --from=builder /usr/local /usr/local
 
-ENV CGAL_GIT_BRANCH 5.5.x-branch
-ENV CGAL55_GIT_HASH 0c17d17f62216319809ed3d259355bc9b35bb12e
+ARG CGAL_GIT_BRANCH
+ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
+ENV CGAL5X_GIT_HASH ad130ba0e0603c06c2a3de887c2570b131ed206f
 ENV SFCGAL_GIT_HASH ae0a12da1e7a32d163930789e62874ca6ff0792c
-ENV PROJ_GIT_HASH 4c3b4264056b641de9a6baeb6aabbb69aaacbb09
-ENV GEOS_GIT_HASH 335cf85d0a66540bcf4474a00f9f39c1084976b3
-ENV GDAL_GIT_HASH da9dd6dbc6b6b3773c56da87245118ae2120eb9c
+ENV PROJ_GIT_HASH 7e10ddc628e014c317c18d4bf464ea8947ce082b
+ENV GEOS_GIT_HASH afcb31885fb206d2e3093ead943aa320a991370a
+ENV GDAL_GIT_HASH 9b77dcc88edf71da468e6e29e26b17df2cf76e5f
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -321,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 36fcdd626ba8b888119c8a53c7365ca9e9786f61
+ENV POSTGIS_GIT_HASH b0388921dcea093d370fddc45b3259610f34153a
 
 RUN set -ex \
     && apt-get update \
@@ -363,8 +366,6 @@ RUN set -ex \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
-#       --with-gui \
-        --with-pcredir="$(pcre-config --prefix)" \
         --enable-lto \
     && make -j$(nproc) \
     && make install \
