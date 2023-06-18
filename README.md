@@ -18,7 +18,7 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions (2023-05-31)
+# Versions (2023-06-18)
 
 Supported architecture: `amd64`
 
@@ -59,7 +59,7 @@ Recommended version for new users: `postgis/postgis:15-3.3`
 
 * We provide alpha, beta, release candidate (rc), and development (identified as ~master) versions.
 * The template for the `*-master` images is updated manually, which might lead to a delay of a few weeks sometimes.
-* The ~master SFCGAL version is 1.4 or higher. The cgal version is locked on the [5.5.x-branch](https://github.com/CGAL/cgal/tree/5.5.x-branch).
+* The ~master SFCGAL version is 1.4 or higher. The cgal version is locked on the [5.6.x-branch](https://github.com/CGAL/cgal/tree/5.6.x-branch).
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
