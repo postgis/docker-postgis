@@ -18,7 +18,7 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions (2023-06-19)
+# Versions (2023-07-04)
 
 Supported architecture: `amd64`
 
@@ -65,8 +65,8 @@ Recommended version for new users: `postgis/postgis:15-3.3`
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:15-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-master/Dockerfile) | debian:bullseye | 15 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:16beta1-3.3.3-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta1-3.3.3-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta1-3.3.3/alpine/Dockerfile) | alpine:3.18 | 16beta1 | 3.3.3 |
-| [postgis/postgis:16beta1-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta1-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta1-master/Dockerfile) | debian:bullseye | 16beta1 | development: postgis, geos, proj, gdal |
+| [postgis/postgis:16beta2-3.3.3-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta2-3.3.3-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta2-3.3.3/alpine/Dockerfile) | alpine:3.18 | 16beta2 | 3.3.3 |
+| [postgis/postgis:16beta2-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta2-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta2-master/Dockerfile) | debian:bullseye | 16beta2 | development: postgis, geos, proj, gdal |
 
 ## Usage
 

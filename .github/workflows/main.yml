@@ -25,10 +25,10 @@ jobs:
           - postgres: 15
             postgis: master
             variant: default
-          - postgres: 16beta1
+          - postgres: 16beta2
             postgis: master
             variant: default
-          - postgres: 16beta1
+          - postgres: 16beta2
             postgis: 3.3.3
             variant: alpine
 
