@@ -43,6 +43,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
     [3.1]='3'
     [3.2]='3'
     [3.3]='3'
+    [3.4]='3'
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'

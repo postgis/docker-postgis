@@ -64,9 +64,11 @@ Recommended version for new users: `postgis/postgis:15-3.3`
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
+| [postgis/postgis:15-3.4.0beta2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.4.0beta2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.4.0beta2/alpine/Dockerfile) | alpine:3.18 | 15 | 3.4.0beta2 |
 | [postgis/postgis:15-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-master/Dockerfile) | debian:bullseye | 15 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:16beta2-3.3](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta2-3.3) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta2-3.3/Dockerfile) | debian:bullseye | 16beta2 | 3.3.4 |
 | [postgis/postgis:16beta2-3.3-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta2-3.3-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta2-3.3/alpine/Dockerfile) | alpine:3.18 | 16beta2 | 3.3.4 |
+| [postgis/postgis:16beta2-3.4.0beta2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta2-3.4.0beta2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta2-3.4.0beta2/alpine/Dockerfile) | alpine:3.18 | 16beta2 | 3.4.0beta2 |
 | [postgis/postgis:16beta2-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16beta2-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16beta2-master/Dockerfile) | debian:bullseye | 16beta2 | development: postgis, geos, proj, gdal |
 
 ## Usage
