@@ -88,7 +88,7 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # one can benefit from the latest CGAL patches while avoiding compatibility issues.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH dd3b569e7abd66ba181d8d5567b62b1b88f187d1
+ENV CGAL5X_GIT_HASH edf855967dd10dff04318b0cdde980f397194565
 ENV SFCGAL_GIT_HASH ae0a12da1e7a32d163930789e62874ca6ff0792c
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -152,7 +152,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 3d4870f7970dfac1b090e8a0d05d9b969a9d1180
+ENV GEOS_GIT_HASH 193dacad1128de3a9be032eaf13a0f4081fcae76
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -168,7 +168,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH d5ae41aed1960dfd511d3c1edfbcefbe85d1adb2
+ENV GDAL_GIT_HASH 3e4dc710a2d4cff1f02b70ca5c4df280a5378ae0
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -301,11 +301,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH dd3b569e7abd66ba181d8d5567b62b1b88f187d1
+ENV CGAL5X_GIT_HASH edf855967dd10dff04318b0cdde980f397194565
 ENV SFCGAL_GIT_HASH ae0a12da1e7a32d163930789e62874ca6ff0792c
 ENV PROJ_GIT_HASH fde3d58e4af51f8e6c9cafeeb2b0299ab1218d91
-ENV GEOS_GIT_HASH 3d4870f7970dfac1b090e8a0d05d9b969a9d1180
-ENV GDAL_GIT_HASH d5ae41aed1960dfd511d3c1edfbcefbe85d1adb2
+ENV GEOS_GIT_HASH 193dacad1128de3a9be032eaf13a0f4081fcae76
+ENV GDAL_GIT_HASH 3e4dc710a2d4cff1f02b70ca5c4df280a5378ae0
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 6c7661430ebcce4521b23bd97b0a0d2be5ea027d
+ENV POSTGIS_GIT_HASH 111e4a133b3e036cf634826ab05e7217ebc81cbf
 
 RUN set -ex \
     && apt-get update \
