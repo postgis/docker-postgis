@@ -5,11 +5,11 @@ ARG BASE_IMAGE=postgres:15-alpine3.18
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.4.0beta2 spatial database extension with PostgreSQL 15 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.4.0rc1 spatial database extension with PostgreSQL 15 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION 3.4.0beta2
-ENV POSTGIS_SHA256 9460f546b02e95958ce3c4c763d75aa4dc8d44d559a9d5a108ef0e718671b3aa
+ENV POSTGIS_VERSION 3.4.0rc1
+ENV POSTGIS_SHA256 113cd54983823858f958c46941c2a06219e1d8d67913e6c93e18df2b94a50c58
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
