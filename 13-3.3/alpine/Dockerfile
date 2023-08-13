@@ -76,7 +76,7 @@ RUN set -eux \
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
-    && su postgres -c 'pg_ctl -D /tempdb start' \
+    && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
     \
@@ -94,6 +94,7 @@ RUN set -eux \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
+    && rm -rf /tmp/logfile \
     && rm -rf /tmp/pgis_reg \
 # add .postgis-rundeps
     && apk add --no-cache --virtual .postgis-rundeps \

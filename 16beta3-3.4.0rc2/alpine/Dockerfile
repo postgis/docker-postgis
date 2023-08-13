@@ -1,15 +1,15 @@
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG BASE_IMAGE=postgres:16beta2-alpine3.18
+ARG BASE_IMAGE=postgres:16beta3-alpine3.18
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.3.4 spatial database extension with PostgreSQL 16beta2 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.4.0rc2 spatial database extension with PostgreSQL 16beta3 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION 3.3.4
-ENV POSTGIS_SHA256 68507aa4ab7f9f7218fcefdcdd989911415e5f670128eb33acbbb362a24a998e
+ENV POSTGIS_VERSION 3.4.0rc2
+ENV POSTGIS_SHA256 546239b4ce901f734f6daa1e9f607696792213eeab1e9e8827582bbea24ac219
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
@@ -76,7 +76,7 @@ RUN set -eux \
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
-    && su postgres -c 'pg_ctl -D /tempdb start' \
+    && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
     \
@@ -94,6 +94,7 @@ RUN set -eux \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
+    && rm -rf /tmp/logfile \
     && rm -rf /tmp/pgis_reg \
 # add .postgis-rundeps
     && apk add --no-cache --virtual .postgis-rundeps \

@@ -7,10 +7,10 @@
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG CGAL_GIT_BRANCH=5.6.x-branch
-FROM postgres:16beta2-bullseye as builder
+FROM postgres:16beta3-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 16beta2 bullseye" \
+      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 16beta3 bullseye" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
@@ -122,7 +122,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH fde3d58e4af51f8e6c9cafeeb2b0299ab1218d91
+ENV PROJ_GIT_HASH c5c7e64b8a9b1416db7fcb129decc038439b96ec
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -152,7 +152,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 193dacad1128de3a9be032eaf13a0f4081fcae76
+ENV GEOS_GIT_HASH feaa331749598866ffc47c3f2bef828eaa4eff8f
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -168,7 +168,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 3e4dc710a2d4cff1f02b70ca5c4df280a5378ae0
+ENV GDAL_GIT_HASH 949ac934a6518f0e4fe60ca55827ec5e9d29d755
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -252,7 +252,7 @@ RUN set -ex \
 # -------------------------------------------
 # STAGE  final
 # -------------------------------------------
-FROM postgres:16beta2-bullseye
+FROM postgres:16beta3-bullseye
 
 ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
@@ -303,9 +303,9 @@ ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL5X_GIT_HASH edf855967dd10dff04318b0cdde980f397194565
 ENV SFCGAL_GIT_HASH ae0a12da1e7a32d163930789e62874ca6ff0792c
-ENV PROJ_GIT_HASH fde3d58e4af51f8e6c9cafeeb2b0299ab1218d91
-ENV GEOS_GIT_HASH 193dacad1128de3a9be032eaf13a0f4081fcae76
-ENV GDAL_GIT_HASH 3e4dc710a2d4cff1f02b70ca5c4df280a5378ae0
+ENV PROJ_GIT_HASH c5c7e64b8a9b1416db7fcb129decc038439b96ec
+ENV GEOS_GIT_HASH feaa331749598866ffc47c3f2bef828eaa4eff8f
+ENV GDAL_GIT_HASH 949ac934a6518f0e4fe60ca55827ec5e9d29d755
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 111e4a133b3e036cf634826ab05e7217ebc81cbf
+ENV POSTGIS_GIT_HASH 7faeed1d4800fb9a46dc7143eebd7c785ec3fa7e
 
 RUN set -ex \
     && apt-get update \
@@ -378,7 +378,7 @@ RUN set -ex \
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
-    && su postgres -c 'pg_ctl -D /tempdb start' \
+    && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && ldconfig \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
@@ -397,6 +397,7 @@ RUN set -ex \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
+    && rm -rf /tmp/logfile \
     && rm -rf /tmp/pgis_reg \
 # clean
     && cd / \
