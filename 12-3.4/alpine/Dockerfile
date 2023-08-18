@@ -1,15 +1,15 @@
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG BASE_IMAGE=postgres:16beta3-alpine3.18
+ARG BASE_IMAGE=postgres:12-alpine3.18
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.3.4 spatial database extension with PostgreSQL 16beta3 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.4.0 spatial database extension with PostgreSQL 12 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION 3.3.4
-ENV POSTGIS_SHA256 68507aa4ab7f9f7218fcefdcdd989911415e5f670128eb33acbbb362a24a998e
+ENV POSTGIS_VERSION 3.4.0
+ENV POSTGIS_SHA256 3acdf303adfd58d73543a70e6ebe99af29301262c56cf32220d42caa3efab024
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
