@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/postgis/docker-postgis/workflows/Docker%20PostGIS%20CI/badge.svg)](https://github.com/postgis/docker-postgis/actions) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x for each supported version of Postgres (11, 12, 13, 14 and 15).  Additionally, an image version is provided which is built from the latest two versions of Postgres (14, 15) with versions of PostGIS and its dependencies built from their respective master branches.
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, and 16beta3. For PostgreSQL version 11, the image supports PostGIS 3.3, as it is not compatible with PostGIS 3.4.  Additionally, an image version is provided which is built from the latest two versions of Postgres (14, 15) with versions of PostGIS and its dependencies built from their respective master branches.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -20,7 +20,7 @@ Unless `-e POSTGRES_DB` is passed to the container at startup time, this databas
 
 # Versions (2023-08-17)
 
-Supported architecture: `amd64`
+Supported architecture: `amd64` (also known as X86-64)"
 
 Recommended version for new users: `postgis/postgis:15-3.4`
 
@@ -31,6 +31,7 @@ Recommended version for new users: `postgis/postgis:15-3.4`
 * We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
   * In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
 * This version is easy to extend and has matured over time.
+* PostgreSQL 11 is not compatible with PostGIS 3.4, so it remains on PostGIS 3.3. Please note that after November 9, 2023, PostgreSQL 11 will reach its [end-of-life (EOL)](https://www.postgresql.org/support/versioning/) and will no longer receive support.
 
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
@@ -46,6 +47,8 @@ Recommended version for new users: `postgis/postgis:15-3.4`
 * The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
 * In the Alpine 3.18 version, the package versions are: geos=3.11, gdal=3.6, proj=9.2, and sfcgal=1.4.
 * PostGIS is compiled from source, making it a bit more challenging to extend.
+* PostgreSQL 11 is not compatible with PostGIS 3.4, so it remains on PostGIS 3.3. Please note that after November 9, 2023, PostgreSQL 11 will reach its [end-of-life (EOL)](https://www.postgresql.org/support/versioning/) and will no longer receive support.
+
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
