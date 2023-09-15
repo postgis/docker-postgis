@@ -7,10 +7,10 @@
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG CGAL_GIT_BRANCH=5.6.x-branch
-FROM postgres:16rc1-bullseye as builder
+FROM postgres:16-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 16rc1 bullseye" \
+      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 16 bullseye" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
@@ -88,7 +88,7 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # one can benefit from the latest CGAL patches while avoiding compatibility issues.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH 9c9a2690fb4916c249342f3c2dcd08ccd99b7ac8
+ENV CGAL5X_GIT_HASH 3c8e2053721271119499506ea1d8a49dee89e30c
 ENV SFCGAL_GIT_HASH fc4dc5640e402c8b00426b5a3562324226725df9
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -122,7 +122,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 4a14240a606e5d2ba091a922f52cd3f38dba258c
+ENV PROJ_GIT_HASH d4ebd920c1e1ecd0e192790ab4fdb98c7b982176
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -152,7 +152,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 15185e65b3e7bc671cf693c97cf103125fb4a171
+ENV GEOS_GIT_HASH 1033161eca3684e0d9479daeafd35a4e0fb1800e
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -168,7 +168,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 7dec7e98b6be558ef76e1c17262994610a532573
+ENV GDAL_GIT_HASH 8f2f8efd89db360811f4aab8c7e6a67b307cc12c
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -252,7 +252,7 @@ RUN set -ex \
 # -------------------------------------------
 # STAGE  final
 # -------------------------------------------
-FROM postgres:16rc1-bullseye
+FROM postgres:16-bullseye
 
 ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
@@ -301,11 +301,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH 9c9a2690fb4916c249342f3c2dcd08ccd99b7ac8
+ENV CGAL5X_GIT_HASH 3c8e2053721271119499506ea1d8a49dee89e30c
 ENV SFCGAL_GIT_HASH fc4dc5640e402c8b00426b5a3562324226725df9
-ENV PROJ_GIT_HASH 4a14240a606e5d2ba091a922f52cd3f38dba258c
-ENV GEOS_GIT_HASH 15185e65b3e7bc671cf693c97cf103125fb4a171
-ENV GDAL_GIT_HASH 7dec7e98b6be558ef76e1c17262994610a532573
+ENV PROJ_GIT_HASH d4ebd920c1e1ecd0e192790ab4fdb98c7b982176
+ENV GEOS_GIT_HASH 1033161eca3684e0d9479daeafd35a4e0fb1800e
+ENV GDAL_GIT_HASH 8f2f8efd89db360811f4aab8c7e6a67b307cc12c
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH cc7a8ca0871ae2114e920aa7472c639ec80abe7d
+ENV POSTGIS_GIT_HASH d692cc82e27a9b7865cc6e81eb2837fcae67289a
 
 RUN set -ex \
     && apt-get update \
