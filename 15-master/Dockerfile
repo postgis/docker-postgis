@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 565d8bce2da937c30261db762a7704636ffb683d
+ENV POSTGIS_GIT_HASH d7b58458ea7cf8157d09f59e955820d3a4321892
 
 RUN set -ex \
     && apt-get update \
@@ -336,6 +336,8 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
+      docbook-xml \
+      docbook5-xml \
       g++ \
       git \
       libboost-all-dev \
@@ -350,6 +352,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libxml2-utils \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
@@ -409,6 +412,8 @@ RUN set -ex \
       bison \
       build-essential \
       cmake \
+      docbook-xml \
+      docbook5-xml \
       g++ \
       git \
       libboost-all-dev \
@@ -422,6 +427,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libxml2-utils \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \

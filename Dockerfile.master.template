@@ -336,6 +336,8 @@ RUN set -ex \
       build-essential \
       ca-certificates \
       cmake \
+      docbook-xml \
+      docbook5-xml \
       g++ \
       git \
       libboost-all-dev \
@@ -350,6 +352,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libxml2-utils \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
@@ -409,6 +412,8 @@ RUN set -ex \
       bison \
       build-essential \
       cmake \
+      docbook-xml \
+      docbook5-xml \
       g++ \
       git \
       libboost-all-dev \
@@ -422,6 +427,7 @@ RUN set -ex \
       libtiff-dev \
       libtool \
       libxml2-dev \
+      libxml2-utils \
       make \
       pkg-config \
       postgresql-server-dev-$PG_MAJOR \
