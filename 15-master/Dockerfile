@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH d692cc82e27a9b7865cc6e81eb2837fcae67289a
+ENV POSTGIS_GIT_HASH e7b81349bcb2dc51a77eef2275e71fd3ad91239c
 
 RUN set -ex \
     && apt-get update \
