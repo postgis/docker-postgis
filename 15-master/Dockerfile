@@ -168,7 +168,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 8f2f8efd89db360811f4aab8c7e6a67b307cc12c
+ENV GDAL_GIT_HASH 43e51bc48e7d48795ae60731ddc1414611ec5d3e
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -305,7 +305,7 @@ ENV CGAL5X_GIT_HASH 3c8e2053721271119499506ea1d8a49dee89e30c
 ENV SFCGAL_GIT_HASH fc4dc5640e402c8b00426b5a3562324226725df9
 ENV PROJ_GIT_HASH d4ebd920c1e1ecd0e192790ab4fdb98c7b982176
 ENV GEOS_GIT_HASH 1033161eca3684e0d9479daeafd35a4e0fb1800e
-ENV GDAL_GIT_HASH 8f2f8efd89db360811f4aab8c7e6a67b307cc12c
+ENV GDAL_GIT_HASH 43e51bc48e7d48795ae60731ddc1414611ec5d3e
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH e7b81349bcb2dc51a77eef2275e71fd3ad91239c
+ENV POSTGIS_GIT_HASH 565d8bce2da937c30261db762a7704636ffb683d
 
 RUN set -ex \
     && apt-get update \
