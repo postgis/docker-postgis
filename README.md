@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/postgis/docker-postgis/workflows/Docker%20PostGIS%20CI/badge.svg)](https://github.com/postgis/docker-postgis/actions) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, and 16beta3. For PostgreSQL version 11, the image supports PostGIS 3.3, as it is not compatible with PostGIS 3.4.  Additionally, an image version is provided which is built from the latest two versions of Postgres (14, 15) with versions of PostGIS and its dependencies built from their respective master branches.
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, and 16. For PostgreSQL version 11, the image supports PostGIS 3.3, as it is not compatible with PostGIS 3.4.  Additionally, an image version is provided which is built from the latest two versions of Postgres (15, 16) with versions of PostGIS and its dependencies built from their respective master branches.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -18,11 +18,11 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions (2023-09-01)
+# Versions (2023-09-16)
 
 Supported architecture: `amd64` (also known as X86-64)"
 
-Recommended version for new users: `postgis/postgis:15-3.4`
+Recommended version for new users: `postgis/postgis:16-3.4`
 
 ### Debian based (recommended)
 
@@ -41,6 +41,7 @@ Recommended version for new users: `postgis/postgis:15-3.4`
 | [postgis/postgis:13-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.4/Dockerfile) | debian:bullseye | 13 | 3.4.0 |
 | [postgis/postgis:14-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.4/Dockerfile) | debian:bullseye | 14 | 3.4.0 |
 | [postgis/postgis:15-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.4/Dockerfile) | debian:bullseye | 15 | 3.4.0 |
+| [postgis/postgis:16-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.4/Dockerfile) | debian:bullseye | 16 | 3.4.0 |
 
 ### Alpine based
 
@@ -57,6 +58,7 @@ Recommended version for new users: `postgis/postgis:15-3.4`
 | [postgis/postgis:13-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.4/alpine/Dockerfile) | alpine:3.18 | 13 | 3.4.0 |
 | [postgis/postgis:14-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.4/alpine/Dockerfile) | alpine:3.18 | 14 | 3.4.0 |
 | [postgis/postgis:15-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.4/alpine/Dockerfile) | alpine:3.18 | 15 | 3.4.0 |
+| [postgis/postgis:16-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.4/alpine/Dockerfile) | alpine:3.18 | 16 | 3.4.0 |
 
 ### Test images
 
@@ -66,12 +68,9 @@ Recommended version for new users: `postgis/postgis:15-3.4`
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
-| [postgis/postgis:14-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-master/Dockerfile) | debian:bullseye | 14 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:15-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-master/Dockerfile) | debian:bullseye | 15 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:16rc1-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16rc1-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16rc1-3.4/Dockerfile) | debian:bullseye | 16rc1 | 3.4.0 |
-| [postgis/postgis:16rc1-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16rc1-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16rc1-3.4/alpine/Dockerfile) | alpine:3.18 | 16rc1 | 3.4.0 |
-| [postgis/postgis:16rc1-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16rc1-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16rc1-master/Dockerfile) | debian:bullseye | 16rc1 | development: postgis, geos, proj, gdal |
- 
+| [postgis/postgis:16-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-master/Dockerfile) | debian:bullseye | 16 | development: postgis, geos, proj, gdal |
+
 ## Usage
 
 In order to run a basic container capable of serving a PostGIS-enabled database, start a container as follows:
