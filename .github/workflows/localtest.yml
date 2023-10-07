@@ -1,0 +1,17 @@
+name: "Localtest"
+# testing the workflow
+on:
+    push:
+    pull_request:
+    schedule:
+        - cron: '15 5 * * 1'
+
+jobs:
+  localtest:
+    name: "testing ./localtest.sh ( update.sh and build test and push to local registry )"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker ps -a
+      - run: ./localtest.sh
+      - run: docker images

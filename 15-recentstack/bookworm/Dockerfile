@@ -1,0 +1,530 @@
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#       source: "Dockerfile.master.template"
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+# "Experimental"; solely for testing purposes. Anticipate frequent changes!
+# This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
+
+ARG PGIS_V1_BASE_IMAGE=postgres:15-bookworm
+
+ARG PGIS_V1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
+ARG PGIS_V1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
+ARG PGIS_V1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
+ARG PGIS_V1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
+ARG PGIS_V1_SFCGAL_REPOSITORY=https://gitlab.com/Oslandia/SFCGAL.git
+ARG PGIS_V1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
+
+ARG PGIS_V1_POSTGIS_CHECKOUT=tags/3.4.0
+ARG PGIS_V1_GEOS_CHECKOUT=tags/3.12.0
+ARG PGIS_V1_GDAL_CHECKOUT=tags/v3.7.2
+ARG PGIS_V1_PROJ_CHECKOUT=tags/9.3.0
+ARG PGIS_V1_SFCGAL_CHECKOUT=tags/v1.4.1
+ARG PGIS_V1_CGAL_CHECKOUT=tags/v5.6
+
+ARG PGIS_V1_BOOST_VERSION=1.74.0
+
+ARG PGIS_V1_CMAKE_BUILD_TYPE=Release
+
+FROM ${PGIS_V1_BASE_IMAGE} as builder
+
+WORKDIR /
+
+ARG PGIS_V1_BOOST_VERSION
+ENV PGIS_V1_BOOST_VERSION=${PGIS_V1_BOOST_VERSION}
+
+# apt-get install
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      curl \
+      libboost-atomic${PGIS_V1_BOOST_VERSION} \
+      libboost-chrono${PGIS_V1_BOOST_VERSION} \
+      libboost-date-time${PGIS_V1_BOOST_VERSION} \
+      libboost-filesystem${PGIS_V1_BOOST_VERSION} \
+      libboost-program-options${PGIS_V1_BOOST_VERSION} \
+      libboost-serialization${PGIS_V1_BOOST_VERSION} \
+      libboost-system${PGIS_V1_BOOST_VERSION} \
+      libboost-test${PGIS_V1_BOOST_VERSION} \
+      libboost-thread${PGIS_V1_BOOST_VERSION} \
+      libboost-timer${PGIS_V1_BOOST_VERSION} \
+      libcurl3-gnutls \
+      libexpat1 \
+      libgmp10 \
+      libgmpxx4ldbl \
+      libjson-c5 \
+      libmpfr6 \
+      libprotobuf-c1 \
+      libtiff6 \
+      libxml2 \
+      sqlite3 \
+      # build dependency
+      autoconf \
+      automake \
+      autotools-dev \
+      bison \
+      build-essential \
+      ca-certificates \
+      cmake \
+      g++ \
+      git \
+      libboost-all-dev \
+      libcurl4-gnutls-dev \
+      libgmp-dev \
+      libjson-c-dev \
+      libmpfr-dev \
+      libpcre3-dev \
+      libpq-dev \
+      libprotobuf-c-dev \
+      libsqlite3-dev \
+      libtiff-dev \
+      libtool \
+      libxml2-dev \
+      make \
+      pkg-config \
+      protobuf-c-compiler \
+      xsltproc \
+      # gdal+
+      libblosc-dev \
+      libcfitsio-dev \
+      libfreexl-dev \
+      libfyba-dev \
+      libhdf5-dev \
+      libkml-dev \
+      liblz4-dev \
+      liblzma-dev \
+      libopenjp2-7-dev \
+      libqhull-dev \
+      libwebp-dev \
+      libzstd-dev
+
+ARG PGIS_V1_CMAKE_BUILD_TYPE
+ENV PGIS_V1_CMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE}
+
+# cgal & sfcgal
+ARG PGIS_V1_SFCGAL_REPOSITORY
+ENV PGIS_V1_SFCGAL_REPOSITORY ${PGIS_V1_SFCGAL_REPOSITORY}
+ARG PGIS_V1_SFCGAL_CHECKOUT
+ENV PGIS_V1_SFCGAL_CHECKOUT ${PGIS_V1_SFCGAL_CHECKOUT}
+
+ARG PGIS_V1_CGAL_REPOSITORY
+ENV PGIS_V1_CGAL_REPOSITORY ${PGIS_V1_CGAL_REPOSITORY}
+ARG PGIS_V1_CGAL_CHECKOUT
+ENV PGIS_V1_CGAL_CHECKOUT ${PGIS_V1_CGAL_CHECKOUT}
+
+RUN set -ex \
+    && cd /usr/src \
+    && mkdir cgal \
+    && cd cgal \
+    && git init \
+    && git remote add origin ${PGIS_V1_CGAL_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS_V1_CGAL_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    && git log -1 > /_pgis_cgal_last_commit.txt \
+    && cd /usr/src \
+    && mkdir SFCGAL \
+    && cd SFCGAL \
+    && git init \
+    && git remote add origin ${PGIS_V1_SFCGAL_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS_V1_SFCGAL_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    && git log -1 > /_pgis_sfcgal_last_commit.txt \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake .. \
+       -DCGAL_DIR=/usr/src/cgal \
+       -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} \
+       -DSFCGAL_BUILD_BENCH=OFF \
+       -DSFCGAL_BUILD_EXAMPLES=OFF \
+       -DSFCGAL_BUILD_TESTS=OFF \
+       -DSFCGAL_WITH_OSG=OFF \
+    && make -j$(nproc) \
+    && make install \
+    # clean
+    && rm -fr /usr/src/SFCGAL \
+    && rm -fr /usr/src/cgal
+
+# proj
+ARG PGIS_V1_PROJ_REPOSITORY
+ENV PGIS_V1_PROJ_REPOSITORY ${PGIS_V1_PROJ_REPOSITORY}
+ARG PGIS_V1_PROJ_CHECKOUT
+ENV PGIS_V1_PROJ_CHECKOUT ${PGIS_V1_PROJ_CHECKOUT}
+RUN set -ex \
+    && cd /usr/src \
+    && mkdir PROJ \
+    && cd PROJ \
+    && git init \
+    && git remote add origin ${PGIS_V1_PROJ_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS_V1_PROJ_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    && git log -1 > /_pgis_proj_last_commit.txt \
+    # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
+    && if [ -f "autogen.sh" ] ; then \
+        set -eux \
+        && echo "autotools version: 'autogen.sh' exists! Older version!"  \
+        && ./autogen.sh \
+        && ./configure --disable-static \
+        && make -j$(nproc) \
+        && make install \
+        ; \
+    else \
+        set -eux \
+        && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
+        && mkdir build \
+        && cd build \
+        && cmake .. -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+        && make -j$(nproc) \
+        && make install \
+        ; \
+    fi \
+    \
+    && rm -fr /usr/src/PROJ
+
+# geos
+ARG PGIS_V1_GEOS_REPOSITORY
+ENV PGIS_V1_GEOS_REPOSITORY ${PGIS_V1_GEOS_REPOSITORY}
+ARG PGIS_V1_GEOS_CHECKOUT
+ENV PGIS_V1_GEOS_CHECKOUT ${PGIS_V1_GEOS_CHECKOUT}
+RUN set -ex \
+    && cd /usr/src \
+    && mkdir geos \
+    && cd geos \
+    && git init \
+    && git remote add origin ${PGIS_V1_GEOS_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS_V1_GEOS_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    && git log -1 > /_pgis_geos_last_commit.txt \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake .. -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+    && make -j$(nproc) \
+    && make install \
+    && cd / \
+    && rm -fr /usr/src/geos
+
+# gdal
+ARG PGIS_V1_GDAL_REPOSITORY
+ENV PGIS_V1_GDAL_REPOSITORY ${PGIS_V1_GDAL_REPOSITORY}
+ARG PGIS_V1_GDAL_CHECKOUT
+ENV PGIS_V1_GDAL_CHECKOUT ${PGIS_V1_GDAL_CHECKOUT}
+
+RUN set -ex \
+    && cd /usr/src \
+    && mkdir gdal \
+    && cd gdal \
+    && git init \
+    && git remote add origin ${PGIS_V1_GDAL_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS_V1_GDAL_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    && git log -1 > /_pgis_gdal_last_commit.txt \
+    \
+    # gdal project directory structure - has been changed !
+    && if [ -d "gdal" ] ; then \
+        echo "Directory 'gdal' dir exists -> older version!" ; \
+        cd gdal ; \
+    else \
+        echo "Directory 'gdal' does not exists! Newer version! " ; \
+    fi \
+    \
+    && if [ -f "./autogen.sh" ]; then \
+        # Building with autoconf ( old/deprecated )
+        set -eux \
+        && ./autogen.sh \
+        && ./configure --disable-static \
+        ; \
+    else \
+        # Building with cmake
+        set -eux \
+        && mkdir build \
+        && cd build \
+        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
+        && cmake .. -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+            -DBUILD_DOCS=OFF \
+            \
+            -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
+            -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
+            -DGDAL_USE_BLOSC=ON \
+            -DGDAL_USE_CFITSIO=ON \
+            -DGDAL_USE_CURL=ON \
+            -DGDAL_USE_DEFLATE=ON \
+            -DGDAL_USE_EXPAT=ON \
+            -DGDAL_USE_FREEXL=ON \
+            -DGDAL_USE_FYBA=ON \
+            -DGDAL_USE_GEOS=ON \
+            -DGDAL_USE_HDF5=ON \
+            -DGDAL_USE_JSONC=ON \
+            -DGDAL_USE_LERC_INTERNAL=ON \
+            -DGDAL_USE_LIBKML=ON \
+            -DGDAL_USE_LIBLZMA=ON \
+            -DGDAL_USE_LZ4=ON \
+            -DGDAL_USE_OPENJPEG=ON \
+            -DGDAL_USE_POSTGRESQL=ON \
+            -DGDAL_USE_QHULL=ON \
+            -DGDAL_USE_SQLITE3=ON \
+            -DGDAL_USE_TIFF=ON \
+            -DGDAL_USE_WEBP=ON \
+            -DGDAL_USE_ZSTD=ON \
+            \
+            # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
+            # -DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
+            -DGDAL_USE_ECW=OFF \
+            -DGDAL_USE_GEOTIFF=OFF \
+            -DGDAL_USE_HEIF=OFF \
+            -DGDAL_USE_SPATIALITE=OFF \
+        ; \
+    fi \
+    \
+    && make -j$(nproc) \
+    && make install \
+    && cd / \
+    && rm -fr /usr/src/gdal
+
+# Minimal command line test.
+RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && ldd $(which gdalinfo) \
+    && gdalinfo --version \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version \
+    && pcre-config  --version
+
+# -------------------------------------------
+# STAGE  final
+# -------------------------------------------
+FROM ${PGIS_V1_BASE_IMAGE}
+
+LABEL maintainer="PostGIS Project - https://postgis.net" \
+      org.opencontainers.image.description="PostGIS - 15-recentstack spatial database extension with PostgreSQL 15 bookworm" \
+      org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
+
+ARG PGIS_V1_CMAKE_BUILD_TYPE
+ARG PGIS_V1_BASE_IMAGE
+ARG PGIS_V1_BOOST_VERSION
+
+ENV PGIS_V1_CMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} \
+    PGIS_V1_BASE_IMAGE=${PGIS_V1_BASE_IMAGE} \
+    PGIS_V1_BOOST_VERSION=${PGIS_V1_BOOST_VERSION}
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      curl \
+      libboost-atomic${PGIS_V1_BOOST_VERSION} \
+      libboost-chrono${PGIS_V1_BOOST_VERSION} \
+      libboost-date-time${PGIS_V1_BOOST_VERSION} \
+      libboost-filesystem${PGIS_V1_BOOST_VERSION} \
+      libboost-program-options${PGIS_V1_BOOST_VERSION} \
+      libboost-serialization${PGIS_V1_BOOST_VERSION} \
+      libboost-system${PGIS_V1_BOOST_VERSION} \
+      libboost-test${PGIS_V1_BOOST_VERSION} \
+      libboost-thread${PGIS_V1_BOOST_VERSION} \
+      libboost-timer${PGIS_V1_BOOST_VERSION} \
+      libcurl3-gnutls \
+      libexpat1 \
+      libgmp10 \
+      libgmpxx4ldbl \
+      libjson-c5 \
+      libmpfr6 \
+      libpcre3 \
+      libprotobuf-c1 \
+      libtiff6 \
+      libxml2 \
+      sqlite3 \
+      # gdal+
+      libblosc1 \
+      libcfitsio10 \
+      libfreexl1 \
+      libfyba0 \
+      libhdf5-103-1 \
+      libkmlbase1 \
+      libkmldom1 \
+      libkmlengine1 \
+      libopenjp2-7 \
+      libqhull-r8.0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /_pgis*.* /
+COPY --from=builder /usr/local /usr/local
+
+ARG PGIS_V1_GDAL_CHECKOUT
+ARG PGIS_V1_GDAL_REPOSITORY
+ARG PGIS_V1_GEOS_CHECKOUT
+ARG PGIS_V1_GEOS_REPOSITORY
+ARG PGIS_V1_PROJ_CHECKOUT
+ARG PGIS_V1_PROJ_REPOSITORY
+ARG PGIS_V1_SFCGAL_CHECKOUT
+ARG PGIS_V1_SFCGAL_REPOSITORY
+
+ENV PGIS_V1_GDAL_CHECKOUT=${PGIS_V1_GDAL_CHECKOUT} \
+    PGIS_V1_GDAL_REPOSITORY=${PGIS_V1_GDAL_REPOSITORY} \
+    PGIS_V1_GEOS_CHECKOUT=${PGIS_V1_GEOS_CHECKOUT} \
+    PGIS_V1_GEOS_REPOSITORY=${PGIS_V1_GEOS_REPOSITORY} \
+    PGIS_V1_PROJ_CHECKOUT=${PGIS_V1_PROJ_CHECKOUT} \
+    PGIS_V1_PROJ_REPOSITORY=${PGIS_V1_PROJ_REPOSITORY} \
+    PGIS_V1_SFCGAL_CHECKOUT=${PGIS_V1_SFCGAL_CHECKOUT} \
+    PGIS_V1_SFCGAL_REPOSITORY=${PGIS_V1_SFCGAL_REPOSITORY}
+
+# Minimal command line test ( fail fast )
+RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && ldd $(which gdalinfo) \
+    && gdalinfo --version \
+    && gdal-config --formats \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version \
+    \
+    # Testing ogr2ogr PostgreSQL driver.
+    && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
+            || echo "ogr2ogr missing PostgreSQL driver" && exit 1
+
+# install postgis
+ARG PGIS_V1_POSTGIS_CHECKOUT
+ARG PGIS_V1_POSTGIS_REPOSITORY
+
+ENV PGIS_V1_POSTGIS_CHECKOUT=${PGIS_V1_POSTGIS_CHECKOUT} \
+    PGIS_V1_POSTGIS_REPOSITORY=${PGIS_V1_POSTGIS_REPOSITORY}
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      autoconf \
+      automake \
+      autotools-dev \
+      bison \
+      build-essential \
+      ca-certificates \
+      cmake \
+      docbook-xml \
+      docbook5-xml \
+      g++ \
+      git \
+      libboost-all-dev \
+      libcunit1-dev \
+      libcurl4-gnutls-dev \
+      libgmp-dev \
+      libjson-c-dev \
+      libmpfr-dev \
+      libpcre3-dev \
+      libprotobuf-c-dev \
+      libsqlite3-dev \
+      libtiff-dev \
+      libtool \
+      libxml2-dev \
+      libxml2-utils \
+      make \
+      pkg-config \
+      postgresql-server-dev-$PG_MAJOR \
+      protobuf-c-compiler \
+      xsltproc \
+    && cd \
+    # postgis
+    && cd /usr/src \
+    && mkdir postgis \
+    && cd postgis \
+    && git init \
+    && git remote add origin ${PGIS_V1_POSTGIS_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS_V1_POSTGIS_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    && git log -1 > /_pgis_last_commit.txt \
+    && ./autogen.sh \
+# configure options taken from:
+# https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
+    && ./configure \
+        --enable-lto \
+    && make -j$(nproc) \
+    && make install \
+# refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
+    && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
+    && projsync --system-directory --file us_noaa_eshpgn \
+    && projsync --system-directory --file us_noaa_prvi \
+    && projsync --system-directory --file us_noaa_wmhpgn \
+# regress check
+    && mkdir /tempdb \
+    && chown -R postgres:postgres /tempdb \
+    && su postgres -c 'pg_ctl -D /tempdb init' \
+    && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
+    && ldconfig \
+    && cd regress \
+    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
+    && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
+    && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \
+    \
+    && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
+    && rm -rf /tempdb \
+    && rm -rf /tmp/logfile \
+    && rm -rf /tmp/pgis_reg \
+# clean
+    && cd / \
+    && rm -rf /usr/src/postgis \
+    && apt-get purge -y --autoremove \
+      autoconf \
+      automake \
+      autotools-dev \
+      bison \
+      build-essential \
+      cmake \
+      docbook-xml \
+      docbook5-xml \
+      g++ \
+      git \
+      libboost-all-dev \
+      libcurl4-gnutls-dev \
+      libgmp-dev \
+      libjson-c-dev \
+      libmpfr-dev \
+      libpcre3-dev \
+      libprotobuf-c-dev \
+      libsqlite3-dev \
+      libtiff-dev \
+      libtool \
+      libxml2-dev \
+      libxml2-utils \
+      make \
+      pkg-config \
+      postgresql-server-dev-$PG_MAJOR \
+      protobuf-c-compiler \
+      xsltproc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /docker-entrypoint-initdb.d
+COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
+COPY ./update-postgis.sh /usr/local/bin
+
+# last final test
+RUN set -ex \
+    && ldconfig \
+    && cs2cs \
+    && ldd $(which gdalinfo) \
+    && gdalinfo --version \
+    && gdal-config --formats \
+    && geos-config --version \
+    && ogr2ogr --version \
+    && proj \
+    && sfcgal-config --version \
+    \
+    # Is the "ca-certificates" package installed? (for accessing remote raster files)
+    #   https://github.com/postgis/docker-postgis/issues/307
+    && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
+    \
+    # list last commits.
+    && find /_pgis_*_last_commit.txt -type f -print -exec cat {} \;  \
+    # list postgresql, postgis version
+    && cat _pgis_full_version.txt

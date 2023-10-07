@@ -1,0 +1,116 @@
+# .circleci/config.yml
+
+# Circle CI arm64 builder
+version: 2.1
+
+orbs:
+  # https://circleci.com/developer/orbs/orb/circleci/docker
+  docker: circleci/docker@2.2.0
+
+jobs:
+  build-arm64:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: arm.medium
+    environment:
+      BUILDX_PLATFORMS: linux/arm64v8
+      DOCKER_BUILDKIT: '1'
+      PLATFORM: linux/arm64v8
+    parameters:
+      target-version-variant:
+        type: string
+    steps:
+      - checkout
+      - run: uname -a
+      - run: docker --version
+      - run: docker info
+      - run: source tools/environment_init.sh
+      - run: make check_version
+      - docker/check:
+          registry: docker.io
+          docker-username: DOCKERHUB_USERNAME
+          docker-password: DOCKERHUB_ACCESS_TOKEN
+
+      - run:
+          name: Conditional Docker Check - Halt if not on master branch or if it's a PR
+          command: |
+            # Check if the current branch is 'master' and the weekly image is not extis
+            #    If weekly image exists, skip docker build and push
+            if [ "$CIRCLE_BRANCH" == "master" ] && check_image_exists "${{ matrix.version }}-${{ matrix.variant }}$(IMAGE_VERSION_ID)"; then
+              circleci-agent step halt
+            fi
+
+      - run: make -n test-<< parameters.target-version-variant >>
+      - run: make test-<< parameters.target-version-variant >>
+      - run: docker images
+
+      - run:
+          name: Conditional Docker Check - Halt if not on master branch or if it's a PR
+          command: |
+            # Check if the current branch is NOT 'master' or if the build is triggered by a pull request.
+            # If either of these conditions is met, halt the workflow.
+            if [ "$CIRCLE_BRANCH" != "master" ] || [ -n "$CIRCLE_PULL_REQUEST" ]; then
+              circleci-agent step halt
+            fi
+
+      - run:
+          name: Install manifest-tool (linux-arm64 )
+          command: |
+            wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
+            mkdir manifest-tool
+            tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
+            sudo mv manifest-tool/manifest-tool-linux-arm64 /usr/local/bin/manifest-tool
+            manifest-tool -v
+
+      - run:
+          name: "Push docker image : make push-<< parameters.target-version-variant >>"
+          command: |
+            if [ "$CIRCLE_BRANCH" == "master" ] && [ -z "$CIRCLE_PULL_REQUEST" ]; then
+              make push-<< parameters.target-version-variant >>
+              make manifest-<< parameters.target-version-variant >>
+              echo "...push and manifest done..."
+            fi
+
+workflows:
+  build-deploy:
+#   AND triggered by weekly from the app.circleci.com UI
+    jobs:
+      - build-arm64:
+          matrix:
+            parameters:
+              target-version-variant: [
+#
+# They are created using the ./apply-ci.sh script based on the version.json file,
+#      where the architecture is defined as "arm64".
+# These "--skip--" images serve as inputs for the "*-bundle" images,
+#       hence they must be generated within the bundle JOB.
+#
+#circleci-targets-start
+                "11-3.3-alpine3.18",
+                "11-3.3-bookworm",
+                "11-3.3-bullseye",
+                "12-3.4-alpine3.18",
+                "12-3.4-bookworm",
+                "12-3.4-bullseye",
+                "13-3.4-alpine3.18",
+#   --skip--    "13-3.4-bookworm",  -->  generated with the related bundle job!
+                "13-3.4-bullseye",
+                "13-3.4-bundle-bookworm",
+                "14-3.4-alpine3.18",
+#   --skip--    "14-3.4-bookworm",  -->  generated with the related bundle job!
+                "14-3.4-bullseye",
+                "14-3.4-bundle-bookworm",
+                "15-3.4-alpine3.18",
+#   --skip--    "15-3.4-bookworm",  -->  generated with the related bundle job!
+                "15-3.4-bullseye",
+                "15-3.4-bundle-bookworm",
+                "15-master-bookworm",
+                "15-recentstack-bookworm",
+                "16-3.4-alpine3.18",
+#   --skip--    "16-3.4-bookworm",  -->  generated with the related bundle job!
+                "16-3.4-bullseye",
+                "16-3.4-bundle-bookworm",
+                "16-master-bookworm",
+                "16-recentstack-bookworm",
+#circleci-targets-end
+              ]

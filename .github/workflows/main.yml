@@ -1,53 +1,167 @@
-name: Docker PostGIS CI
+name: Build PostGIS images
+
+# This is the x86_64/Amd64 build worklow
 
 on:
   push:
   pull_request:
   schedule:
-    - cron: '15 5 * * 1'
+    - cron: '15 5 * * *'
 
 defaults:
   run:
     shell: bash
 
 jobs:
-
   make-docker-images:
     strategy:
       matrix:
-        postgres: [12, 13, 14, 15, 16beta3]
-        postgis: ['3.4']
-        variant: [default, alpine]
         include:
-          - postgres: 14
-            postgis: master
-            variant: default
-          - postgres: 15
-            postgis: master
-            variant: default
-          - postgres: 16beta3
-            postgis: master
-            variant: default
-          - postgres: 11
-            postgis: 3.3
-            variant: default
-          - postgres: 11
-            postgis: 3.3
-            variant: alpine
+#
+# They are created using the ./apply-ci.sh script based on the version.json file,
+#
+# These "--skip--" images serve as inputs for the "*-bundle" images,
+#       hence they must be generated within the bundle JOB.
+#
+#matrix-include-start
+           - { version: "11-3.3", variant: "alpine3.18", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-alpine3.18 11-3.3.4-alpine3.18 11-3.3-alpine", readme_group: "alpine3.18" }
+           - { version: "11-3.3", variant: "bookworm", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-bookworm 11-3.3.4-bookworm 11-3.3", readme_group: "bookworm" }
+           - { version: "11-3.3", variant: "bullseye", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-bullseye 11-3.3.4-bullseye", readme_group: "bullseye" }
+           - { version: "12-3.4", variant: "alpine3.18", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-alpine3.18 12-3.4.0-alpine3.18 12-3.4-alpine", readme_group: "alpine3.18" }
+           - { version: "12-3.4", variant: "bookworm", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-bookworm 12-3.4.0-bookworm 12-3.4", readme_group: "bookworm" }
+           - { version: "12-3.4", variant: "bullseye", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-bullseye 12-3.4.0-bullseye", readme_group: "bullseye" }
+           - { version: "13-3.4", variant: "alpine3.18", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-alpine3.18 13-3.4.0-alpine3.18 13-3.4-alpine", readme_group: "alpine3.18" }
+# --skip-- - { version: "13-3.4", variant: "bookworm", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-bookworm 13-3.4.0-bookworm 13-3.4", readme_group: "bookworm" }
+           - { version: "13-3.4", variant: "bullseye", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-bullseye 13-3.4.0-bullseye", readme_group: "bullseye" }
+           - { version: "13-3.4-bundle", variant: "bookworm", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-bundle-bookworm 13-3.4.0-bundle-bookworm 13-3.4-bundle", readme_group: "bundle" }
+           - { version: "14-3.4", variant: "alpine3.18", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-alpine3.18 14-3.4.0-alpine3.18 14-3.4-alpine", readme_group: "alpine3.18" }
+# --skip-- - { version: "14-3.4", variant: "bookworm", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-bookworm 14-3.4.0-bookworm 14-3.4", readme_group: "bookworm" }
+           - { version: "14-3.4", variant: "bullseye", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-bullseye 14-3.4.0-bullseye", readme_group: "bullseye" }
+           - { version: "14-3.4-bundle", variant: "bookworm", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-bundle-bookworm 14-3.4.0-bundle-bookworm 14-3.4-bundle", readme_group: "bundle" }
+           - { version: "15-3.4", variant: "alpine3.18", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-alpine3.18 15-3.4.0-alpine3.18 15-3.4-alpine alpine", readme_group: "alpine3.18" }
+# --skip-- - { version: "15-3.4", variant: "bookworm", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-bookworm 15-3.4.0-bookworm 15-3.4 latest", readme_group: "bookworm" }
+           - { version: "15-3.4", variant: "bullseye", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-bullseye 15-3.4.0-bullseye", readme_group: "bullseye" }
+           - { version: "15-3.4-bundle", variant: "bookworm", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-bundle-bookworm 15-3.4.0-bundle-bookworm 15-3.4-bundle bundle", readme_group: "bundle" }
+           - { version: "15-master", variant: "bookworm", postgres: "15", postgis: "master", arch: "amd64 arm64", tags: "15-master-bookworm 15-master", readme_group: "test" }
+           - { version: "15-recentstack", variant: "bookworm", postgres: "15", postgis: "recentstack", arch: "amd64 arm64", tags: "15-recentstack-bookworm 15-recentstack", readme_group: "recentstack" }
+           - { version: "16-3.4", variant: "alpine3.18", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-alpine3.18 16-3.4.0-alpine3.18 16-3.4-alpine", readme_group: "alpine3.18" }
+# --skip-- - { version: "16-3.4", variant: "bookworm", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-bookworm 16-3.4.0-bookworm 16-3.4", readme_group: "bookworm" }
+           - { version: "16-3.4", variant: "bullseye", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-bullseye 16-3.4.0-bullseye", readme_group: "bullseye" }
+           - { version: "16-3.4-bundle", variant: "bookworm", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-bundle-bookworm 16-3.4.0-bundle-bookworm 16-3.4-bundle", readme_group: "bundle" }
+           - { version: "16-master", variant: "bookworm", postgres: "16", postgis: "master", arch: "amd64 arm64", tags: "16-master-bookworm 16-master", readme_group: "test" }
+           - { version: "16-recentstack", variant: "bookworm", postgres: "16", postgis: "recentstack", arch: "amd64 arm64", tags: "16-recentstack-bookworm 16-recentstack", readme_group: "recentstack" }
+#matrix-include-end
 
-    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
-    runs-on: ubuntu-20.04
+    name: "${{ matrix.version }}-${{ matrix.variant }} docker image"
+    runs-on: ubuntu-22.04
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
-      VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
-      VARIANT: ${{ matrix.variant }}
+      PLATFORM: linux/amd64
+      DOCKER_BUILDKIT: '1'
+      BUILDX_PLATFORMS: linux/amd64
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
-      run: make test
+    - name: Environment init
+      run: source tools/environment_init.sh
+
+    - run: make check_version
+
+    - name: Check if DOCKERHUB_USERNAME exists
+      run: |
+        if [[ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]]; then
+          echo "DOCKERHUB_USERNAME is not set"
+          exit 1
+        else
+          echo "DOCKERHUB_USERNAME is set"
+        fi
+
+    - name: Check if DOCKERHUB_ACCESS_TOKEN exists
+      run: |
+        if [[ -z "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" ]]; then
+          echo "DOCKERHUB_ACCESS_TOKEN is not set"
+          exit 1
+        else
+          echo "DOCKERHUB_ACCESS_TOKEN is set"
+        fi
+
+    - name: Source the check_image_exists function
+      run: source tools/environment_init.sh
+
+    - name: Check if image exists
+      id: check-image
+      run: |
+          if check_image_exists "${{ matrix.version }}-${{ matrix.variant }}$(IMAGE_VERSION_ID)"; then
+              echo "IMAGE_EXISTS=true" >> $GITHUB_ENV
+          else
+              echo "IMAGE_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+    - name: Exit if image exists
+      if: env.IMAGE_EXISTS == 'true'
+      run: |
+          echo "weekly build exists; no need to re-build. STOP"
+          exit 0
+
+    - name: "verify: make -n test-${{ matrix.version }}-${{ matrix.variant }} tags ${{ matrix.tags }}"
+      if: env.IMAGE_EXISTS == 'false'
+      run: make -n test-${{ matrix.version }}-${{ matrix.variant }}
+
+    - name: "make test-${{ matrix.version }}-${{ matrix.variant }} tags ${{ matrix.tags }}"
+      if: env.IMAGE_EXISTS == 'false'
+      run: make test-${{ matrix.version }}-${{ matrix.variant }}
+
+    - run: make dockerlist
+
+    - name: Login to dockerhub
+      uses: docker/login-action@v2
+      if: ${{ (env.IMAGE_EXISTS == 'false') && (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+    - name: Install manifest-tool
+      if: ${{ (env.IMAGE_EXISTS == 'false') && (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      run: |
+            wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
+            mkdir manifest-tool
+            tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
+            sudo mv manifest-tool/manifest-tool-linux-amd64 /usr/local/bin/manifest-tool
+            manifest-tool -v
+
+    - name: Push docker image to dockerhub
+      if: ${{ (env.IMAGE_EXISTS == 'false') && (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      run: |
+        make push-${{ matrix.version }}-${{ matrix.variant }}
+        make manifest-${{ matrix.version }}-${{ matrix.variant }}
+
+
+  make-manifest:
+    name: update manifest
+    needs: make-docker-images
+    runs-on: ubuntu-22.04
+    env:
+      PLATFORM: linux/amd64
+      DOCKER_BUILDKIT: '1'
+      BUILDX_PLATFORMS: linux/amd64
+
+    # Todo: wait CircleCI workflow to start updating the manifest
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Environment init
+      run: source tools/environment_init.sh
+
+    - run: make check_version
+
+#TODO: fix waiting for CircleCI
+    - run: sleep 20m # Wait for CircleCI to finish building images; Temporary workarounds
 
     - name: Login to dockerhub
       uses: docker/login-action@v2
@@ -56,10 +170,23 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-    - name: Push docker image to dockerhub
+    - name: Install manifest-tool
+      run: |
+          wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
+          mkdir manifest-tool
+          tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
+          sudo mv manifest-tool/manifest-tool-linux-amd64 /usr/local/bin/manifest-tool
+          manifest-tool -v
+
+    - name: Update docker manifest
+      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      run: ./manifest.sh
+
+    - name: push readme to docker hub api
       if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      run: make push
+      run: make push-readme
+
 
