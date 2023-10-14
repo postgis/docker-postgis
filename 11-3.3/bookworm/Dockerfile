@@ -12,7 +12,8 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
 ENV POSTGIS_MAJOR 3
 ENV POSTGIS_VERSION 3.3.4+dfsg-1.pgdg120+1
 
-RUN apt-get update \
+RUN set -eux \
+      && apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       && apt-get install -y --no-install-recommends \
            # ca-certificates: for accessing remote raster files;

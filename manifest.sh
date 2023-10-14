@@ -174,26 +174,6 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:13-3.4.0-bullseye \
     --target ${dockername}:13-3.4.0-bullseye || true
 
-# ----- 13-3.4-bundle-bookworm -----
-
-echo "manifest: ${dockername}:13-3.4-bundle-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4-bundle-bookworm \
-    --target ${dockername}:13-3.4-bundle-bookworm || true
-
-echo "manifest: ${dockername}:13-3.4.0-bundle-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4.0-bundle-bookworm \
-    --target ${dockername}:13-3.4.0-bundle-bookworm || true
-
-echo "manifest: ${dockername}:13-3.4-bundle"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4-bundle \
-    --target ${dockername}:13-3.4-bundle || true
-
 # ----- 14-3.4-alpine3.18 -----
 
 echo "manifest: ${dockername}:14-3.4-alpine3.18"
@@ -248,25 +228,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.4.0-bullseye \
     --target ${dockername}:14-3.4.0-bullseye || true
 
-# ----- 14-3.4-bundle-bookworm -----
+# ----- 14-3.4-bundle0-bookworm -----
 
-echo "manifest: ${dockername}:14-3.4-bundle-bookworm"
+echo "manifest: ${dockername}:14-3.4-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4-bundle-bookworm \
-    --target ${dockername}:14-3.4-bundle-bookworm || true
+    --template ${dockername}-ARCHVARIANT:14-3.4-bundle0-bookworm \
+    --target ${dockername}:14-3.4-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:14-3.4.0-bundle-bookworm"
+echo "manifest: ${dockername}:14-3.4.0-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4.0-bundle-bookworm \
-    --target ${dockername}:14-3.4.0-bundle-bookworm || true
+    --template ${dockername}-ARCHVARIANT:14-3.4.0-bundle0-bookworm \
+    --target ${dockername}:14-3.4.0-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:14-3.4-bundle"
+echo "manifest: ${dockername}:14-3.4-bundle0"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4-bundle \
-    --target ${dockername}:14-3.4-bundle || true
+    --template ${dockername}-ARCHVARIANT:14-3.4-bundle0 \
+    --target ${dockername}:14-3.4-bundle0 || true
 
 # ----- 15-3.4-alpine3.18 -----
 
@@ -334,31 +314,31 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.4.0-bullseye \
     --target ${dockername}:15-3.4.0-bullseye || true
 
-# ----- 15-3.4-bundle-bookworm -----
+# ----- 15-3.4-bundle0-bookworm -----
 
-echo "manifest: ${dockername}:15-3.4-bundle-bookworm"
+echo "manifest: ${dockername}:15-3.4-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.4-bundle-bookworm \
-    --target ${dockername}:15-3.4-bundle-bookworm || true
+    --template ${dockername}-ARCHVARIANT:15-3.4-bundle0-bookworm \
+    --target ${dockername}:15-3.4-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:15-3.4.0-bundle-bookworm"
+echo "manifest: ${dockername}:15-3.4.0-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.4.0-bundle-bookworm \
-    --target ${dockername}:15-3.4.0-bundle-bookworm || true
+    --template ${dockername}-ARCHVARIANT:15-3.4.0-bundle0-bookworm \
+    --target ${dockername}:15-3.4.0-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:15-3.4-bundle"
+echo "manifest: ${dockername}:15-3.4-bundle0"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.4-bundle \
-    --target ${dockername}:15-3.4-bundle || true
+    --template ${dockername}-ARCHVARIANT:15-3.4-bundle0 \
+    --target ${dockername}:15-3.4-bundle0 || true
 
-echo "manifest: ${dockername}:bundle"
+echo "manifest: ${dockername}:bundle0"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:bundle \
-    --target ${dockername}:bundle || true
+    --template ${dockername}-ARCHVARIANT:bundle0 \
+    --target ${dockername}:bundle0 || true
 
 # ----- 15-master-bookworm -----
 
@@ -374,19 +354,19 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-master \
     --target ${dockername}:15-master || true
 
-# ----- 15-recentstack-bookworm -----
+# ----- 15-recent-bookworm -----
 
-echo "manifest: ${dockername}:15-recentstack-bookworm"
+echo "manifest: ${dockername}:15-recent-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-recentstack-bookworm \
-    --target ${dockername}:15-recentstack-bookworm || true
+    --template ${dockername}-ARCHVARIANT:15-recent-bookworm \
+    --target ${dockername}:15-recent-bookworm || true
 
-echo "manifest: ${dockername}:15-recentstack"
+echo "manifest: ${dockername}:15-recent"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-recentstack \
-    --target ${dockername}:15-recentstack || true
+    --template ${dockername}-ARCHVARIANT:15-recent \
+    --target ${dockername}:15-recent || true
 
 # ----- 16-3.4-alpine3.18 -----
 
@@ -442,25 +422,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.4.0-bullseye \
     --target ${dockername}:16-3.4.0-bullseye || true
 
-# ----- 16-3.4-bundle-bookworm -----
+# ----- 16-3.4-bundle0-bookworm -----
 
-echo "manifest: ${dockername}:16-3.4-bundle-bookworm"
+echo "manifest: ${dockername}:16-3.4-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.4-bundle-bookworm \
-    --target ${dockername}:16-3.4-bundle-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-3.4-bundle0-bookworm \
+    --target ${dockername}:16-3.4-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:16-3.4.0-bundle-bookworm"
+echo "manifest: ${dockername}:16-3.4.0-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.4.0-bundle-bookworm \
-    --target ${dockername}:16-3.4.0-bundle-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-3.4.0-bundle0-bookworm \
+    --target ${dockername}:16-3.4.0-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:16-3.4-bundle"
+echo "manifest: ${dockername}:16-3.4-bundle0"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.4-bundle \
-    --target ${dockername}:16-3.4-bundle || true
+    --template ${dockername}-ARCHVARIANT:16-3.4-bundle0 \
+    --target ${dockername}:16-3.4-bundle0 || true
 
 # ----- 16-master-bookworm -----
 
@@ -476,16 +456,16 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-master \
     --target ${dockername}:16-master || true
 
-# ----- 16-recentstack-bookworm -----
+# ----- 16-recent-bookworm -----
 
-echo "manifest: ${dockername}:16-recentstack-bookworm"
+echo "manifest: ${dockername}:16-recent-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-recentstack-bookworm \
-    --target ${dockername}:16-recentstack-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-recent-bookworm \
+    --target ${dockername}:16-recent-bookworm || true
 
-echo "manifest: ${dockername}:16-recentstack"
+echo "manifest: ${dockername}:16-recent"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-recentstack \
-    --target ${dockername}:16-recentstack || true
+    --template ${dockername}-ARCHVARIANT:16-recent \
+    --target ${dockername}:16-recent || true

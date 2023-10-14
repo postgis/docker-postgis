@@ -5,7 +5,11 @@ version: 2.1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/docker
-  docker: circleci/docker@2.2.0
+  docker: circleci/docker@2.4.0
+  # https://circleci.com/developer/orbs/orb/circleci/python
+  python: circleci/python@2.1.1
+  # https://circleci.com/developer/orbs/orb/circleci/shellcheck
+  shellcheck: circleci/shellcheck@3.2.0
 
 jobs:
   build-arm64:
@@ -24,6 +28,15 @@ jobs:
       - run: uname -a
       - run: docker --version
       - run: docker info
+      - run:
+          name: Install manifest-tool (linux-arm64 )
+          command: |
+            wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
+            mkdir manifest-tool
+            tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
+            sudo mv manifest-tool/manifest-tool-linux-arm64 /usr/local/bin/manifest-tool
+            manifest-tool -v
+      - run: pip3 install lastversion
       - run: source tools/environment_init.sh
       - run: make check_version
       - docker/check:
@@ -32,11 +45,14 @@ jobs:
           docker-password: DOCKERHUB_ACCESS_TOKEN
 
       - run:
-          name: Conditional Docker Check - Halt if not on master branch or if it's a PR
+          name: Conditional Docker Check - Halt if not on master branch or if it's a PR or Weekly image exists
           command: |
             # Check if the current branch is 'master' and the weekly image is not extis
             #    If weekly image exists, skip docker build and push
-            if [ "$CIRCLE_BRANCH" == "master" ] && check_image_exists "${{ matrix.version }}-${{ matrix.variant }}$(IMAGE_VERSION_ID)"; then
+            source tools/environment_init.sh
+            echo "check: << parameters.target-version-variant >>${IMAGE_VERSION_ID}"
+            check_image_exists "<< parameters.target-version-variant >>${IMAGE_VERSION_ID}" || true
+            if [ "$CIRCLE_BRANCH" == "master" ] && check_image_exists "<< parameters.target-version-variant >>${IMAGE_VERSION_ID}"; then
               circleci-agent step halt
             fi
 
@@ -52,15 +68,6 @@ jobs:
             if [ "$CIRCLE_BRANCH" != "master" ] || [ -n "$CIRCLE_PULL_REQUEST" ]; then
               circleci-agent step halt
             fi
-
-      - run:
-          name: Install manifest-tool (linux-arm64 )
-          command: |
-            wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
-            mkdir manifest-tool
-            tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
-            sudo mv manifest-tool/manifest-tool-linux-arm64 /usr/local/bin/manifest-tool
-            manifest-tool -v
 
       - run:
           name: "Push docker image : make push-<< parameters.target-version-variant >>"
@@ -93,24 +100,23 @@ workflows:
                 "12-3.4-bookworm",
                 "12-3.4-bullseye",
                 "13-3.4-alpine3.18",
-#   --skip--    "13-3.4-bookworm",  -->  generated with the related bundle job!
+                "13-3.4-bookworm",
                 "13-3.4-bullseye",
-                "13-3.4-bundle-bookworm",
                 "14-3.4-alpine3.18",
 #   --skip--    "14-3.4-bookworm",  -->  generated with the related bundle job!
                 "14-3.4-bullseye",
-                "14-3.4-bundle-bookworm",
+                "14-3.4-bundle0-bookworm",
                 "15-3.4-alpine3.18",
 #   --skip--    "15-3.4-bookworm",  -->  generated with the related bundle job!
                 "15-3.4-bullseye",
-                "15-3.4-bundle-bookworm",
+                "15-3.4-bundle0-bookworm",
                 "15-master-bookworm",
-                "15-recentstack-bookworm",
+                "15-recent-bookworm",
                 "16-3.4-alpine3.18",
 #   --skip--    "16-3.4-bookworm",  -->  generated with the related bundle job!
                 "16-3.4-bullseye",
-                "16-3.4-bundle-bookworm",
+                "16-3.4-bundle0-bookworm",
                 "16-master-bookworm",
-                "16-recentstack-bookworm",
+                "16-recent-bookworm",
 #circleci-targets-end
               ]

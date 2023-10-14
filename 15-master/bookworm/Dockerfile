@@ -6,48 +6,48 @@
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
-ARG PGIS_V1_BASE_IMAGE=postgres:15-bookworm
+ARG PGIS1_BASE_IMAGE=postgres:15-bookworm
 
-ARG PGIS_V1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
-ARG PGIS_V1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
-ARG PGIS_V1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
-ARG PGIS_V1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
-ARG PGIS_V1_SFCGAL_REPOSITORY=https://gitlab.com/Oslandia/SFCGAL.git
-ARG PGIS_V1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
+ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
+ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
+ARG PGIS1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
+ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
+ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/Oslandia/SFCGAL.git
+ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
-ARG PGIS_V1_POSTGIS_CHECKOUT=5c3c66a9282b3472bb161f61d1e762789cf4928b
-ARG PGIS_V1_GEOS_CHECKOUT=28d70a2e4582edcd3625659f70e31d1853423875
-ARG PGIS_V1_GDAL_CHECKOUT=2cf3921a088d42d6840a8b18e5ce7b994d4e9cf4
-ARG PGIS_V1_PROJ_CHECKOUT=2040e685f5ab9c2958b7b611f5aaafee21fed82f
-ARG PGIS_V1_SFCGAL_CHECKOUT=35f72d2f52b4253013201b170467757b0fc355e5
-ARG PGIS_V1_CGAL_CHECKOUT=3c8e2053721271119499506ea1d8a49dee89e30c
+ARG PGIS1_POSTGIS_CHECKOUT=b178091a9833febf41d6d9f388804a414a26421a
+ARG PGIS1_GEOS_CHECKOUT=28d70a2e4582edcd3625659f70e31d1853423875
+ARG PGIS1_GDAL_CHECKOUT=7c78481624c632a996915195b298190c23c3cc2e
+ARG PGIS1_PROJ_CHECKOUT=61003c9550925bcfc7c0ab37f3c64fc6c29c46a4
+ARG PGIS1_SFCGAL_CHECKOUT=34f5a2e5e91a730121128f75d2ef4b55bb8e2afa
+ARG PGIS1_CGAL_CHECKOUT=3c8e2053721271119499506ea1d8a49dee89e30c
 
-ARG PGIS_V1_BOOST_VERSION=1.74.0
+ARG PGIS1_BOOST_VERSION=1.74.0
 
-ARG PGIS_V1_CMAKE_BUILD_TYPE=Release
+ARG PGIS1_CMAKE_BUILD_TYPE=Release
 
-FROM ${PGIS_V1_BASE_IMAGE} as builder
+FROM ${PGIS1_BASE_IMAGE} as builder
 
 WORKDIR /
 
-ARG PGIS_V1_BOOST_VERSION
-ENV PGIS_V1_BOOST_VERSION=${PGIS_V1_BOOST_VERSION}
+ARG PGIS1_BOOST_VERSION
+ENV PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
 # apt-get install
-RUN set -ex \
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic${PGIS_V1_BOOST_VERSION} \
-      libboost-chrono${PGIS_V1_BOOST_VERSION} \
-      libboost-date-time${PGIS_V1_BOOST_VERSION} \
-      libboost-filesystem${PGIS_V1_BOOST_VERSION} \
-      libboost-program-options${PGIS_V1_BOOST_VERSION} \
-      libboost-serialization${PGIS_V1_BOOST_VERSION} \
-      libboost-system${PGIS_V1_BOOST_VERSION} \
-      libboost-test${PGIS_V1_BOOST_VERSION} \
-      libboost-thread${PGIS_V1_BOOST_VERSION} \
-      libboost-timer${PGIS_V1_BOOST_VERSION} \
+      libboost-atomic${PGIS1_BOOST_VERSION} \
+      libboost-chrono${PGIS1_BOOST_VERSION} \
+      libboost-date-time${PGIS1_BOOST_VERSION} \
+      libboost-filesystem${PGIS1_BOOST_VERSION} \
+      libboost-program-options${PGIS1_BOOST_VERSION} \
+      libboost-serialization${PGIS1_BOOST_VERSION} \
+      libboost-system${PGIS1_BOOST_VERSION} \
+      libboost-test${PGIS1_BOOST_VERSION} \
+      libboost-thread${PGIS1_BOOST_VERSION} \
+      libboost-timer${PGIS1_BOOST_VERSION} \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
@@ -98,42 +98,44 @@ RUN set -ex \
       libwebp-dev \
       libzstd-dev
 
-ARG PGIS_V1_CMAKE_BUILD_TYPE
-ENV PGIS_V1_CMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE}
+ARG PGIS1_CMAKE_BUILD_TYPE
+ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE}
+
+FROM builder as cgal-sfcgal-builder
 
 # cgal & sfcgal
-ARG PGIS_V1_SFCGAL_REPOSITORY
-ENV PGIS_V1_SFCGAL_REPOSITORY ${PGIS_V1_SFCGAL_REPOSITORY}
-ARG PGIS_V1_SFCGAL_CHECKOUT
-ENV PGIS_V1_SFCGAL_CHECKOUT ${PGIS_V1_SFCGAL_CHECKOUT}
+ARG PGIS1_SFCGAL_REPOSITORY
+ENV PGIS1_SFCGAL_REPOSITORY ${PGIS1_SFCGAL_REPOSITORY}
+ARG PGIS1_SFCGAL_CHECKOUT
+ENV PGIS1_SFCGAL_CHECKOUT ${PGIS1_SFCGAL_CHECKOUT}
 
-ARG PGIS_V1_CGAL_REPOSITORY
-ENV PGIS_V1_CGAL_REPOSITORY ${PGIS_V1_CGAL_REPOSITORY}
-ARG PGIS_V1_CGAL_CHECKOUT
-ENV PGIS_V1_CGAL_CHECKOUT ${PGIS_V1_CGAL_CHECKOUT}
+ARG PGIS1_CGAL_REPOSITORY
+ENV PGIS1_CGAL_REPOSITORY ${PGIS1_CGAL_REPOSITORY}
+ARG PGIS1_CGAL_CHECKOUT
+ENV PGIS1_CGAL_CHECKOUT ${PGIS1_CGAL_CHECKOUT}
 
-RUN set -ex \
+RUN set -eux \
     && cd /usr/src \
     && mkdir cgal \
     && cd cgal \
     && git init \
-    && git remote add origin ${PGIS_V1_CGAL_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_CGAL_CHECKOUT} \
+    && git remote add origin ${PGIS1_CGAL_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_CGAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && mkdir SFCGAL \
     && cd SFCGAL \
     && git init \
-    && git remote add origin ${PGIS_V1_SFCGAL_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_SFCGAL_CHECKOUT} \
+    && git remote add origin ${PGIS1_SFCGAL_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_SFCGAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. \
        -DCGAL_DIR=/usr/src/cgal \
-       -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} \
+       -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
        -DSFCGAL_BUILD_BENCH=OFF \
        -DSFCGAL_BUILD_EXAMPLES=OFF \
        -DSFCGAL_BUILD_TESTS=OFF \
@@ -144,18 +146,21 @@ RUN set -ex \
     && rm -fr /usr/src/SFCGAL \
     && rm -fr /usr/src/cgal
 
+
+FROM builder as proj-builder
+
 # proj
-ARG PGIS_V1_PROJ_REPOSITORY
-ENV PGIS_V1_PROJ_REPOSITORY ${PGIS_V1_PROJ_REPOSITORY}
-ARG PGIS_V1_PROJ_CHECKOUT
-ENV PGIS_V1_PROJ_CHECKOUT ${PGIS_V1_PROJ_CHECKOUT}
-RUN set -ex \
+ARG PGIS1_PROJ_REPOSITORY
+ENV PGIS1_PROJ_REPOSITORY ${PGIS1_PROJ_REPOSITORY}
+ARG PGIS1_PROJ_CHECKOUT
+ENV PGIS1_PROJ_CHECKOUT ${PGIS1_PROJ_CHECKOUT}
+RUN set -eux \
     && cd /usr/src \
     && mkdir PROJ \
     && cd PROJ \
     && git init \
-    && git remote add origin ${PGIS_V1_PROJ_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_PROJ_CHECKOUT} \
+    && git remote add origin ${PGIS1_PROJ_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_PROJ_CHECKOUT} \
     && git checkout FETCH_HEAD \
     && git log -1 > /_pgis_proj_last_commit.txt \
     # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
@@ -172,7 +177,7 @@ RUN set -ex \
         && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
         && mkdir build \
         && cd build \
-        && cmake .. -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+        && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
         && make -j$(nproc) \
         && make install \
         ; \
@@ -180,41 +185,55 @@ RUN set -ex \
     \
     && rm -fr /usr/src/PROJ
 
+
+FROM builder as geos-builder
+
 # geos
-ARG PGIS_V1_GEOS_REPOSITORY
-ENV PGIS_V1_GEOS_REPOSITORY ${PGIS_V1_GEOS_REPOSITORY}
-ARG PGIS_V1_GEOS_CHECKOUT
-ENV PGIS_V1_GEOS_CHECKOUT ${PGIS_V1_GEOS_CHECKOUT}
-RUN set -ex \
+ARG PGIS1_GEOS_REPOSITORY
+ENV PGIS1_GEOS_REPOSITORY ${PGIS1_GEOS_REPOSITORY}
+ARG PGIS1_GEOS_CHECKOUT
+ENV PGIS1_GEOS_CHECKOUT ${PGIS1_GEOS_CHECKOUT}
+RUN set -eux \
     && cd /usr/src \
     && mkdir geos \
     && cd geos \
     && git init \
-    && git remote add origin ${PGIS_V1_GEOS_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_GEOS_CHECKOUT} \
+    && git remote add origin ${PGIS1_GEOS_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_GEOS_CHECKOUT} \
     && git checkout FETCH_HEAD \
     && git log -1 > /_pgis_geos_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
-    && cmake .. -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+    && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
     && make -j$(nproc) \
     && make install \
     && cd / \
     && rm -fr /usr/src/geos
 
-# gdal
-ARG PGIS_V1_GDAL_REPOSITORY
-ENV PGIS_V1_GDAL_REPOSITORY ${PGIS_V1_GDAL_REPOSITORY}
-ARG PGIS_V1_GDAL_CHECKOUT
-ENV PGIS_V1_GDAL_CHECKOUT ${PGIS_V1_GDAL_CHECKOUT}
 
-RUN set -ex \
+FROM builder as stage0-builder
+
+COPY --from=cgal-sfcgal-builder /_pgis*.* /
+COPY --from=cgal-sfcgal-builder /usr/local /usr/local
+
+COPY --from=proj-builder /_pgis*.* /
+COPY --from=proj-builder /usr/local /usr/local
+
+COPY --from=geos-builder /_pgis*.* /
+COPY --from=geos-builder /usr/local /usr/local
+# gdal
+ARG PGIS1_GDAL_REPOSITORY
+ENV PGIS1_GDAL_REPOSITORY ${PGIS1_GDAL_REPOSITORY}
+ARG PGIS1_GDAL_CHECKOUT
+ENV PGIS1_GDAL_CHECKOUT ${PGIS1_GDAL_CHECKOUT}
+
+RUN set -eux \
     && cd /usr/src \
     && mkdir gdal \
     && cd gdal \
     && git init \
-    && git remote add origin ${PGIS_V1_GDAL_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_GDAL_CHECKOUT} \
+    && git remote add origin ${PGIS1_GDAL_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_GDAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
     && git log -1 > /_pgis_gdal_last_commit.txt \
     \
@@ -238,7 +257,7 @@ RUN set -ex \
         && mkdir build \
         && cd build \
         # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
-        && cmake .. -DCMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+        && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
             -DBUILD_DOCS=OFF \
             \
             -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
@@ -280,7 +299,7 @@ RUN set -ex \
     && rm -fr /usr/src/gdal
 
 # Minimal command line test.
-RUN set -ex \
+RUN set -eux \
     && ldconfig \
     && cs2cs \
     && ldd $(which gdalinfo) \
@@ -292,36 +311,36 @@ RUN set -ex \
     && pcre-config  --version
 
 # -------------------------------------------
-# STAGE  final
+# final stage
 # -------------------------------------------
-FROM ${PGIS_V1_BASE_IMAGE}
+FROM ${PGIS1_BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
       org.opencontainers.image.description="PostGIS - 15-master spatial database extension with PostgreSQL 15 bookworm" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ARG PGIS_V1_CMAKE_BUILD_TYPE
-ARG PGIS_V1_BASE_IMAGE
-ARG PGIS_V1_BOOST_VERSION
+ARG PGIS1_CMAKE_BUILD_TYPE
+ARG PGIS1_BASE_IMAGE
+ARG PGIS1_BOOST_VERSION
 
-ENV PGIS_V1_CMAKE_BUILD_TYPE=${PGIS_V1_CMAKE_BUILD_TYPE} \
-    PGIS_V1_BASE_IMAGE=${PGIS_V1_BASE_IMAGE} \
-    PGIS_V1_BOOST_VERSION=${PGIS_V1_BOOST_VERSION}
+ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
+    PGIS1_BASE_IMAGE=${PGIS1_BASE_IMAGE} \
+    PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
-RUN set -ex \
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic${PGIS_V1_BOOST_VERSION} \
-      libboost-chrono${PGIS_V1_BOOST_VERSION} \
-      libboost-date-time${PGIS_V1_BOOST_VERSION} \
-      libboost-filesystem${PGIS_V1_BOOST_VERSION} \
-      libboost-program-options${PGIS_V1_BOOST_VERSION} \
-      libboost-serialization${PGIS_V1_BOOST_VERSION} \
-      libboost-system${PGIS_V1_BOOST_VERSION} \
-      libboost-test${PGIS_V1_BOOST_VERSION} \
-      libboost-thread${PGIS_V1_BOOST_VERSION} \
-      libboost-timer${PGIS_V1_BOOST_VERSION} \
+      libboost-atomic${PGIS1_BOOST_VERSION} \
+      libboost-chrono${PGIS1_BOOST_VERSION} \
+      libboost-date-time${PGIS1_BOOST_VERSION} \
+      libboost-filesystem${PGIS1_BOOST_VERSION} \
+      libboost-program-options${PGIS1_BOOST_VERSION} \
+      libboost-serialization${PGIS1_BOOST_VERSION} \
+      libboost-system${PGIS1_BOOST_VERSION} \
+      libboost-test${PGIS1_BOOST_VERSION} \
+      libboost-thread${PGIS1_BOOST_VERSION} \
+      libboost-timer${PGIS1_BOOST_VERSION} \
       libcurl3-gnutls \
       libexpat1 \
       libgmp10 \
@@ -347,29 +366,37 @@ RUN set -ex \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /_pgis*.* /
-COPY --from=builder /usr/local /usr/local
+COPY --from=stage0-builder /_pgis*.* /
+COPY --from=stage0-builder /usr/local /usr/local
 
-ARG PGIS_V1_GDAL_CHECKOUT
-ARG PGIS_V1_GDAL_REPOSITORY
-ARG PGIS_V1_GEOS_CHECKOUT
-ARG PGIS_V1_GEOS_REPOSITORY
-ARG PGIS_V1_PROJ_CHECKOUT
-ARG PGIS_V1_PROJ_REPOSITORY
-ARG PGIS_V1_SFCGAL_CHECKOUT
-ARG PGIS_V1_SFCGAL_REPOSITORY
+ARG PGIS1_GDAL_CHECKOUT
+ARG PGIS1_GDAL_REPOSITORY
+ARG PGIS1_GEOS_CHECKOUT
+ARG PGIS1_GEOS_REPOSITORY
+ARG PGIS1_PROJ_CHECKOUT
+ARG PGIS1_PROJ_REPOSITORY
+ARG PGIS1_SFCGAL_CHECKOUT
+ARG PGIS1_SFCGAL_REPOSITORY
+ARG PGIS1_CGAL_REPOSITORY
+ARG PGIS1_CGAL_CHECKOUT
+ARG PGIS1_POSTGIS_CHECKOUT
+ARG PGIS1_POSTGIS_REPOSITORY
 
-ENV PGIS_V1_GDAL_CHECKOUT=${PGIS_V1_GDAL_CHECKOUT} \
-    PGIS_V1_GDAL_REPOSITORY=${PGIS_V1_GDAL_REPOSITORY} \
-    PGIS_V1_GEOS_CHECKOUT=${PGIS_V1_GEOS_CHECKOUT} \
-    PGIS_V1_GEOS_REPOSITORY=${PGIS_V1_GEOS_REPOSITORY} \
-    PGIS_V1_PROJ_CHECKOUT=${PGIS_V1_PROJ_CHECKOUT} \
-    PGIS_V1_PROJ_REPOSITORY=${PGIS_V1_PROJ_REPOSITORY} \
-    PGIS_V1_SFCGAL_CHECKOUT=${PGIS_V1_SFCGAL_CHECKOUT} \
-    PGIS_V1_SFCGAL_REPOSITORY=${PGIS_V1_SFCGAL_REPOSITORY}
+ENV PGIS1_GDAL_CHECKOUT=${PGIS1_GDAL_CHECKOUT} \
+    PGIS1_GDAL_REPOSITORY=${PGIS1_GDAL_REPOSITORY} \
+    PGIS1_GEOS_CHECKOUT=${PGIS1_GEOS_CHECKOUT} \
+    PGIS1_GEOS_REPOSITORY=${PGIS1_GEOS_REPOSITORY} \
+    PGIS1_PROJ_CHECKOUT=${PGIS1_PROJ_CHECKOUT} \
+    PGIS1_PROJ_REPOSITORY=${PGIS1_PROJ_REPOSITORY} \
+    PGIS1_CGAL_CHECKOUT=${PGIS1_CGAL_CHECKOUT} \
+    PGIS1_CGAL_REPOSITORY=${PGIS1_CGAL_REPOSITORY} \
+    PGIS1_SFCGAL_CHECKOUT=${PGIS1_SFCGAL_CHECKOUT} \
+    PGIS1_SFCGAL_REPOSITORY=${PGIS1_SFCGAL_REPOSITORY} \
+    PGIS1_POSTGIS_CHECKOUT=${PGIS1_POSTGIS_CHECKOUT} \
+    PGIS1_POSTGIS_REPOSITORY=${PGIS1_POSTGIS_REPOSITORY}
 
 # Minimal command line test ( fail fast )
-RUN set -ex \
+RUN set -eux \
     && ldconfig \
     && cs2cs \
     && ldd $(which gdalinfo) \
@@ -384,14 +411,12 @@ RUN set -ex \
     && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
-# install postgis
-ARG PGIS_V1_POSTGIS_CHECKOUT
-ARG PGIS_V1_POSTGIS_REPOSITORY
+# temporary workaround for : nitdb: invalid locale settings; check LANG and LC_* environment variables
+#   https://github.com/docker-library/postgres/issues/1112#issuecomment-1746076388
+RUN set -eux \
+    && echo en_US.UTF-8 UTF-8 >> /etc/locale.gen && locale-gen
 
-ENV PGIS_V1_POSTGIS_CHECKOUT=${PGIS_V1_POSTGIS_CHECKOUT} \
-    PGIS_V1_POSTGIS_REPOSITORY=${PGIS_V1_POSTGIS_REPOSITORY}
-
-RUN set -ex \
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       autoconf \
@@ -429,8 +454,8 @@ RUN set -ex \
     && mkdir postgis \
     && cd postgis \
     && git init \
-    && git remote add origin ${PGIS_V1_POSTGIS_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_POSTGIS_CHECKOUT} \
+    && git remote add origin ${PGIS1_POSTGIS_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_POSTGIS_CHECKOUT} \
     && git checkout FETCH_HEAD \
     && git log -1 > /_pgis_last_commit.txt \
     && ./autogen.sh \
@@ -509,7 +534,7 @@ COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 
 # last final test
-RUN set -ex \
+RUN set -eux \
     && ldconfig \
     && cs2cs \
     && ldd $(which gdalinfo) \

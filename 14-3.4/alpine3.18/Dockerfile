@@ -4,23 +4,23 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-ARG PGIS_V1_BASE_IMAGE=postgres:14-alpine3.18
-ARG PGIS_V1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
-ARG PGIS_V1_POSTGIS_CHECKOUT=tags/3.4.0
-ARG PGIS_V1_POSTGIS_CHECKOUT_SHA1=0874ea342af5392e3cd9f4e6157ef08648c9d2d8
+ARG PGIS1_BASE_IMAGE=postgres:14-alpine3.18
+ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
+ARG PGIS1_POSTGIS_CHECKOUT=tags/3.4.0
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=0874ea342af5392e3cd9f4e6157ef08648c9d2d8
 
-FROM ${PGIS_V1_BASE_IMAGE}
+FROM ${PGIS1_BASE_IMAGE}
 
-ARG PGIS_V1_POSTGIS_REPOSITORY
-ARG PGIS_V1_POSTGIS_CHECKOUT
-ARG PGIS_V1_POSTGIS_CHECKOUT_SHA1
+ARG PGIS1_POSTGIS_REPOSITORY
+ARG PGIS1_POSTGIS_CHECKOUT
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.4.0 spatial database extension with PostgreSQL 14 alpine3.18" \
+      org.opencontainers.image.description="PostGIS ${PGIS1_POSTGIS_CHECKOUT} spatial database extension with PostgreSQL 14 alpine3.18" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION 3.4.0
-ENV POSTGIS_SHA256 3acdf303adfd58d73543a70e6ebe99af29301262c56cf32220d42caa3efab024
+# ENV POSTGIS_VERSION 3.4.0
+# ENV POSTGIS_SHA256 3acdf303adfd58d73543a70e6ebe99af29301262c56cf32220d42caa3efab024
 
 RUN set -eux \
 #    && apk add --no-cache --virtual .fetch-deps \
@@ -54,9 +54,8 @@ RUN set -eux \
         \
         autoconf \
         automake \
+        bison \
         cunit-dev \
-        docbook-xml \
-        docbook5-xml \
         file \
         g++ \
         gcc \
@@ -76,11 +75,11 @@ RUN set -eux \
     && mkdir postgis \
     && cd postgis \
     && git init \
-    && git remote add origin ${PGIS_V1_POSTGIS_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_POSTGIS_CHECKOUT} \
+    && git remote add origin ${PGIS1_POSTGIS_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_POSTGIS_CHECKOUT} \
     && git checkout FETCH_HEAD \
     # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS_V1_POSTGIS_CHECKOUT_SHA1" ]; then exit 1; fi \
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_POSTGIS_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_last_commit.txt \
 # build PostGIS - with Link Time Optimization (LTO) enabled
     && cd /usr/src/postgis \
@@ -140,8 +139,12 @@ RUN set -eux \
         ca-certificates \
 # clean
     && cd / \
-    && rm -rf /usr/src/postgis \
-    && apk del .fetch-deps .build-deps \
+    && rm -rf \
+         /usr/src/postgis \
+     	 /usr/local/share/doc \
+	  	 /usr/local/share/man \
+    && apk del .build-deps \
+    #&& apk del .fetch-deps \
 # At the end of the build, we print the collected information
 # from the '/_pgis_full_version.txt' file. This is for experimental and internal purposes.
     && cat /_pgis_full_version.txt

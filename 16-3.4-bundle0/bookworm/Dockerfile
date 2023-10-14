@@ -1,6 +1,6 @@
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#       source: "Dockerfile.bundle.template"
+#       source: "Dockerfile.bundle0.template"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
@@ -16,28 +16,32 @@ ARG REGISTRY=docker.io
 ARG REPO_NAME=imresamu
 ARG IMAGE_NAME=postgis-amd64
 
-ARG PGIS_V1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:16-3.4-bookworm
+ARG PGIS1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:16-3.4-bookworm
 
-ARG PGIS_V1_MOBILITYDB_REPOSITORY=https://github.com/MobilityDB/MobilityDB.git
-ARG PGIS_V1_MOBILITYDB_CHECKOUT=tags/v1.1.0-alpha
-ARG PGIS_V1_MOBILITYDB_CHECKOUT_SHA1=ae74a3f12757a768942c6a38ed774323bcd446ec
+ARG PGIS1_MOBILITYDB_REPOSITORY=https://github.com/MobilityDB/MobilityDB.git
+ARG PGIS1_MOBILITYDB_CHECKOUT=tags/v1.1.0-beta1
+ARG PGIS1_MOBILITYDB_CHECKOUT_SHA1=641d0818542acbfadbfbb54b131a3af75f8dc809
 
-ARG PGIS_V1_PGSQL_HTTP_REPOSITORY=https://github.com/pramsey/pgsql-http.git
-ARG PGIS_V1_PGSQL_HTTP_CHECKOUT=tags/v1.6.0
-ARG PGIS_V1_PGSQL_HTTP_CHECKOUT_SHA1=d0ca28df6121f10cd3868744d219904c7923c5be
+ARG PGIS1_PGSQL_HTTP_REPOSITORY=https://github.com/pramsey/pgsql-http.git
+ARG PGIS1_PGSQL_HTTP_CHECKOUT=tags/v1.6.0
+ARG PGIS1_PGSQL_HTTP_CHECKOUT_SHA1=d0ca28df6121f10cd3868744d219904c7923c5be
 
-ARG PGIS_V1_PGSQL_GZIP_REPOSITORY=https://github.com/pramsey/pgsql-gzip.git
-ARG PGIS_V1_PGSQL_GZIP_CHECKOUT=tags/v1.0.0
-ARG PGIS_V1_PGSQL_GZIP_CHECKOUT_SHA1=7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49
+ARG PGIS1_PGSQL_GZIP_REPOSITORY=https://github.com/pramsey/pgsql-gzip.git
+ARG PGIS1_PGSQL_GZIP_CHECKOUT=tags/v1.0.0
+ARG PGIS1_PGSQL_GZIP_CHECKOUT_SHA1=7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49
 
-ARG PGIS_V1_TIMESCALEDB_APACHE_ONLY=false
-ARG PGIS_V1_TIMESCALEDB_REPOSITORY=https://github.com/timescale/timescaledb.git
-ARG PGIS_V1_TIMESCALEDB_CHECKOUT=tags/2.12.0
-ARG PGIS_V1_TIMESCALEDB_CHECKOUT_SHA1=ec99b00f18a6cc636fc7ff6e4bcff870d4201c90
+ARG PGIS1_TIMESCALEDB_APACHE_ONLY=false
+ARG PGIS1_TIMESCALEDB_REPOSITORY=https://github.com/timescale/timescaledb.git
+ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.12.1
+ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=c93faddbe95e45d93a53c3f652e2033558e8b380
 
-FROM ${PGIS_V1_BASE_IMAGE} AS builder
+ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
+ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL16_1_6_0
+ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1=fa0a461af929c06f7c96956369458456c26e7ad9
 
-RUN set -ex \
+FROM ${PGIS1_BASE_IMAGE} AS builder
+
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       autoconf \
@@ -62,6 +66,8 @@ RUN set -ex \
       libkrb5-dev \
       # pgsql-http
       libcurl4-gnutls-dev \
+      # hydra (columnar)
+      liblz4-dev \
       #  pgsql-gzip
       zlib1g-dev \
       # sqlite_fdw
@@ -70,63 +76,69 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 
-ARG PGIS_V1_MOBILITYDB_REPOSITORY
-ARG PGIS_V1_MOBILITYDB_CHECKOUT
-ARG PGIS_V1_MOBILITYDB_CHECKOUT_SHA1
+FROM builder as builder-http-gzip
 
-ARG PGIS_V1_PGSQL_HTTP_REPOSITORY
-ARG PGIS_V1_PGSQL_HTTP_CHECKOUT
-ARG PGIS_V1_PGSQL_HTTP_CHECKOUT_SHA1
+ARG PGIS1_PGSQL_HTTP_REPOSITORY
+ARG PGIS1_PGSQL_HTTP_CHECKOUT
+ARG PGIS1_PGSQL_HTTP_CHECKOUT_SHA1
 
-ARG PGIS_V1_PGSQL_GZIP_REPOSITORY
-ARG PGIS_V1_PGSQL_GZIP_CHECKOUT
-ARG PGIS_V1_PGSQL_GZIP_CHECKOUT_SHA1
+ARG PGIS1_PGSQL_GZIP_REPOSITORY
+ARG PGIS1_PGSQL_GZIP_CHECKOUT
+ARG PGIS1_PGSQL_GZIP_CHECKOUT_SHA1
 
-ARG PGIS_V1_TIMESCALEDB_APACHE_ONLY
-ARG PGIS_V1_TIMESCALEDB_REPOSITORY
-ARG PGIS_V1_TIMESCALEDB_CHECKOUT
-ARG PGIS_V1_TIMESCALEDB_CHECKOUT_SHA1
-
-RUN set -ex \
+RUN set -eux \
     && mkdir -p /pgsql-gzip \
     && cd pgsql-gzip \
     && git init \
-    && git remote add origin ${PGIS_V1_PGSQL_GZIP_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_PGSQL_GZIP_CHECKOUT} \
+    && git remote add origin ${PGIS1_PGSQL_GZIP_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_PGSQL_GZIP_CHECKOUT} \
     && git checkout FETCH_HEAD \
     # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS_V1_PGSQL_GZIP_CHECKOUT_SHA1" ]; then exit 1; fi \
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_PGSQL_GZIP_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgsql_gzip_last_commit.txt \
     && make -j$(nproc) \
     && make install
 
-RUN set -ex \
+RUN set -eux \
     && mkdir -p /pgsql-http \
     && cd pgsql-http \
     && git init \
-    && git remote add origin ${PGIS_V1_PGSQL_HTTP_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_PGSQL_HTTP_CHECKOUT} \
+    && git remote add origin ${PGIS1_PGSQL_HTTP_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_PGSQL_HTTP_CHECKOUT} \
     && git checkout FETCH_HEAD \
     # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS_V1_PGSQL_HTTP_CHECKOUT_SHA1" ]; then exit 1; fi \
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_PGSQL_HTTP_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgsql_http_last_commit.txt \
     && make -j$(nproc) \
     && make install
 
 
+FROM builder as builder-timescaledb
+
+ARG PGIS1_TIMESCALEDB_APACHE_ONLY
+ARG PGIS1_TIMESCALEDB_REPOSITORY
+ARG PGIS1_TIMESCALEDB_CHECKOUT
+ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1
+
 #  Timescaledb not supported on pg16 yet
 
 
+FROM builder as builder-mobilitydb
+
+ARG PGIS1_MOBILITYDB_REPOSITORY
+ARG PGIS1_MOBILITYDB_CHECKOUT
+ARG PGIS1_MOBILITYDB_CHECKOUT_SHA1
+
 # Install MobilityDB
-RUN set -ex \
+RUN set -eux \
     && mkdir -p /MobilityDB \
     && cd MobilityDB \
     && git init \
-    && git remote add origin ${PGIS_V1_MOBILITYDB_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS_V1_MOBILITYDB_CHECKOUT} \
+    && git remote add origin ${PGIS1_MOBILITYDB_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_MOBILITYDB_CHECKOUT} \
     && git checkout FETCH_HEAD \
     # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS_V1_MOBILITYDB_CHECKOUT_SHA1" ]; then exit 1; fi \
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_MOBILITYDB_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_MobilityDB_last_commit.txt \
     && mkdir build \
     && cd build \
@@ -137,36 +149,51 @@ RUN set -ex \
     && make -j$(nproc) \
     && make install
 
-RUN pgxn install ddlx
-RUN pgxn install h3        # https://github.com/zachasme/h3-pg
-RUN pgxn install json_accessors
-RUN pgxn install lostgis
-RUN pgxn install parray_gin
-RUN pgxn install pg_curl   # https://github.com/RekGRpth/pg_curl
-RUN pgxn install pg_roaringbitmap
-RUN pgxn install pg_rowalesce
-RUN pgxn install pg_uuidv7
-RUN pgxn install pg_xenophile
-RUN pgxn install pg_xxhash
-RUN pgxn install pgsql_tweaks
+
+FROM builder as builder-pgxn
+
+RUN pgxn install --verbose ddlx
+RUN pgxn install --verbose h3        # https://github.com/zachasme/h3-pg
+RUN pgxn install --verbose json_accessors
+RUN pgxn install --verbose lostgis
+RUN pgxn install --verbose parray_gin
+RUN pgxn install --verbose pg_curl   # https://github.com/RekGRpth/pg_curl
+RUN pgxn install --verbose pg_roaringbitmap
+RUN pgxn install --verbose pg_rowalesce
+RUN pgxn install --verbose pg_uuidv7
+RUN pgxn install --verbose pg_xenophile
+RUN pgxn install --verbose pg_xxhash
+RUN pgxn install --verbose pgsql_tweaks
 
 # sqlite_fdw not supported on pg16 yet
 # RUN USE_PGXS=1 pgxn install sqlite_fdw
 
-RUN git clone --depth 1 https://github.com/NikolayS/postgres_dba.git \
+
+FROM builder as builder-other
+
+ARG PGIS1_PG_HINT_PLAN_REPOSITORY
+ARG PGIS1_PG_HINT_PLAN_CHECKOUT
+ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
+
+# PG16 + hydra not supperted https://github.com/hydradatabase/hydra
+
+# install pg_hint_plan
+RUN set -eux \
+    && mkdir pg_hint_plan \
+    && cd pg_hint_plan \
+    && git init \
+    && git remote add origin ${PGIS1_PG_HINT_PLAN_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_PG_HINT_PLAN_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1" ]; then exit 1; fi \
+    && make -j$(nproc) \
+    && make install
+
+RUN set -eux \
+    && git clone --depth 1 https://github.com/NikolayS/postgres_dba.git \
     && cd postgres_dba  \
     && rm -rf .git
-
-
-#TODO: add https://github.com/hydradatabase/hydra
-#          https://github.com/powa-team/pg_qualstats
-#          https://github.com/darold/pgtt
-#          https://github.com/apache/arrow-flight-sql-postgresql
-#          https://github.com/neondatabase/pg_embedding/
-# pgrust ; "pg-graphql
-#          https://github.com/kelvich/pg_tiktoken
-#
-# --------------------------------------------------------------
 
 
 FROM ${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:16-3.4-bookworm
@@ -177,12 +204,11 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
 
 # install all utf8 locales;
 # helping: https://github.com/docker-library/docs/tree/master/postgres#locale-customization
-#TODO - uncomment
-RUN set -ex \
+RUN set -eux \
     && sed -i -e 's/# \(.*\.UTF-8\)/\1/' /etc/locale.gen \
     && locale-gen
 
-RUN set -ex \
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         \
@@ -275,18 +301,31 @@ RUN set -ex \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install from stages
+COPY --from=builder-http-gzip   /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
+COPY --from=builder-http-gzip   /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
 
-# Install MobilityDB,Timescaledb,h3,etc from builder
-COPY --from=builder /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
-COPY --from=builder /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
-COPY --from=builder /postgres_dba                              /postgres_dba
+COPY --from=builder-mobilitydb  /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
+COPY --from=builder-mobilitydb  /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
+
+COPY --from=builder-timescaledb /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
+COPY --from=builder-timescaledb /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
+
+COPY --from=builder-pgxn        /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
+COPY --from=builder-pgxn        /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
+
+COPY --from=builder-other       /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
+COPY --from=builder-other       /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
+
+COPY --from=builder-other /postgres_dba                              /postgres_dba
 
 # check any missing dependencies
-RUN set -ex \
+RUN set -eux \
     && ldd /usr/lib/postgresql/$PG_MAJOR/lib/*.so | grep 'not found' && exit 1 || true
 
 # multiple LLVM existance is not allowed.
-RUN llvm_count=$(dpkg -l | grep llvm | wc -l) \
+RUN set -eux \
+    && llvm_count=$(dpkg -l | grep llvm | wc -l) \
     && if [ "$llvm_count" -ne 1 ]; then \
         echo "More than one llvm package or none at all found. Stopping."; \
         dpkg -l | grep llvm ; \
@@ -294,10 +333,10 @@ RUN llvm_count=$(dpkg -l | grep llvm | wc -l) \
        fi
 
 # add MobilityDB requirements
-RUN set -eux; \
-	cp -v /usr/share/postgresql/postgresql.conf.sample /usr/share/postgresql/postgresql.conf.sample.orig; \
+RUN set -eux \
+    && cp -v /usr/share/postgresql/postgresql.conf.sample /usr/share/postgresql/postgresql.conf.sample.orig; \
     # add MobilityDB requirements;  ( TimescaleDB not yet supported on pg16 )
-	echo "shared_preload_libraries = 'postgis-3,pg_cron,pg_stat_statements'" >>  /usr/share/postgresql/postgresql.conf.sample; \
+	echo "shared_preload_libraries = 'pg_hint_plan,postgis-3,pg_cron,pg_stat_statements'" >>  /usr/share/postgresql/postgresql.conf.sample; \
     # MobilityDB recomendation
 	echo "max_locks_per_transaction = 128" >>  /usr/share/postgresql/postgresql.conf.sample; \
     echo "timescaledb.telemetry_level=off" >>  /usr/share/postgresql/postgresql.conf.sample

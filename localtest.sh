@@ -33,20 +33,17 @@ echo " ------- .env.test -------- "
 cat .env.test
 echo " -------------------------- "
 
-# generate,update
-#     versions.json, Dockerfiles, README.md, .github/workflows/main.yml .circleci/config.yml
-
 ./update.sh
 
 # check commands
-make -n test-15-3.4-bundle-bookworm
-make -n push-15-3.4-bundle-bookworm
-make -n manifest-15-3.4-bundle-bookworm
+make -n test-15-3.4-bundle0-bookworm
+make -n push-15-3.4-bundle0-bookworm
+make -n manifest-15-3.4-bundle0-bookworm
 
 # run commands
-make test-15-3.4-bundle-bookworm
-make push-15-3.4-bundle-bookworm
-make manifest-15-3.4-bundle-bookworm
+make test-15-3.4-bundle0-bookworm
+make push-15-3.4-bundle0-bookworm
+make manifest-15-3.4-bundle0-bookworm
 
 # check images
 echo " "
@@ -65,7 +62,7 @@ echo "done."
 
 #  manual tests cheetsheets:
 #  ----------------------------
-#  REGISTRY=localhost:5000  make push-15-3.4-bundle
-#  REGISTRY=localhost:5000  make push-15-3.4-bundle-bookworm
-#  TEST=true                make push-15-3.4-bundle-bookworm
+#  REGISTRY=localhost:5000  make push-15-3.4-bundle0
+#  REGISTRY=localhost:5000  make push-15-3.4-bundle0-bookworm
+#  TEST=true                make push-15-3.4-bundle0-bookworm
 #

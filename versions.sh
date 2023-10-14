@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 set -Eeuo pipefail
 
 # Source environment variables and necessary configurations
@@ -152,40 +153,63 @@ postgisGitHash="$(git ls-remote https://github.com/postgis/postgis.git heads/mas
 # Function to get the latest version tag and its SHA1 hash
 get_latest_version_and_hash() {
     # Argument 1: Repository URL
-    local repo_url=$1
+    local repo_url="$1"
     # Argument 2: Repository identifier
-    local repo_id=$2
-    echo "[+] Checking lastversion : $repo_id  - $repo_url"  
+    local repo_id="$2"
+    # Argumnet 3:  tag filter - optional
+    local repo_only="${3:-}"
+
+    echo "[+] Checking lastversion : $repo_id  - $repo_url"
     # Fetch the latest version tag using the lastversion command
-    eval "lastversion_${repo_id}=$(lastversion --format tag --pre "${repo_url}")"
-    
+
+    if [ -z "$repo_only" ]; then
+        eval "lastversion_${repo_id}=$(lastversion --format tag --pre "${repo_url}")"
+    else
+        eval "lastversion_${repo_id}${repo_only}=$(lastversion --format tag --pre --only "${repo_only}" "${repo_url}")"
+    fi
+
     # Intermediary step to resolve the variable name
-    local var_name="lastversion_${repo_id}"
+    local var_name="lastversion_${repo_id}${repo_only}"
     local last_version=${!var_name}
-    
+
     # Fetch the SHA1 hash of the tag using the get_tag_hash function
-    eval "lastversion_${repo_id}_sha1=$(get_tag_hash "${repo_url}" "${last_version}")"
+    eval "lastversion_${repo_id}${repo_only}_sha1=$(get_tag_hash "${repo_url}" "${last_version}")"
 
     #creating new variables for using later ..
-    echo "    lastversion_${repo_id} = ${last_version}"
+    echo "    lastversion_${repo_id}${repo_only} = ${last_version}"
 
-    local sha1_var_name="lastversion_${repo_id}_sha1"
+    local sha1_var_name="lastversion_${repo_id}${repo_only}_sha1"
     local sha1_value=${!sha1_var_name}
-    echo "    lastversion_${repo_id}_sha1 = ${sha1_value}"
+    echo "    lastversion_${repo_id}${repo_only}_sha1 = ${sha1_value}"
     echo "    "
+
+    if [ -z "$last_version" ]; then
+        echo "[-] Error: could not get the latest version tag! Stopping!"
+        exit 1
+    fi
+
+    if [ -z "$sha1_value" ]; then
+        echo "[-] Error: could not get the SHA1 hash for the latest version tag! Stopping!"
+        exit 1
+    fi
 }
 
 get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobilitydb"
-get_latest_version_and_hash "https://github.com/pramsey/pgsql-http"    "pgsql_http"
-get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip"    "pgsql_gzip"
+get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http"
+get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip"
 get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb"
 
-get_latest_version_and_hash "https://github.com/postgis/postgis"       "postgis"
-get_latest_version_and_hash "https://github.com/CGAL/cgal"             "cgal"
-get_latest_version_and_hash "https://github.com/libgeos/geos"          "geos"
-get_latest_version_and_hash "https://github.com/OSGeo/gdal"            "gdal"
-get_latest_version_and_hash "https://github.com/OSGeo/PROJ"            "proj"
-get_latest_version_and_hash "https://gitlab.com/Oslandia/SFCGAL"       "sfcgal"
+get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis"
+get_latest_version_and_hash "https://github.com/CGAL/cgal" "cgal"
+get_latest_version_and_hash "https://github.com/libgeos/geos" "geos"
+get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal"
+get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj"
+get_latest_version_and_hash "https://gitlab.com/Oslandia/SFCGAL" "sfcgal"
+
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL16
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL15
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL14
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL13
 
 #-------------------------------------------
 
@@ -324,7 +348,7 @@ for version in "${versions[@]}"; do
     fi
     echo " "
 
-    if [[ "master" == "$postgisVersion" || "recentstack" == "$postgisVersion" ]]; then
+    if [[ "master" == "$postgisVersion" || "recent" == "$postgisVersion" ]]; then
         srcVersion=""
         srcSha256=""
         srcSha1=""
@@ -374,13 +398,13 @@ for version in "${versions[@]}"; do
             postgisFullVersion["$suite"]="$postgisVersion"
             postgisMajor["$suite"]=""
             postgisDocSrc["$suite"]="development: postgis, geos, proj, gdal"
-        elif [ "recentstack" == "$postgisVersion" ]; then
+        elif [ "recent" == "$postgisVersion" ]; then
             #TODO
             debianPostgisMajMin["$suite"]=""
             postgisPackageName["$suite"]=""
             postgisFullVersion["$suite"]="$postgisVersion"
             postgisMajor["$suite"]=""
-            postgisDocSrc["$suite"]="... recentstack ... "
+            postgisDocSrc["$suite"]="... recent ... "
         else
             postgisMajMin["$suite"]="$(echo "${postgisVersion}" | cut -d. -f1).$(echo "${postgisVersion}" | cut -d. -f2)"
             echo "postgisMajMin[$suite]= ${postgisMajMin[${suite}]}"
@@ -422,8 +446,8 @@ for version in "${versions[@]}"; do
 
                 if [[ "master" == "$postgisVersion" ]]; then
                     postgisDockerTag="master"
-                elif [[ "recentstack" == "$postgisVersion" ]]; then
-                    postgisDockerTag="recentstack"
+                elif [[ "recent" == "$postgisVersion" ]]; then
+                    postgisDockerTag="recent"
                 else
                     postgisDockerTag="${postgisLastDockerTags[$postgisVersion]}"
                 fi
@@ -433,8 +457,8 @@ for version in "${versions[@]}"; do
                 if [ -n "$bundleType" ]; then
                     readme_group="$bundleType"
                     bundleTypeTags="-${bundleType}"
-                elif [[ "recentstack" == "$postgisVersion" ]]; then
-                    readme_group="recentstack"
+                elif [[ "recent" == "$postgisVersion" ]]; then
+                    readme_group="recent"
                 elif [[ ${mainTags} =~ [a-zA-Z] ]]; then
                     readme_group="test"
                 else
@@ -442,7 +466,7 @@ for version in "${versions[@]}"; do
                 fi
 
                 tags="${mainTags}${bundleTypeTags}-${variant}"
-                if [[ "master" != "$postgisVersion" && "recentstack" != "$postgisVersion" && "${postgisDocSrc[$variant]}" != "${postgisDockerTag}" ]]; then
+                if [[ "master" != "$postgisVersion" && "recent" != "$postgisVersion" && "${postgisDocSrc[$variant]}" != "${postgisDockerTag}" ]]; then
                     tags+=" ${postgresLastMainTags[$postgresVersion]}-${postgisDocSrc[$variant]}${bundleTypeTags}-${variant}"
                 fi
                 if [[ "$variant" == "$debian_latest" ]]; then
@@ -488,7 +512,7 @@ for version in "${versions[@]}"; do
                         printf "    BOOST_VERSION: '%s'\n" "${boostVersion[$variant]}"
                     } >>_versions.yml
 
-                elif [[ "recentstack" == "$postgisVersion" ]]; then
+                elif [[ "recent" == "$postgisVersion" ]]; then
                     {
                         printf "    arch: '%s'\n" "amd64 arm64"
                         printf "    template: '%s'\n" "Dockerfile.master.template"
@@ -533,6 +557,12 @@ for version in "${versions[@]}"; do
 
                             printf "    TIMESCALEDB_CHECKOUT: 'tags/%s'\n" "$lastversion_timescaledb"
                             printf "    TIMESCALEDB_CHECKOUT_SHA1: '%s'\n" "$lastversion_timescaledb_sha1"
+
+                            lastversion_pg_hint_plan="lastversion_pg_hint_planREL${postgresVersion}"
+                            lastversion_pg_hint_plan_sha1="lastversion_pg_hint_planREL${postgresVersion}_sha1"
+                            printf "    PG_HINT_PLAN_CHECKOUT: 'tags/%s'\n" "${!lastversion_pg_hint_plan}"
+                            printf "    PG_HINT_PLAN_CHECKOUT_SHA1: '%s'\n" "${!lastversion_pg_hint_plan_sha1}"
+
                         fi
 
                         printf "    POSTGIS_MAJOR: '%s'\n" "${postgisMajor[$variant]}"
@@ -554,7 +584,7 @@ for version in "${versions[@]}"; do
             )
         elif [ -d "$version/$variant" ]; then
             (
-                if [[ "master" == "$postgisVersion" || "$postgisVersion" == "recentstack" ]]; then
+                if [[ "master" == "$postgisVersion" || "$postgisVersion" == "recent" ]]; then
                     echo "Alpine - $postgisVersion is not supported! STOP!"
                     exit 1
                 fi
@@ -569,7 +599,7 @@ for version in "${versions[@]}"; do
                 fi
                 tags="${mainTags}-${variant}"
 
-                if [[ "master" != "$postgisVersion" && "$postgisVersion" != "recentstack" && "$srcVersion" != "${postgisLastDockerTags[$postgisVersion]}" ]]; then
+                if [[ "master" != "$postgisVersion" && "$postgisVersion" != "recent" && "$srcVersion" != "${postgisLastDockerTags[$postgisVersion]}" ]]; then
                     tags+=" ${postgresLastMainTags[$postgresVersion]}-${srcVersion}-${variant}"
                 fi
                 if [[ "$variant" == "$alpine_latest" ]]; then

@@ -132,7 +132,7 @@ test: $(foreach dir,$(DOCKERFILE_DIRS),test-$(word 1,$(subst /, ,$(dir)))-$(word
 # --------------------------------------------------
 # Push targets for each version-variant combination
 define push-target
-push-$(1)-$(2): $(if $(filter 2,$(shell echo $(1) | grep -o '-' | wc -l)),push-$(shell echo $(1) | cut -d- -f1,2)-$(2)) 
+push-$(1)-$(2): $(if $(filter 2,$(shell echo $(1) | grep -o '-' | wc -l)),push-$(shell echo $(1) | cut -d- -f1,2)-$(2))
 	@echo '::push $(1)/$(2)'
 	# push all image tags
 	$(foreach tag,$(shell cat $(1)/$(2)/tags), \

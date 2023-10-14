@@ -7,7 +7,8 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
 ENV POSTGIS_MAJOR {{ .[env.variant].POSTGIS_MAJOR }}
 ENV POSTGIS_VERSION {{ .[env.variant].POSTGIS_VERSION }}
 
-RUN apt-get update \
+RUN set -eux \
+      && apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       && apt-get install -y --no-install-recommends \
            # ca-certificates: for accessing remote raster files;
