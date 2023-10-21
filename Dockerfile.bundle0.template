@@ -189,7 +189,7 @@ RUN pgxn install --verbose dsef
 RUN pgxn install --verbose h3        # https://github.com/zachasme/h3-pg
 RUN pgxn install --verbose json_accessors
 RUN pgxn install --verbose lostgis
-RUN pgxn install --verbose orafce
+
 RUN pgxn install --verbose parray_gin
 RUN pgxn install --verbose permuteseq
 RUN pgxn install --verbose pg_curl   # https://github.com/RekGRpth/pg_curl
@@ -201,12 +201,13 @@ RUN pgxn install --verbose pg_xxhash
 RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
 RUN USE_PGXS=1 pgxn install sqlite_fdw
+
+#TODO
 # RUN pgxn install --verbose plv8 # todo: need to fix build
 # RUN USE_PGXS=1 pgxn install sqlite_fdw : todo check
 # RUN pgxn install --verbose pg_bm25  # need rust
-
-# todo add libpgosm ; https://github.com/developmentseed/osm-seed/blob/develop/images/db/lib/quad_tile/quad_tile.c
-
+# RUN pgxn install --verbose orafce : todo check
+# add?? libpgosm ; https://github.com/developmentseed/osm-seed/blob/develop/images/db/lib/quad_tile/quad_tile.c
 
 FROM builder as builder-other
 
