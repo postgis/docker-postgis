@@ -23,7 +23,7 @@ debian_variants=" bullseye bookworm "
 debian_latest="bookworm"
 alpine_latest="alpine3.18"
 postgis_latest="3.4"
-postgres_latest="15"
+postgres_latest="16"
 postgis_versions="3.0 3.1 3.2 3.3 3.4"
 postgres_versions="11 12 13 14 15 16"
 

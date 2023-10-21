@@ -268,12 +268,6 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.4-alpine \
     --target ${dockername}:15-3.4-alpine || true
 
-echo "manifest: ${dockername}:alpine"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:alpine \
-    --target ${dockername}:alpine || true
-
 # ----- 15-3.4-bookworm -----
 
 echo "manifest: ${dockername}:15-3.4-bookworm"
@@ -293,12 +287,6 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-3.4 \
     --target ${dockername}:15-3.4 || true
-
-echo "manifest: ${dockername}:latest"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:latest \
-    --target ${dockername}:latest || true
 
 # ----- 15-3.4-bullseye -----
 
@@ -333,12 +321,6 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-3.4-bundle0 \
     --target ${dockername}:15-3.4-bundle0 || true
-
-echo "manifest: ${dockername}:bundle0"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:bundle0 \
-    --target ${dockername}:bundle0 || true
 
 # ----- 15-master-bookworm -----
 
@@ -388,6 +370,12 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.4-alpine \
     --target ${dockername}:16-3.4-alpine || true
 
+echo "manifest: ${dockername}:alpine"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:alpine \
+    --target ${dockername}:alpine || true
+
 # ----- 16-3.4-bookworm -----
 
 echo "manifest: ${dockername}:16-3.4-bookworm"
@@ -407,6 +395,12 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:16-3.4 \
     --target ${dockername}:16-3.4 || true
+
+echo "manifest: ${dockername}:latest"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:latest \
+    --target ${dockername}:latest || true
 
 # ----- 16-3.4-bullseye -----
 
@@ -441,6 +435,12 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:16-3.4-bundle0 \
     --target ${dockername}:16-3.4-bundle0 || true
+
+echo "manifest: ${dockername}:bundle0"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:bundle0 \
+    --target ${dockername}:bundle0 || true
 
 # ----- 16-master-bookworm -----
 

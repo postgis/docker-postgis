@@ -32,8 +32,8 @@ ARG PGIS1_PGSQL_GZIP_CHECKOUT_SHA1=7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49
 
 ARG PGIS1_TIMESCALEDB_APACHE_ONLY=false
 ARG PGIS1_TIMESCALEDB_REPOSITORY=https://github.com/timescale/timescaledb.git
-ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.12.1
-ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=c93faddbe95e45d93a53c3f652e2033558e8b380
+ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.12.2
+ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=2a39fbb444888bbba9139c7f7ab84f2aa28509ee
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL14_1_4_2
@@ -72,6 +72,13 @@ RUN set -eux \
       zlib1g-dev \
       # sqlite_fdw
       sqlite3 \
+      # plv8
+      ninja-build \
+      pkg-config \
+      # bytemagic
+      libmagic-dev \
+      # pgsoudium \
+      libsodium-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -177,20 +184,29 @@ RUN set -eux \
 
 FROM builder as builder-pgxn
 
+RUN pgxn install --verbose byteamagic
 RUN pgxn install --verbose ddlx
+RUN pgxn install --verbose dsef
 RUN pgxn install --verbose h3        # https://github.com/zachasme/h3-pg
 RUN pgxn install --verbose json_accessors
 RUN pgxn install --verbose lostgis
+RUN pgxn install --verbose orafce
 RUN pgxn install --verbose parray_gin
+RUN pgxn install --verbose permuteseq
 RUN pgxn install --verbose pg_curl   # https://github.com/RekGRpth/pg_curl
 RUN pgxn install --verbose pg_roaringbitmap
 RUN pgxn install --verbose pg_rowalesce
 RUN pgxn install --verbose pg_uuidv7
 RUN pgxn install --verbose pg_xenophile
 RUN pgxn install --verbose pg_xxhash
+RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
-
 RUN USE_PGXS=1 pgxn install sqlite_fdw
+# RUN pgxn install --verbose plv8 # todo: need to fix build
+# RUN USE_PGXS=1 pgxn install sqlite_fdw : todo check
+# RUN pgxn install --verbose pg_bm25  # need rust
+
+# todo add libpgosm ; https://github.com/developmentseed/osm-seed/blob/develop/images/db/lib/quad_tile/quad_tile.c
 
 
 FROM builder as builder-other
@@ -282,6 +298,7 @@ RUN set -eux \
         pgtop \
         pspg \
         \
+        \
         postgresql-$PG_MAJOR-asn1oid \
         postgresql-$PG_MAJOR-cron \
         postgresql-$PG_MAJOR-decoderbufs \
@@ -292,33 +309,40 @@ RUN set -eux \
         postgresql-$PG_MAJOR-icu-ext \
         postgresql-$PG_MAJOR-jsquery \
         postgresql-$PG_MAJOR-numeral \
+        postgresql-$PG_MAJOR-partman \
+        postgresql-$PG_MAJOR-periods \
+        postgresql-$PG_MAJOR-pg-fact-loader \
         postgresql-$PG_MAJOR-pg-failover-slots \
         postgresql-$PG_MAJOR-pg-stat-kcache \
         postgresql-$PG_MAJOR-pgaudit \
+#       postgresql-$PG_MAJOR-pgdg-pgroonga \  # todo: check
+        postgresql-$PG_MAJOR-pglogical \
         postgresql-$PG_MAJOR-pgmp \
         postgresql-$PG_MAJOR-pgpcre \
         postgresql-$PG_MAJOR-pgq3 \
         postgresql-$PG_MAJOR-pgsphere \
         postgresql-$PG_MAJOR-pgtap \
         postgresql-$PG_MAJOR-pldebugger \
-        postgresql-$PG_MAJOR-prefix \
+        postgresql-$PG_MAJOR-plpgsql-check \
         postgresql-$PG_MAJOR-prefix \
         postgresql-$PG_MAJOR-prioritize \
         postgresql-$PG_MAJOR-q3c \
         postgresql-$PG_MAJOR-repack \
         postgresql-$PG_MAJOR-rum \
-        \
-        postgresql-$PG_MAJOR-partman \
-        postgresql-$PG_MAJOR-pg-fact-loader \
-        postgresql-$PG_MAJOR-pglogical \
-        postgresql-$PG_MAJOR-plpgsql-check \
-        postgresql-$PG_MAJOR-pointcloud \
+        postgresql-$PG_MAJOR-show-plans \
         postgresql-$PG_MAJOR-squeeze \
+        postgresql-$PG_MAJOR-pointcloud \
         #
         # add MobilityDb missing dependency from libgsl-dev
         libgsl27 \
+        # MeCab based tokenizer for pgdg-pgroonga
+        groonga-tokenizer-mecab \
+        # bytemagic
+        libmagic1 libmagic-mgc \
+        # pgsodium
+        libsodium23 \
     \
-    # && pip3 install --upgrade pip \
+#    && pip3 install --upgrade pip \
     \
 #    && pipx install geopy \
 #    && pipx install plpygis \
