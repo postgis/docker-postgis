@@ -22,9 +22,9 @@ fi
 
 jqf='.template-helper-functions.jq'
 if [ -n "${BASHBREW_SCRIPTS:-}" ]; then
-	jqf="$BASHBREW_SCRIPTS/template-helper-functions.jq"
-elif [ "$BASH_SOURCE" -nt "$jqf" ]; then
-	wget -qO "$jqf" 'https://github.com/docker-library/bashbrew/raw/master/scripts/template-helper-functions.jq'
+    jqf="$BASHBREW_SCRIPTS/template-helper-functions.jq"
+elif [ "${BASH_SOURCE[0]}" -nt "$jqf" ]; then
+    wget -qO "$jqf" 'https://github.com/docker-library/bashbrew/raw/master/scripts/template-helper-functions.jq'
 fi
 
 if [ "$#" -eq 0 ]; then
