@@ -1,3 +1,4 @@
 .jq-template.awk
+.template-helper-functions.jq
 _*
 .vscode/

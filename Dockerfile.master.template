@@ -7,7 +7,7 @@ ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
 ARG PGIS1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
 ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
-ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/Oslandia/SFCGAL.git
+ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 ARG PGIS1_POSTGIS_CHECKOUT={{ .[env.variant].POSTGIS_CHECKOUT }}

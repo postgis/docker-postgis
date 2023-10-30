@@ -12,12 +12,12 @@ ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
 ARG PGIS1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
 ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
-ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/Oslandia/SFCGAL.git
+ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 ARG PGIS1_POSTGIS_CHECKOUT=tags/3.4.0
 ARG PGIS1_GEOS_CHECKOUT=tags/3.12.0
-ARG PGIS1_GDAL_CHECKOUT=tags/v3.7.2
+ARG PGIS1_GDAL_CHECKOUT=tags/v3.7.3RC1
 ARG PGIS1_PROJ_CHECKOUT=tags/9.3.0
 ARG PGIS1_SFCGAL_CHECKOUT=tags/v1.4.1
 ARG PGIS1_CGAL_CHECKOUT=tags/v5.6

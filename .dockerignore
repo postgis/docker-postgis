@@ -1,6 +1,7 @@
 .git
 _*
 .jq-template.awk
+.template-helper-functions.jq
 .vscode/
 
 .git/

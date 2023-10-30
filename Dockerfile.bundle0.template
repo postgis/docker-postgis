@@ -301,7 +301,7 @@ RUN set -eux \
         pgtap \
         pgtop \
         pspg \
-        \
+        vip-manager \
         \
         postgresql-$PG_MAJOR-asn1oid \
         postgresql-$PG_MAJOR-cron \
@@ -318,8 +318,10 @@ RUN set -eux \
         postgresql-$PG_MAJOR-pg-fact-loader \
         postgresql-$PG_MAJOR-pg-failover-slots \
         postgresql-$PG_MAJOR-pg-stat-kcache \
+        postgresql-$PG_MAJOR-pg-wait-sampling \
         postgresql-$PG_MAJOR-pgaudit \
 #       postgresql-$PG_MAJOR-pgdg-pgroonga \  # todo: check
+        postgresql-$PG_MAJOR-pgl-ddl-deploy \
         postgresql-$PG_MAJOR-pglogical \
         postgresql-$PG_MAJOR-pgmp \
         postgresql-$PG_MAJOR-pgpcre \
