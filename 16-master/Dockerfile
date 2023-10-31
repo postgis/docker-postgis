@@ -89,7 +89,7 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL5X_GIT_HASH 3c8e2053721271119499506ea1d8a49dee89e30c
-ENV SFCGAL_GIT_HASH fc4dc5640e402c8b00426b5a3562324226725df9
+ENV SFCGAL_GIT_HASH b6d4cf94d6074d0965dcf5d5c4c21c2277d5cc63
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -98,7 +98,7 @@ RUN set -ex \
     && git checkout ${CGAL5X_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
-    && git clone https://gitlab.com/Oslandia/SFCGAL.git \
+    && git clone https://gitlab.com/SFCGAL/SFCGAL.git \
     && cd SFCGAL \
     && git checkout ${SFCGAL_GIT_HASH} \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
