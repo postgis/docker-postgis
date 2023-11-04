@@ -33,6 +33,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
     [3.2]='3'
     [3.3]='3'
     [3.4]='3'
+    [3.5]='3'    
 )
 
 declare -A boostVersion=(
@@ -156,16 +157,24 @@ get_latest_version_and_hash() {
     local repo_url="$1"
     # Argument 2: Repository identifier
     local repo_id="$2"
+    # development version .. witj --pre
+    local repo_development="${3:-}"
     # Argumnet 3:  tag filter - optional
-    local repo_only="${3:-}"
+    local repo_only="${4:-}"
 
     echo "[+] Checking lastversion : $repo_id  - $repo_url"
     # Fetch the latest version tag using the lastversion command
 
-    if [ -z "$repo_only" ]; then
-        eval "lastversion_${repo_id}=$(lastversion --format tag --pre "${repo_url}")"
+    if [[ "${repo_development}" == "pre-releases" ]]; then
+        repo_development=" --pre "
     else
-        eval "lastversion_${repo_id}${repo_only}=$(lastversion --format tag --pre --only "${repo_only}" "${repo_url}")"
+        repo_development=""
+    fi
+
+    if [ -z "$repo_only" ]; then
+        eval "lastversion_${repo_id}=$(lastversion ${repo_development} --format tag "${repo_url}")"
+    else
+        eval "lastversion_${repo_id}${repo_only}=$(lastversion ${repo_development} --format tag --only "${repo_only}" "${repo_url}")"
     fi
 
     # Intermediary step to resolve the variable name
@@ -194,22 +203,22 @@ get_latest_version_and_hash() {
     fi
 }
 
-get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobilitydb"
-get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http"
-get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip"
-get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb"
+get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobilitydb" pre-releases
+get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http" releases
+get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip" releases
+get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb" releases
 
-get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis"
-get_latest_version_and_hash "https://github.com/CGAL/cgal" "cgal"
-get_latest_version_and_hash "https://github.com/libgeos/geos" "geos"
-get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal"
-get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj"
-get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal"
+get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis" releases
+get_latest_version_and_hash "https://github.com/CGAL/cgal" "cgal" releases
+get_latest_version_and_hash "https://github.com/libgeos/geos" "geos" releases
+get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal" releases
+get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj" releases
+get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal" releases
 
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL16
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL15
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL14
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" REL13
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL16
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL15
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL14
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL13
 
 #-------------------------------------------
 

@@ -15,12 +15,19 @@ ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
 ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
-ARG PGIS1_POSTGIS_CHECKOUT=6adb29e43b5514be567c4f91b43c635ad9163948
-ARG PGIS1_GEOS_CHECKOUT=a7a12f54371ddefee4e468ef89677ba9305719b1
-ARG PGIS1_GDAL_CHECKOUT=33d6db38db8fc4a9f7028f5a5c9e0a5e749553d9
-ARG PGIS1_PROJ_CHECKOUT=576fbc42fd7412fd68e802376f3e629ebb84d961
+ARG PGIS1_POSTGIS_CHECKOUT=42f04a29effdd9e8280c7aba17420ba306fc73f4
+ARG PGIS1_GEOS_CHECKOUT=13c25a877704327db9f4f0dfd9c41d527dc8f46d
+ARG PGIS1_GDAL_CHECKOUT=099fd25145c07ff56319bc1e25764a171825fa73
+ARG PGIS1_PROJ_CHECKOUT=21244f7db80aaf3a2f6552fb190a54744e067200
 ARG PGIS1_SFCGAL_CHECKOUT=cbcf0adaa6cecc80347345952b5c850a64d2db4f
 ARG PGIS1_CGAL_CHECKOUT=07d93e2b452c4121aed5b6435c29b03826f44602
+
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=42f04a29effdd9e8280c7aba17420ba306fc73f4
+ARG PGIS1_GEOS_CHECKOUT_SHA1=13c25a877704327db9f4f0dfd9c41d527dc8f46d
+ARG PGIS1_GDAL_CHECKOUT_SHA1=099fd25145c07ff56319bc1e25764a171825fa73
+ARG PGIS1_PROJ_CHECKOUT_SHA1=21244f7db80aaf3a2f6552fb190a54744e067200
+ARG PGIS1_SFCGAL_CHECKOUT_SHA1=cbcf0adaa6cecc80347345952b5c850a64d2db4f
+ARG PGIS1_CGAL_CHECKOUT_SHA1=07d93e2b452c4121aed5b6435c29b03826f44602
 
 ARG PGIS1_BOOST_VERSION=1.74.0
 
@@ -93,6 +100,7 @@ RUN set -eux \
       libkml-dev \
       liblz4-dev \
       liblzma-dev \
+      libnetcdf-dev \
       libopenjp2-7-dev \
       libqhull-dev \
       libwebp-dev \
@@ -108,11 +116,13 @@ ARG PGIS1_SFCGAL_REPOSITORY
 ENV PGIS1_SFCGAL_REPOSITORY ${PGIS1_SFCGAL_REPOSITORY}
 ARG PGIS1_SFCGAL_CHECKOUT
 ENV PGIS1_SFCGAL_CHECKOUT ${PGIS1_SFCGAL_CHECKOUT}
+ARG PGIS1_SFCGAL_CHECKOUT_SHA1
 
 ARG PGIS1_CGAL_REPOSITORY
 ENV PGIS1_CGAL_REPOSITORY ${PGIS1_CGAL_REPOSITORY}
 ARG PGIS1_CGAL_CHECKOUT
 ENV PGIS1_CGAL_CHECKOUT ${PGIS1_CGAL_CHECKOUT}
+ARG PGIS1_CGAL_CHECKOUT_SHA1
 
 RUN set -eux \
     && cd /usr/src \
@@ -122,6 +132,8 @@ RUN set -eux \
     && git remote add origin ${PGIS1_CGAL_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_CGAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_CGAL_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && mkdir SFCGAL \
@@ -130,6 +142,8 @@ RUN set -eux \
     && git remote add origin ${PGIS1_SFCGAL_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_SFCGAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_SFCGAL_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -154,6 +168,8 @@ ARG PGIS1_PROJ_REPOSITORY
 ENV PGIS1_PROJ_REPOSITORY ${PGIS1_PROJ_REPOSITORY}
 ARG PGIS1_PROJ_CHECKOUT
 ENV PGIS1_PROJ_CHECKOUT ${PGIS1_PROJ_CHECKOUT}
+ARG PGIS1_PROJ_CHECKOUT_SHA1
+
 RUN set -eux \
     && cd /usr/src \
     && mkdir PROJ \
@@ -162,6 +178,8 @@ RUN set -eux \
     && git remote add origin ${PGIS1_PROJ_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_PROJ_CHECKOUT} \
     && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_PROJ_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_proj_last_commit.txt \
     # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
     && if [ -f "autogen.sh" ] ; then \
@@ -193,6 +211,8 @@ ARG PGIS1_GEOS_REPOSITORY
 ENV PGIS1_GEOS_REPOSITORY ${PGIS1_GEOS_REPOSITORY}
 ARG PGIS1_GEOS_CHECKOUT
 ENV PGIS1_GEOS_CHECKOUT ${PGIS1_GEOS_CHECKOUT}
+ARG PGIS1_GEOS_CHECKOUT_SHA1
+
 RUN set -eux \
     && cd /usr/src \
     && mkdir geos \
@@ -201,6 +221,8 @@ RUN set -eux \
     && git remote add origin ${PGIS1_GEOS_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_GEOS_CHECKOUT} \
     && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_GEOS_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_geos_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -226,6 +248,7 @@ ARG PGIS1_GDAL_REPOSITORY
 ENV PGIS1_GDAL_REPOSITORY ${PGIS1_GDAL_REPOSITORY}
 ARG PGIS1_GDAL_CHECKOUT
 ENV PGIS1_GDAL_CHECKOUT ${PGIS1_GDAL_CHECKOUT}
+ARG PGIS1_GDAL_CHECKOUT_SHA1
 
 RUN set -eux \
     && cd /usr/src \
@@ -235,6 +258,8 @@ RUN set -eux \
     && git remote add origin ${PGIS1_GDAL_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_GDAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_GDAL_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_gdal_last_commit.txt \
     \
     # gdal project directory structure - has been changed !
@@ -262,6 +287,7 @@ RUN set -eux \
             \
             -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
             -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
+#           -DGDAL_USE_ARROW=ON \
             -DGDAL_USE_BLOSC=ON \
             -DGDAL_USE_CFITSIO=ON \
             -DGDAL_USE_CURL=ON \
@@ -276,12 +302,15 @@ RUN set -eux \
             -DGDAL_USE_LIBKML=ON \
             -DGDAL_USE_LIBLZMA=ON \
             -DGDAL_USE_LZ4=ON \
+            -DGDAL_USE_NETCDF=ON \
             -DGDAL_USE_OPENJPEG=ON \
+#           -DGDAL_USE_PARQUET=ON \
             -DGDAL_USE_POSTGRESQL=ON \
             -DGDAL_USE_QHULL=ON \
             -DGDAL_USE_SQLITE3=ON \
             -DGDAL_USE_TIFF=ON \
             -DGDAL_USE_WEBP=ON \
+            -DGDAL_USE_ZLIB=ON \
             -DGDAL_USE_ZSTD=ON \
             \
             # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
@@ -361,8 +390,10 @@ RUN set -eux \
       libkmlbase1 \
       libkmldom1 \
       libkmlengine1 \
+      libnetcdf19 \
       libopenjp2-7 \
       libqhull-r8.0 \
+      netcdf-bin \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -379,8 +410,10 @@ ARG PGIS1_SFCGAL_CHECKOUT
 ARG PGIS1_SFCGAL_REPOSITORY
 ARG PGIS1_CGAL_REPOSITORY
 ARG PGIS1_CGAL_CHECKOUT
+
 ARG PGIS1_POSTGIS_CHECKOUT
 ARG PGIS1_POSTGIS_REPOSITORY
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1
 
 ENV PGIS1_GDAL_CHECKOUT=${PGIS1_GDAL_CHECKOUT} \
     PGIS1_GDAL_REPOSITORY=${PGIS1_GDAL_REPOSITORY} \
@@ -457,6 +490,8 @@ RUN set -eux \
     && git remote add origin ${PGIS1_POSTGIS_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_POSTGIS_CHECKOUT} \
     && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_POSTGIS_CHECKOUT_SHA1" ]; then exit 1; fi \
     && git log -1 > /_pgis_last_commit.txt \
     && ./autogen.sh \
 # configure options taken from:

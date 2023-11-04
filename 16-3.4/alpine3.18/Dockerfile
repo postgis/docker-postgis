@@ -19,25 +19,7 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
       org.opencontainers.image.description="PostGIS ${PGIS1_POSTGIS_CHECKOUT} spatial database extension with PostgreSQL 16 alpine3.18" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-# ENV POSTGIS_VERSION 3.4.0
-# ENV POSTGIS_SHA256 3acdf303adfd58d73543a70e6ebe99af29301262c56cf32220d42caa3efab024
-
 RUN set -eux \
-#    && apk add --no-cache --virtual .fetch-deps \
-#        ca-certificates \
-#        openssl \
-#        tar \
-#    \
-#    && wget -O postgis.tar.gz "https://github.com/postgis/postgis/archive/${POSTGIS_VERSION}.tar.gz" \
-#    && echo "${POSTGIS_SHA256} *postgis.tar.gz" | sha256sum -c - \
-#    && mkdir -p /usr/src/postgis \
-#    && tar \
-#        --extract \
-#        --file postgis.tar.gz \
-#        --directory /usr/src/postgis \
-#        --strip-components 1 \
-#    && rm postgis.tar.gz \
-    \
     && apk add --no-cache --virtual .build-deps \
         \
         ca-certificates \
