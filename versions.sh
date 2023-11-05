@@ -166,7 +166,7 @@ get_latest_version_and_hash() {
     # Fetch the latest version tag using the lastversion command
 
     if [[ "${repo_development}" == "pre-releases" ]]; then
-        repo_development=" --pre "
+        repo_development="--pre"
     else
         repo_development=""
     fi

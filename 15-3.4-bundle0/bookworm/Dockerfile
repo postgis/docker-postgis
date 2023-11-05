@@ -12,9 +12,9 @@
 
 # set the base image ,  make build-* is overwriting with the actual value !
 
-ARG REGISTRY=localhost:5000
-ARG REPO_NAME=testrepo
-ARG IMAGE_NAME=testpostgisimage-amd64
+ARG REGISTRY=docker.io
+ARG REPO_NAME=imresamu
+ARG IMAGE_NAME=postgis-amd64
 
 ARG PGIS1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:15-3.4-bookworm
 
