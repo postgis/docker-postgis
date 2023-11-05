@@ -48,7 +48,7 @@ make dockerlist
 # check images
 echo " "
 echo " ---- check images exists ---- "
-image_to_check="15-3.4-bundle0-bookworm"
+image_to_check="$test_tag"
 if check_image_exists "$image_to_check"; then
     echo "Image '$image_to_check' is available."
 else
