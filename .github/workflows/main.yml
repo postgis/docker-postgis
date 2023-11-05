@@ -150,7 +150,6 @@ jobs:
       DOCKER_BUILDKIT: '1'
       BUILDX_PLATFORMS: linux/amd64
 
-    # Todo: wait CircleCI workflow to start updating the manifest
     steps:
     - name: Checkout source
       uses: actions/checkout@v4
@@ -170,7 +169,7 @@ jobs:
 
     - run: make check_version
 
-    - run: sleep 20m # Wait for CircleCI to finish building images; Temporary workarounds
+#    - run: sleep 20m # Wait for CircleCI to finish building images; Temporary workarounds
 
     - name: Login to dockerhub
       uses: docker/login-action@v2
@@ -186,7 +185,7 @@ jobs:
         DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
       run: make push-readme
 
-    - name: Update docker manifest
-      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
-      run: ./manifest.sh
+#    - name: Update docker manifest
+#      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+#      run: ./manifest.sh
 

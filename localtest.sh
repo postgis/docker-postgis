@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# Enable TEST mode and use the local registry at localhost:5000 (as specified in the .env.test file).
+export TEST=true
+# Source environment variables and necessary configurations
+source tools/environment_init.sh
+
 # Check if the container with name "registry" is already running
 # https://docs.docker.com/registry/deploying/
 
@@ -20,38 +25,48 @@ else
     echo "Container with name: $testregistry is already running"
 fi
 
-# Enable TEST mode and use the local registry at localhost:5000 (as specified in the .env.test file).
-export TEST=true
-set -a
-# shellcheck disable=SC1091
-source .env.test
-set +a
-
-echo " "
-echo "Test mode = $TEST ; Reading from the .env.test file !"
-echo " ------- .env.test -------- "
-cat .env.test
-echo " -------------------------- "
-
+# check update code
 ./update.sh
 
+test_tag=16-3.4-bookworm
+
 # check commands
-make -n test-15-3.4-bundle0-bookworm
-make -n push-15-3.4-bundle0-bookworm
-make -n manifest-15-3.4-bundle0-bookworm
+make -n test-${test_tag}
+make -n push-${test_tag}
+make -n manifest-${test_tag}
 
 # run commands
-make test-15-3.4-bundle0-bookworm
-make push-15-3.4-bundle0-bookworm
-make manifest-15-3.4-bundle0-bookworm
+make test-${test_tag}
+make push-${test_tag}
+make manifest-${test_tag}
 
 # check images
 echo " "
 echo " ---- generated images ---- "
 make dockerlist
 
-# check registy
+# check images
 echo " "
+echo " ---- check images exists ---- "
+image_to_check="15-3.4-bundle0-bookworm"
+if check_image_exists "$image_to_check"; then
+    echo "Image '$image_to_check' is available."
+else
+    echo "Image '$image_to_check' does not exist."
+    echo "Unexpected error .. STOP"
+    exit 1
+fi
+
+# should not exists ....
+if check_image_exists "99-9.9.9"; then
+    echo "exist - Unexpected error .. STOP"
+    exit 1
+else
+    echo "OK: not found check is OK"
+fi
+
+# check registy
+echo " --- registry --- "
 make lregistryinfo
 
 echo " "

@@ -281,7 +281,7 @@ RUN set -eux \
         set -eux \
         && mkdir build \
         && cd build \
-        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
+        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules                          
         && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
             -DBUILD_DOCS=OFF \
             \

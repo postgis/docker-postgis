@@ -89,44 +89,27 @@ if ! python3 -c 'import yaml, json' &>/dev/null; then
     exit 1
 fi
 
-# check_image_exists
+# Define a function to check for the existence of a Docker image tag.
+# Usage:
+#   check_image_exists "tag"
 #
-# Checks if a specific Docker image tag exists in a repository.
+# This function uses `manifest-tool` to inspect the image manifest. It is a more reliable way to check
+# for image existence across different platforms and registries without requiring the image to be pulled locally.
 #
-# Arguments:
-#   TAG_NAME: The name of the Docker image tag to check.
-#
-# Globals:
-#   REPO_NAME: Name of the Docker repository.
-#   IMAGE_NAME: Name of the Docker image.
-#
-# Outputs:
-#   Prints metadata and whether the image exists.
-#
-# Returns:
-#   0: If the Docker image tag exists.
-#   1: If the Docker image tag does not exist.
-#
-# Example:
-#      if check_image_exists "15-3.4-bundle-bookworm-x2"; then
-#          echo "Proceeding with next steps..."
-#      else
-#          echo "Taking alternative actions..."
-#      fi
-#
+# The function prints a message indicating whether the image-tag exists and returns an exit code.
+# Exit code 0 indicates that the image-tag exists, while 1 indicates non-existence.
 function check_image_exists() {
-    local TAG_NAME="$1"
-    # Assuming REPO_NAME and IMAGE_NAME are either passed as global variables or defined elsewhere
-    local EXISTS_RAW
-    EXISTS_RAW=$(curl -s "https://hub.docker.com/v2/repositories/${REPO_NAME}/${IMAGE_NAME}/tags/${TAG_NAME}/" | jq .)
-    local EXISTS
-    EXISTS=$(echo "${EXISTS_RAW}" | jq -r 'select(.name=="'"${TAG_NAME}"'") | .name')
-    if [[ "$EXISTS" == "$TAG_NAME" ]]; then
-        echo "Image tag $1 exists."
-        return 0 # Return true (image exists)
+    local image_name="${dockername}:$1"
+    local output
+    # Attempt to inspect the image using manifest-tool. Capture the output, including any errors.
+    output=$(manifest-tool inspect "$image_name" 2>&1 || true)
+    # Check the output for a "not found" message, which indicates the image does not exist.
+    if echo "$output" | grep -q "not found"; then
+        echo "The Docker image '$image_name' does not exist."
+        return 1 # Return an exit code of 1 to signify the image does not exist.
     else
-        echo "Image tag: $1 does not exist."
-        return 1 # Return false (image does not exist)
+        echo "The Docker image '$image_name' exists."
+        return 0 # # Return an exit code of 0 to signify the image exists.
     fi
 }
 
