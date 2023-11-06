@@ -1,0 +1,11 @@
+# https://github.com/actions/checkout/issues/135#issuecomment-613361104
+* text eol=lf
+
+/*/**/Dockerfile            linguist-generated
+/*/**/initdb-postgis.sh     linguist-generated
+/*/**/update-postgis.sh     linguist-generated
+/*/**/tags                  linguist-generated
+.github/workflows/main.yml  linguist-generated
+versions.json               linguist-generated
+README.md                   linguist-generated
+/Dockerfile*.template       linguist-language=Dockerfile
