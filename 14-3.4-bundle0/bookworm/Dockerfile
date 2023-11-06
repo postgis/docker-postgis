@@ -187,7 +187,7 @@ FROM builder as builder-pgxn
 RUN pgxn install --verbose byteamagic
 RUN pgxn install --verbose ddlx
 RUN pgxn install --verbose dsef
-RUN pgxn install --verbose h3        # https://github.com/zachasme/h3-pg
+# RUN pgxn install --verbose h3        # https://github.com/zachasme/h3-pg
 RUN pgxn install --verbose json_accessors
 RUN pgxn install --verbose lostgis
 
@@ -293,6 +293,7 @@ RUN set -eux \
         postgresql-postgis \
         postgresql-postgis-scripts \
         \
+        pg-activity \
         pgbackrest \
         pgbadger \
         pgtap \
@@ -305,6 +306,7 @@ RUN set -eux \
         postgresql-$PG_MAJOR-decoderbufs \
         postgresql-$PG_MAJOR-extra-window-functions \
         postgresql-$PG_MAJOR-first-last-agg \
+        postgresql-$PG_MAJOR-h3 \
         postgresql-$PG_MAJOR-hll \
         postgresql-$PG_MAJOR-hypopg \
         postgresql-$PG_MAJOR-icu-ext \
@@ -334,6 +336,7 @@ RUN set -eux \
         postgresql-$PG_MAJOR-rum \
         postgresql-$PG_MAJOR-show-plans \
         postgresql-$PG_MAJOR-squeeze \
+        postgresql-$PG_MAJOR-age \
         postgresql-$PG_MAJOR-pointcloud \
         #
         # add MobilityDb missing dependency from libgsl-dev
