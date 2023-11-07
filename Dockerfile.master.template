@@ -98,7 +98,7 @@ RUN set -ex \
     && git checkout ${CGAL5X_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
-    && git clone https://gitlab.com/Oslandia/SFCGAL.git \
+    && git clone https://gitlab.com/SFCGAL/SFCGAL.git \
     && cd SFCGAL \
     && git checkout ${SFCGAL_GIT_HASH} \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
