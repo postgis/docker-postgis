@@ -186,11 +186,10 @@ FROM builder as builder-pgxn
 RUN pgxn install --verbose byteamagic
 RUN pgxn install --verbose ddlx
 RUN pgxn install --verbose dsef
-# RUN pgxn install --verbose h3        # https://github.com/zachasme/h3-pg
 RUN pgxn install --verbose json_accessors
 RUN pgxn install --verbose lostgis
 
-RUN pgxn install --verbose parray_gin
+#RUN pgxn install --verbose parray_gin # not working on CircleCI arm .. yet
 RUN pgxn install --verbose permuteseq
 RUN pgxn install --verbose pg_curl   # https://github.com/RekGRpth/pg_curl
 RUN pgxn install --verbose pg_roaringbitmap

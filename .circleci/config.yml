@@ -103,9 +103,8 @@ workflows:
                 "13-3.4-bookworm",
                 "13-3.4-bullseye",
                 "14-3.4-alpine3.18",
-#   --skip--    "14-3.4-bookworm",  -->  generated with the related bundle job!
+                "14-3.4-bookworm",
                 "14-3.4-bullseye",
-                "14-3.4-bundle0-bookworm",
                 "15-3.4-alpine3.18",
 #   --skip--    "15-3.4-bookworm",  -->  generated with the related bundle job!
                 "15-3.4-bullseye",

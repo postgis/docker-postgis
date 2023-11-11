@@ -228,26 +228,6 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.4.0-bullseye \
     --target ${dockername}:14-3.4.0-bullseye || true
 
-# ----- 14-3.4-bundle0-bookworm -----
-
-echo "manifest: ${dockername}:14-3.4-bundle0-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4-bundle0-bookworm \
-    --target ${dockername}:14-3.4-bundle0-bookworm || true
-
-echo "manifest: ${dockername}:14-3.4.0-bundle0-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4.0-bundle0-bookworm \
-    --target ${dockername}:14-3.4.0-bundle0-bookworm || true
-
-echo "manifest: ${dockername}:14-3.4-bundle0"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4-bundle0 \
-    --target ${dockername}:14-3.4-bundle0 || true
-
 # ----- 15-3.4-alpine3.18 -----
 
 echo "manifest: ${dockername}:15-3.4-alpine3.18"
