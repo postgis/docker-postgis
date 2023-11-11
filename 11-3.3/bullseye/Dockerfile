@@ -24,6 +24,15 @@ RUN set -eux \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
       && rm -rf /var/lib/apt/lists/*
 
+# multiple LLVM existance is not allowed.
+RUN set -eux \
+    && dpkg -l | grep llvm \
+    && llvm_count=$(dpkg -l | grep llvm | wc -l) \
+    && if [ "$llvm_count" -ne 1 ]; then \
+        echo "More than one llvm package or none at all found. Stopping."; \
+        exit 1; \
+       fi
+
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin

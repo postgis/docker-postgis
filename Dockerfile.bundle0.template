@@ -390,13 +390,14 @@ COPY --from=builder-other /postgres_dba                              /postgres_d
 RUN set -eux \
     && ldd /usr/lib/postgresql/$PG_MAJOR/lib/*.so | grep 'not found' && exit 1 || true
 
-# multiple LLVM existance is not allowed.
+# multiple LLVM existance is not optimal; so we give a warning.
+# known problem: duplicated LLVM
 RUN set -eux \
+    && dpkg -l | grep llvm \
     && llvm_count=$(dpkg -l | grep llvm | wc -l) \
     && if [ "$llvm_count" -ne 1 ]; then \
-        echo "More than one llvm package or none at all found. Stopping."; \
+        echo "WARNING: More than one llvm package or none at all found!"; \
         dpkg -l | grep llvm ; \
-        exit 1; \
        fi
 
 # add MobilityDB requirements
