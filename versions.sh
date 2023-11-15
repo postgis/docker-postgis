@@ -27,6 +27,13 @@ postgres_latest="16"
 postgis_versions="3.0 3.1 3.2 3.3 3.4"
 postgres_versions="11 12 13 14 15 16"
 
+# locking versions for dependencies
+CGAL_CHECKOUT_LOCK=""
+SFCGAL_CHECKOUT_LOCK=""
+GEOS_CHECKOUT_LOCK="tags/3.12.0"
+PROJ_CHECKOUT_LOCK=""
+GDAL_CHECKOUT_LOCK=""
+
 declare -A postgisDebPkgNameVersionSuffixes=(
     [3.0]='3'
     [3.1]='3'
@@ -34,6 +41,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
     [3.3]='3'
     [3.4]='3'
     [3.5]='3'
+    [3.6]='3'
 )
 
 declare -A boostVersion=(
@@ -49,6 +57,9 @@ declare -A boostVersion=(
 function get_tag_hash() {
     local repo="$1"
     local version="$2"
+
+    # remover tasg/ prefix if exists.
+    version=${version#tags/}
 
     git ls-remote --sort="v:refname" "$repo" refs/tags/"$version"* |
         grep -E 'refs/tags/'"$version"'(\^\{\})?$' |
@@ -161,6 +172,8 @@ get_latest_version_and_hash() {
     local repo_development="${3:-}"
     # Argumnet 3:  tag filter - optional
     local repo_only="${4:-}"
+    # Argumnet 4:  checkout lock
+    local checkout_lock="${5:-}"
 
     echo "[+] Checking lastversion : $repo_id  - $repo_url"
     # Fetch the latest version tag using the lastversion command
@@ -171,10 +184,23 @@ get_latest_version_and_hash() {
         repo_development=""
     fi
 
-    if [ -z "$repo_only" ]; then
-        eval "lastversion_${repo_id}=$(lastversion ${repo_development} --format tag "${repo_url}")"
+    if [[ "${repo_only}" == "norepo" ]]; then
+        repo_only=""
+    fi
+
+    if [ -z "$checkout_lock" ]; then
+        if [ -z "$repo_only" ]; then
+            eval "lastversion_${repo_id}=$(lastversion ${repo_development} --format tag "${repo_url}")"
+        else
+            eval "lastversion_${repo_id}${repo_only}=$(lastversion ${repo_development} --format tag --only "${repo_only}" "${repo_url}")"
+        fi
     else
-        eval "lastversion_${repo_id}${repo_only}=$(lastversion ${repo_development} --format tag --only "${repo_only}" "${repo_url}")"
+        echo "[+] Locked to ${checkout_lock}"
+        if [ -z "$repo_only" ]; then
+            eval "lastversion_${repo_id}=${checkout_lock}"
+        else
+            eval "lastversion_${repo_id}${repo_only}=${checkout_lock}"
+        fi
     fi
 
     # Intermediary step to resolve the variable name
@@ -203,22 +229,22 @@ get_latest_version_and_hash() {
     fi
 }
 
-get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobilitydb" pre-releases
-get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http" releases
-get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip" releases
-get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb" releases
+get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobilitydb" pre-releases norepo ""
+get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http" releases norepo ""
+get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip" releases norepo ""
+get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb" releases norepo ""
 
-get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis" releases
-get_latest_version_and_hash "https://github.com/CGAL/cgal" "cgal" releases
-get_latest_version_and_hash "https://github.com/libgeos/geos" "geos" releases
-get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal" releases
-get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj" releases
-get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal" releases
+get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis" releases norepo ""
+get_latest_version_and_hash "https://github.com/CGAL/cgal" "cgal" releases norepo "${CGAL_CHECKOUT_LOCK}"
+get_latest_version_and_hash "https://github.com/libgeos/geos" "geos" releases norepo "${GEOS_CHECKOUT_LOCK}"
+get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal" releases norepo "${GDAL_CHECKOUT_LOCK}"
+get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj" releases norepo "${PROJ_CHECKOUT_LOCK}"
+get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal" releases norepo "${SFCGAL_CHECKOUT_LOCK}"
 
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL16
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL15
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL14
-get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL13
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL16 ""
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL15 ""
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL14 ""
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL13 ""
 
 #-------------------------------------------
 
