@@ -58,7 +58,7 @@ function get_tag_hash() {
     local repo="$1"
     local version="$2"
 
-    # remover tasg/ prefix if exists.
+    # remove tag/ prefix if exists.
     version=${version#tags/}
 
     git ls-remote --sort="v:refname" "$repo" refs/tags/"$version"* |
@@ -175,6 +175,9 @@ get_latest_version_and_hash() {
     # Argumnet 4:  checkout lock
     local checkout_lock="${5:-}"
 
+    # remove tag/ prefix if exists.
+    checkout_lock=${checkout_lock#tags/}
+
     echo "[+] Checking lastversion : $repo_id  - $repo_url"
     # Fetch the latest version tag using the lastversion command
 
@@ -195,7 +198,7 @@ get_latest_version_and_hash() {
             eval "lastversion_${repo_id}${repo_only}=$(lastversion ${repo_development} --format tag --only "${repo_only}" "${repo_url}")"
         fi
     else
-        echo "[+] Locked to ${checkout_lock}"
+        echo "    !Locked to ${checkout_lock}"
         if [ -z "$repo_only" ]; then
             eval "lastversion_${repo_id}=${checkout_lock}"
         else
