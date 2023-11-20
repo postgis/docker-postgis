@@ -30,7 +30,7 @@ postgres_versions="11 12 13 14 15 16"
 # locking versions for dependencies
 CGAL_CHECKOUT_LOCK=""
 SFCGAL_CHECKOUT_LOCK=""
-GEOS_CHECKOUT_LOCK="tags/3.12.0"
+GEOS_CHECKOUT_LOCK=""
 PROJ_CHECKOUT_LOCK=""
 GDAL_CHECKOUT_LOCK=""
 

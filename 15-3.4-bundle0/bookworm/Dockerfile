@@ -203,6 +203,7 @@ RUN pgxn install --verbose pgsql_tweaks
 RUN USE_PGXS=1 pgxn install sqlite_fdw
 
 #TODO
+# add https://github.com/bosth/geofdw
 # RUN pgxn install --verbose plv8 # todo: need to fix build
 # RUN USE_PGXS=1 pgxn install sqlite_fdw : todo check
 # RUN pgxn install --verbose pg_bm25  # need rust

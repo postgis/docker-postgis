@@ -24,25 +24,25 @@ jobs:
 #       hence they must be generated within the bundle JOB.
 #
 #matrix-include-start
-           - { version: "11-3.3", variant: "alpine3.18", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-alpine3.18 11-3.3.4-alpine3.18 11-3.3-alpine", readme_group: "alpine3.18" }
+           - { version: "11-3.3", variant: "alpine3.18", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-alpine3.18 11-3.3.5-alpine3.18 11-3.3-alpine", readme_group: "alpine3.18" }
            - { version: "11-3.3", variant: "bookworm", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-bookworm 11-3.3.4-bookworm 11-3.3", readme_group: "bookworm" }
            - { version: "11-3.3", variant: "bullseye", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-bullseye 11-3.3.4-bullseye", readme_group: "bullseye" }
-           - { version: "12-3.4", variant: "alpine3.18", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-alpine3.18 12-3.4.0-alpine3.18 12-3.4-alpine", readme_group: "alpine3.18" }
+           - { version: "12-3.4", variant: "alpine3.18", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-alpine3.18 12-3.4.1-alpine3.18 12-3.4-alpine", readme_group: "alpine3.18" }
            - { version: "12-3.4", variant: "bookworm", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-bookworm 12-3.4.0-bookworm 12-3.4", readme_group: "bookworm" }
            - { version: "12-3.4", variant: "bullseye", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-bullseye 12-3.4.0-bullseye", readme_group: "bullseye" }
-           - { version: "13-3.4", variant: "alpine3.18", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-alpine3.18 13-3.4.0-alpine3.18 13-3.4-alpine", readme_group: "alpine3.18" }
+           - { version: "13-3.4", variant: "alpine3.18", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-alpine3.18 13-3.4.1-alpine3.18 13-3.4-alpine", readme_group: "alpine3.18" }
            - { version: "13-3.4", variant: "bookworm", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-bookworm 13-3.4.0-bookworm 13-3.4", readme_group: "bookworm" }
            - { version: "13-3.4", variant: "bullseye", postgres: "13", postgis: "3.4", arch: "amd64 arm64", tags: "13-3.4-bullseye 13-3.4.0-bullseye", readme_group: "bullseye" }
-           - { version: "14-3.4", variant: "alpine3.18", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-alpine3.18 14-3.4.0-alpine3.18 14-3.4-alpine", readme_group: "alpine3.18" }
+           - { version: "14-3.4", variant: "alpine3.18", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-alpine3.18 14-3.4.1-alpine3.18 14-3.4-alpine", readme_group: "alpine3.18" }
            - { version: "14-3.4", variant: "bookworm", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-bookworm 14-3.4.0-bookworm 14-3.4", readme_group: "bookworm" }
            - { version: "14-3.4", variant: "bullseye", postgres: "14", postgis: "3.4", arch: "amd64 arm64", tags: "14-3.4-bullseye 14-3.4.0-bullseye", readme_group: "bullseye" }
-           - { version: "15-3.4", variant: "alpine3.18", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-alpine3.18 15-3.4.0-alpine3.18 15-3.4-alpine", readme_group: "alpine3.18" }
+           - { version: "15-3.4", variant: "alpine3.18", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-alpine3.18 15-3.4.1-alpine3.18 15-3.4-alpine", readme_group: "alpine3.18" }
 # --skip-- - { version: "15-3.4", variant: "bookworm", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-bookworm 15-3.4.0-bookworm 15-3.4", readme_group: "bookworm" }
            - { version: "15-3.4", variant: "bullseye", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-bullseye 15-3.4.0-bullseye", readme_group: "bullseye" }
            - { version: "15-3.4-bundle0", variant: "bookworm", postgres: "15", postgis: "3.4", arch: "amd64 arm64", tags: "15-3.4-bundle0-bookworm 15-3.4.0-bundle0-bookworm 15-3.4-bundle0", readme_group: "bundle0" }
            - { version: "15-master", variant: "bookworm", postgres: "15", postgis: "master", arch: "amd64 arm64", tags: "15-master-bookworm 15-master", readme_group: "test" }
            - { version: "15-recent", variant: "bookworm", postgres: "15", postgis: "recent", arch: "amd64 arm64", tags: "15-recent-bookworm 15-recent", readme_group: "recent" }
-           - { version: "16-3.4", variant: "alpine3.18", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-alpine3.18 16-3.4.0-alpine3.18 16-3.4-alpine alpine", readme_group: "alpine3.18" }
+           - { version: "16-3.4", variant: "alpine3.18", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-alpine3.18 16-3.4.1-alpine3.18 16-3.4-alpine alpine", readme_group: "alpine3.18" }
 # --skip-- - { version: "16-3.4", variant: "bookworm", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-bookworm 16-3.4.0-bookworm 16-3.4 latest", readme_group: "bookworm" }
            - { version: "16-3.4", variant: "bullseye", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-bullseye 16-3.4.0-bullseye", readme_group: "bullseye" }
            - { version: "16-3.4-bundle0", variant: "bookworm", postgres: "16", postgis: "3.4", arch: "amd64 arm64", tags: "16-3.4-bundle0-bookworm 16-3.4.0-bundle0-bookworm 16-3.4-bundle0 bundle0", readme_group: "bundle0" }
