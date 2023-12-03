@@ -30,9 +30,17 @@ for version in $versions; do
         arch=$(jq -r ".\"$version\".\"$variant\".arch" "$input_file")
 
         if [[ "$postgis" == "master" ]]; then
-            POSTGIS_DOC_VERSION="development: postgis, geos, proj, gdal"
+            POSTGIS_DOC_VERSION="development: postgis, geos, proj, gdal, cgal, sfcgal"
         elif [[ "$postgis" == "recent" ]]; then
-            POSTGIS_DOC_VERSION="..recent: latest tagged postgis, geos, proj, gdal"
+
+            POSTGIS_TAG=$(jq -r ".\"$version\".\"$variant\".POSTGIS_CHECKOUT" "$input_file")
+            PROJ_TAG=$(jq -r ".\"$version\".\"$variant\".PROJ_CHECKOUT" "$input_file")
+            GDAL_TAG=$(jq -r ".\"$version\".\"$variant\".GDAL_CHECKOUT" "$input_file")
+            GEOS_TAG=$(jq -r ".\"$version\".\"$variant\".GEOS_CHECKOUT" "$input_file")
+            CGAL_TAG=$(jq -r ".\"$version\".\"$variant\".CGAL_CHECKOUT" "$input_file")
+            SFCGAL_TAG=$(jq -r ".\"$version\".\"$variant\".SFCGAL_CHECKOUT" "$input_file")
+
+            POSTGIS_DOC_VERSION="postgis=${POSTGIS_TAG}, geos=${GEOS_TAG}, proj=${PROJ_TAG}, gdal=${GDAL_TAG}, cgal=${CGAL_TAG}, sfcgal=${SFCGAL_TAG}"
         else
             POSTGIS_DOC_VERSION=$(echo "$POSTGIS_VERSION" | awk -F'[+-]' '{print $1}')
         fi

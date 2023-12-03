@@ -504,19 +504,36 @@ for version in "${versions[@]}"; do
                 fi
 
                 tags="${mainTags}${bundleTypeTags}-${variant}"
+                if [[ "recent" == "$postgisVersion" ]]; then
+                    lastversion_postgis_tag=${lastversion_postgis#tags/}
+                    lastversion_postgis_tag=${lastversion_postgis_tag#v}
+                    lastversion_proj_tag=${lastversion_proj#tags/}
+                    lastversion_proj_tag=${lastversion_proj_tag#v}
+                    lastversion_geos_tag=${lastversion_geos#tags/}
+                    lastversion_geos_tag=${lastversion_geos_tag#v}
+                    lastversion_gdal_tag=${lastversion_gdal#tags/}
+                    lastversion_gdal_tag=${lastversion_gdal_tag#v}
+                    lastversion_cgal_tag=${lastversion_cgal#tags/}
+                    lastversion_cgal_tag=${lastversion_cgal_tag#v}
+                    lastversion_sfcgal_tag=${lastversion_sfcgal#tags/}
+                    lastversion_sfcgal_tag=${lastversion_sfcgal_tag#v}
+                    tags+=" ${mainTags}-postgis${lastversion_postgis_tag}-geos${lastversion_geos_tag}-proj${lastversion_proj_tag}-gdal${lastversion_gdal_tag}-cgal${lastversion_cgal_tag}-sfcgal${lastversion_sfcgal_tag}"
+                    tags+=" ${mainTags}-postgis${lastversion_postgis_tag}-geos${lastversion_geos_tag}-proj${lastversion_proj_tag}-gdal${lastversion_gdal_tag}-cgal${lastversion_cgal_tag}-sfcgal${lastversion_sfcgal_tag}-${variant}"
+                fi
+
                 if [[ "master" != "$postgisVersion" && "recent" != "$postgisVersion" && "${postgisDocSrc[$variant]}" != "${postgisDockerTag}" ]]; then
                     tags+=" ${postgresLastMainTags[$postgresVersion]}-${postgisDocSrc[$variant]}${bundleTypeTags}-${variant}"
                 fi
                 if [[ "$variant" == "$debian_latest" ]]; then
                     tags+=" ${postgresLastMainTags[$postgresVersion]}-${postgisDockerTag}${bundleTypeTags}"
                     if [[ "${postgis_latest}" == "${postgisDockerTag}" && "${postgres_latest}" == "${postgresLastMainTags[$postgresVersion]}" ]]; then
-
                         if [ -n "$bundleType" ]; then
                             tags+=" $bundleType"
                         else
                             tags+=" latest"
                         fi
-
+                    elif [[ "recent" == "${postgisDockerTag}" && "${postgres_latest}" == "${postgresLastMainTags[$postgresVersion]}" ]]; then
+                        tags+=" recent"
                     fi
                 fi
 
