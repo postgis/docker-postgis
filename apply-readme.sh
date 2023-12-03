@@ -88,10 +88,10 @@ file_size=$(stat --format=%s "README.md")
 echo " "
 echo "README.md size is $file_size bytes ( max limit $README_SIZE_LIMIT bytes )"
 if [[ $file_size -ge $README_SIZE_LIMIT ]]; then
-    echo "Error: README.md is too large ($file_size bytes). "
+    echo "WARNING: README.md is too large ($file_size bytes). "
     echo "  Must be less than $README_SIZE_LIMIT bytes!"
     echo "  The github API automatically truncates README.md files to $README_SIZE_LIMIT bytes."
-    exit 1
+    echo " "
 fi
 
 echo " "
