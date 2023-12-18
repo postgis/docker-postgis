@@ -26,6 +26,20 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:12-3.4.1-alpine3.18 \
     --target ${dockername}:12-3.4.1-alpine3.18 || true
 
+# ----- 12-3.4-alpine3.19 -----
+
+echo "manifest: ${dockername}:12-3.4-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:12-3.4-alpine3.19 \
+    --target ${dockername}:12-3.4-alpine3.19 || true
+
+echo "manifest: ${dockername}:12-3.4.1-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:12-3.4.1-alpine3.19 \
+    --target ${dockername}:12-3.4.1-alpine3.19 || true
+
 echo "manifest: ${dockername}:12-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
@@ -79,6 +93,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:13-3.4.1-alpine3.18 \
     --target ${dockername}:13-3.4.1-alpine3.18 || true
+
+# ----- 13-3.4-alpine3.19 -----
+
+echo "manifest: ${dockername}:13-3.4-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:13-3.4-alpine3.19 \
+    --target ${dockername}:13-3.4-alpine3.19 || true
+
+echo "manifest: ${dockername}:13-3.4.1-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:13-3.4.1-alpine3.19 \
+    --target ${dockername}:13-3.4.1-alpine3.19 || true
 
 echo "manifest: ${dockername}:13-3.4-alpine"
 manifest-tool push from-args \
@@ -134,6 +162,20 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.4.1-alpine3.18 \
     --target ${dockername}:14-3.4.1-alpine3.18 || true
 
+# ----- 14-3.4-alpine3.19 -----
+
+echo "manifest: ${dockername}:14-3.4-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.4-alpine3.19 \
+    --target ${dockername}:14-3.4-alpine3.19 || true
+
+echo "manifest: ${dockername}:14-3.4.1-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.4.1-alpine3.19 \
+    --target ${dockername}:14-3.4.1-alpine3.19 || true
+
 echo "manifest: ${dockername}:14-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
@@ -187,6 +229,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-3.4.1-alpine3.18 \
     --target ${dockername}:15-3.4.1-alpine3.18 || true
+
+# ----- 15-3.4-alpine3.19 -----
+
+echo "manifest: ${dockername}:15-3.4-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.4-alpine3.19 \
+    --target ${dockername}:15-3.4-alpine3.19 || true
+
+echo "manifest: ${dockername}:15-3.4.1-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.4.1-alpine3.19 \
+    --target ${dockername}:15-3.4.1-alpine3.19 || true
 
 echo "manifest: ${dockername}:15-3.4-alpine"
 manifest-tool push from-args \
@@ -301,6 +357,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:16-3.4.1-alpine3.18 \
     --target ${dockername}:16-3.4.1-alpine3.18 || true
+
+# ----- 16-3.4-alpine3.19 -----
+
+echo "manifest: ${dockername}:16-3.4-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-3.4-alpine3.19 \
+    --target ${dockername}:16-3.4-alpine3.19 || true
+
+echo "manifest: ${dockername}:16-3.4.1-alpine3.19"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-3.4.1-alpine3.19 \
+    --target ${dockername}:16-3.4.1-alpine3.19 || true
 
 echo "manifest: ${dockername}:16-3.4-alpine"
 manifest-tool push from-args \

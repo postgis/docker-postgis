@@ -58,7 +58,7 @@ if [[ "${ENABLE_IMAGE_VERSION_ID:-}" == "true" ]]; then
     # Note: Make sure to keep this synchronized with the corresponding section in Makefile
     COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%d)
     COMMIT_HASH=$(git log -1 --pretty=format:%h)
-    BUILD_WEEK=$(date '+%Yw%U')
+    BUILD_WEEK=$(date '+%Yw%V')
     IMAGE_VERSION_ID="-ver${COMMIT_DATE}-${COMMIT_HASH}-${BUILD_WEEK}"
 fi
 export IMAGE_VERSION_ID

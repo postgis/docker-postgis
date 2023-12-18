@@ -13,7 +13,7 @@
 **Important:** _Please note that this README document is larger than the 25,000 character limit set by Docker Hub. As a result, the version available on Docker Hub will be trimmed and not complete._
 _For the complete and untrimmed version of the README, it is recommended to visit the project GitHub page:_ https://github.com/ImreSamu/docker-postgis/blob/master/README.md
 
-The `imresamu/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, and 16. For PostgreSQL version 11, the image supports PostGIS 3.3, as it is not compatible with PostGIS 3.4.  Additionally, an image version is provided which is built from the latest two versions of Postgres (15, 16) with versions of PostGIS and its dependencies built from their respective master branches.
+The `imresamu/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, and 16.  Additionally, an image version is provided which is built from the latest two versions of Postgres (15, 16) with versions of PostGIS and its dependencies built from their respective master branches.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -58,7 +58,6 @@ For those new to PostGIS, we recommend the following image versions:
 - We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
   - In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
 - This version is easy to extend and has matured over time.
-- PostgreSQL 11 is not compatible with PostGIS 3.4, so it remains on PostGIS 3.3. Please note that after November 9, 2023, PostgreSQL 11 will reach its [end-of-life (EOL)](https://www.postgresql.org/support/versioning/) and will no longer receive support.
 
 <!-- bookworm_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
@@ -75,7 +74,6 @@ For those new to PostGIS, we recommend the following image versions:
 - We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
   - In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
 - This version is easy to extend and has matured over time.
-- PostgreSQL 11 is not compatible with PostGIS 3.4, so it remains on PostGIS 3.3. Please note that after November 9, 2023, PostgreSQL 11 will reach its [end-of-life (EOL)](https://www.postgresql.org/support/versioning/) and will no longer receive support.
 
 <!-- bullseye_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
@@ -115,22 +113,37 @@ Please note that the included package list is subject to change as we continue t
 | [`16-3.4-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-bundle0-bookworm), [`16-3.4.1-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.1-bundle0-bookworm), [`16-3.4-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-bundle0), [`bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.4.1 |
 <!-- bundle0_end  -->
 
-### ⛰️Alpine based
+### ⛰️Alpine 3.18 based
 
 - The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
 - In the Alpine 3.18 version, the package versions are: geos=3.11, gdal=3.6, proj=9.2, and sfcgal=1.4.
 - PostGIS is compiled from source, making it a bit more challenging to extend.
-- PostgreSQL 11 is not compatible with PostGIS 3.4, so it remains on PostGIS 3.3. Please note that after November 9, 2023, PostgreSQL 11 will reach its [end-of-life (EOL)](https://www.postgresql.org/support/versioning/) and will no longer receive support.
 
 <!-- alpine3.18_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
-| [`12-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine3.18), [`12-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-alpine3.18), [`12-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.4.1 |
-| [`13-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine3.18), [`13-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-alpine3.18), [`13-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.4.1 |
-| [`14-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine3.18), [`14-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-alpine3.18), [`14-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.4.1 |
-| [`15-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine3.18), [`15-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4.1-alpine3.18), [`15-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 15 | 3.4.1 |
-| [`16-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine3.18), [`16-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.1-alpine3.18), [`16-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine), [`alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 16 | 3.4.1 |
+| [`12-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine3.18), [`12-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.4.1 |
+| [`13-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine3.18), [`13-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.4.1 |
+| [`14-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine3.18), [`14-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.4.1 |
+| [`15-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine3.18), [`15-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 15 | 3.4.1 |
+| [`16-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine3.18), [`16-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 16 | 3.4.1 |
 <!-- alpine3.18_end  -->
+
+### ⛰️Alpine 3.19 based
+
+- The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
+- In the Alpine 3.19 version, the package versions are: geos=3.12.1, gdal=3.8.1, proj=9.3.1, and sfcgal=1.5.0
+- PostGIS is compiled from source, making it a bit more challenging to extend.
+
+<!-- alpine3.19_begin  -->
+| `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
+| ---- | :-: | :-: | :-: | :-: | :-: |
+| [`12-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine3.19), [`12-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-alpine3.19), [`12-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 12 | 3.4.1 |
+| [`13-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine3.19), [`13-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-alpine3.19), [`13-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 13 | 3.4.1 |
+| [`14-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine3.19), [`14-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-alpine3.19), [`14-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 14 | 3.4.1 |
+| [`15-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine3.19), [`15-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4.1-alpine3.19), [`15-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 15 | 3.4.1 |
+| [`16-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine3.19), [`16-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.1-alpine3.19), [`16-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine), [`alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 16 | 3.4.1 |
+<!-- alpine3.19_end  -->
 
 ### 📋Test images
 
