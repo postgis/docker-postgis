@@ -12,60 +12,6 @@ source tools/environment_init.sh
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-# ----- 11-3.3-alpine3.18 -----
-
-echo "manifest: ${dockername}:11-3.3-alpine3.18"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3-alpine3.18 \
-    --target ${dockername}:11-3.3-alpine3.18 || true
-
-echo "manifest: ${dockername}:11-3.3.5-alpine3.18"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3.5-alpine3.18 \
-    --target ${dockername}:11-3.3.5-alpine3.18 || true
-
-echo "manifest: ${dockername}:11-3.3-alpine"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3-alpine \
-    --target ${dockername}:11-3.3-alpine || true
-
-# ----- 11-3.3-bookworm -----
-
-echo "manifest: ${dockername}:11-3.3-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3-bookworm \
-    --target ${dockername}:11-3.3-bookworm || true
-
-echo "manifest: ${dockername}:11-3.3.4-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3.4-bookworm \
-    --target ${dockername}:11-3.3.4-bookworm || true
-
-echo "manifest: ${dockername}:11-3.3"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3 \
-    --target ${dockername}:11-3.3 || true
-
-# ----- 11-3.3-bullseye -----
-
-echo "manifest: ${dockername}:11-3.3-bullseye"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3-bullseye \
-    --target ${dockername}:11-3.3-bullseye || true
-
-echo "manifest: ${dockername}:11-3.3.4-bullseye"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:11-3.3.4-bullseye \
-    --target ${dockername}:11-3.3.4-bullseye || true
-
 # ----- 12-3.4-alpine3.18 -----
 
 echo "manifest: ${dockername}:12-3.4-alpine3.18"

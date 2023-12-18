@@ -30,7 +30,7 @@ This image ensures that the default database created by the parent `postgres` im
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
 
-## Versions (2023-12-03)
+## Versions (2023-12-18)
 
 We provide multi-platform image support for the following architectures:
 
@@ -63,7 +63,6 @@ For those new to PostGIS, we recommend the following image versions:
 <!-- bookworm_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
-| [`11-3.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3-bookworm), [`11-3.3.4-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3.4-bookworm), [`11-3.3`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/11-3.3/bookworm/Dockerfile) | amd64 arm64 | bookworm | 11 | 3.3.4 |
 | [`12-3.4-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-bookworm), [`12-3.4.1-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-bookworm), [`12-3.4`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/bookworm/Dockerfile) | amd64 arm64 | bookworm | 12 | 3.4.1 |
 | [`13-3.4-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-bookworm), [`13-3.4.1-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-bookworm), [`13-3.4`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/bookworm/Dockerfile) | amd64 arm64 | bookworm | 13 | 3.4.1 |
 | [`14-3.4-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-bookworm), [`14-3.4.1-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-bookworm), [`14-3.4`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/bookworm/Dockerfile) | amd64 arm64 | bookworm | 14 | 3.4.1 |
@@ -81,7 +80,6 @@ For those new to PostGIS, we recommend the following image versions:
 <!-- bullseye_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
-| [`11-3.3-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3-bullseye), [`11-3.3.4-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3.4-bullseye) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/11-3.3/bullseye/Dockerfile) | amd64 arm64 | bullseye | 11 | 3.3.4 |
 | [`12-3.4-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-bullseye), [`12-3.4.1-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-bullseye) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/bullseye/Dockerfile) | amd64 arm64 | bullseye | 12 | 3.4.1 |
 | [`13-3.4-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-bullseye), [`13-3.4.1-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-bullseye) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/bullseye/Dockerfile) | amd64 arm64 | bullseye | 13 | 3.4.1 |
 | [`14-3.4-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-bullseye), [`14-3.4.1-bullseye`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-bullseye) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/bullseye/Dockerfile) | amd64 arm64 | bullseye | 14 | 3.4.1 |
@@ -127,7 +125,6 @@ Please note that the included package list is subject to change as we continue t
 <!-- alpine3.18_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
-| [`11-3.3-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3-alpine3.18), [`11-3.3.5-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3.5-alpine3.18), [`11-3.3-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=11-3.3-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/11-3.3/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 11 | 3.3.5 |
 | [`12-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine3.18), [`12-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-alpine3.18), [`12-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.4.1 |
 | [`13-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine3.18), [`13-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-alpine3.18), [`13-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.4.1 |
 | [`14-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine3.18), [`14-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-alpine3.18), [`14-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.4.1 |

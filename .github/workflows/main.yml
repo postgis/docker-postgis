@@ -24,9 +24,6 @@ jobs:
 #       hence they must be generated within the bundle JOB.
 #
 #matrix-include-start
-           - { version: "11-3.3", variant: "alpine3.18", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-alpine3.18 11-3.3.5-alpine3.18 11-3.3-alpine", readme_group: "alpine3.18" }
-           - { version: "11-3.3", variant: "bookworm", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-bookworm 11-3.3.4-bookworm 11-3.3", readme_group: "bookworm" }
-           - { version: "11-3.3", variant: "bullseye", postgres: "11", postgis: "3.3", arch: "amd64 arm64", tags: "11-3.3-bullseye 11-3.3.4-bullseye", readme_group: "bullseye" }
            - { version: "12-3.4", variant: "alpine3.18", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-alpine3.18 12-3.4.1-alpine3.18 12-3.4-alpine", readme_group: "alpine3.18" }
            - { version: "12-3.4", variant: "bookworm", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-bookworm 12-3.4.1-bookworm 12-3.4", readme_group: "bookworm" }
            - { version: "12-3.4", variant: "bullseye", postgres: "12", postgis: "3.4", arch: "amd64 arm64", tags: "12-3.4-bullseye 12-3.4.1-bullseye", readme_group: "bullseye" }

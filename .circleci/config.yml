@@ -92,9 +92,6 @@ workflows:
 #       hence they must be generated within the bundle JOB.
 #
 #circleci-targets-start
-                "11-3.3-alpine3.18",
-                "11-3.3-bookworm",
-                "11-3.3-bullseye",
                 "12-3.4-alpine3.18",
                 "12-3.4-bookworm",
                 "12-3.4-bullseye",
