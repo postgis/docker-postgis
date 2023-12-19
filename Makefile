@@ -165,7 +165,9 @@ manifest-$(1)-$(2): $(if $(filter 2,$(shell echo $(1) | grep -o '-' | wc -l)),ma
 	@echo '::Manifest $(1)/$(2)'
 	$(foreach tag,$(shell cat $(1)/$(2)/tags), \
 		echo " -->  manifest: $(1)/$(2):$(tag) " && \
-		manifest-tool push from-args \
+		manifest-tool \
+          $(if $(findstring localhost,$(REGISTRY)),--insecure --plain-http) \
+	      push from-args \
 		    --platforms linux/amd64,linux/arm64 \
 		    --template $(REGISTRY)/$(REPO_NAME)/$(PUBLIC_IMAGE_NAME)-ARCHVARIANT:$(tag) \
 		    --target $(REGISTRY)/$(REPO_NAME)/$(PUBLIC_IMAGE_NAME):$(tag) || true; \
