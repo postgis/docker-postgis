@@ -32,7 +32,8 @@ jobs:
       - run: uname -a
       - run: docker --version
       - run: docker info
-      - run: pip install lastversion --upgrade
+      - run: pip3 install --upgrade pip
+      - run: pip3 install --upgrade lastversion
       - run: tools/install_manifest-tool.sh
       - run: tools/environment_init.sh
       - run: make check_version

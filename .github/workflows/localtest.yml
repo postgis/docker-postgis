@@ -9,12 +9,13 @@ on:
 jobs:
   localtest:
     name: "testing ./localtest.sh ( update.sh and build test and push to local registry )"
-    runs-on: ubuntu-22.04    
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - run: docker ps -a
-      - run: pip install lastversion --upgrade
-      - run: tools/install_manifest-tool.sh 
+      - run: pip3 install --upgrade pip
+      - run: pip3 install --upgrade lastversion
+      - run: tools/install_manifest-tool.sh
       - run: tools/environment_init.sh
       - run: ./localtest.sh
       - run: docker images
