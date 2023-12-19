@@ -32,16 +32,9 @@ jobs:
       - run: uname -a
       - run: docker --version
       - run: docker info
-      - run:
-          name: Install manifest-tool (linux-arm64 )
-          command: |
-            wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
-            mkdir manifest-tool
-            tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
-            sudo mv manifest-tool/manifest-tool-linux-arm64 /usr/local/bin/manifest-tool
-            manifest-tool -v
-      - run: pip3 install lastversion
-      - run: source tools/environment_init.sh
+      - run: pip install lastversion --upgrade
+      - run: tools/install_manifest-tool.sh
+      - run: tools/environment_init.sh
       - run: make check_version
       - run:
           name: Conditional Docker Check - Halt if not on master branch or if it's a PR or Weekly image exists

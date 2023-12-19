@@ -9,17 +9,12 @@ on:
 jobs:
   localtest:
     name: "testing ./localtest.sh ( update.sh and build test and push to local registry )"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04    
     steps:
       - uses: actions/checkout@v4
       - run: docker ps -a
-      - name: Install manifest-tool
-        run: |
-              wget https://github.com/estesp/manifest-tool/releases/download/v2.0.8/binaries-manifest-tool-2.0.8.tar.gz
-              mkdir manifest-tool
-              tar -xvzf binaries-manifest-tool-2.0.8.tar.gz -C manifest-tool
-              sudo mv manifest-tool/manifest-tool-linux-amd64 /usr/local/bin/manifest-tool
-              manifest-tool -v
-      - run: pip install lastversion
+      - run: pip install lastversion --upgrade
+      - run: tools/install_manifest-tool.sh 
+      - run: tools/environment_init.sh
       - run: ./localtest.sh
       - run: docker images
