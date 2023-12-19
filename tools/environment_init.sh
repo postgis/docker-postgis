@@ -112,7 +112,7 @@ function check_image_exists() {
     fi
 
     # Attempt to inspect the image using manifest-tool. Capture the output, including any errors.
-    output=$(manifest-tool ${secure_opt} inspect "$image_name" 2>&1 || true)
+    output=$(manifest-tool "${secure_opt}" inspect "$image_name" 2>&1 || true)
     # Check the output for a "not found" message, which indicates the image does not exist.
     if echo "$output" | grep -q "not found"; then
         echo "The Docker image '$image_name' does not exist."
