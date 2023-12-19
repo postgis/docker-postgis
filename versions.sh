@@ -67,6 +67,16 @@ function get_tag_hash() {
         awk '{print $1}'
 }
 
+# extracts a version number and limits it to up to two segments (digits separated by dots).
+function extract_version_up_to_two_digits() {
+    local input_version=$1
+    if [[ $input_version =~ ^([0-9]+(\.[0-9]+)?) ]]; then
+        echo "${BASH_REMATCH[1]}"
+    else
+        echo ""
+    fi
+}
+
 # Convert YAML input to pretty-printed JSON format.
 function yaml2json_pretty {
     python3 -c 'import sys, yaml, json; print(json.dumps(yaml.safe_load(sys.stdin.read()), indent=2, sort_keys=False))'
@@ -517,8 +527,17 @@ for version in "${versions[@]}"; do
                     lastversion_cgal_tag=${lastversion_cgal_tag#v}
                     lastversion_sfcgal_tag=${lastversion_sfcgal#tags/}
                     lastversion_sfcgal_tag=${lastversion_sfcgal_tag#v}
-                    tags+=" ${mainTags}-postgis${lastversion_postgis_tag}-geos${lastversion_geos_tag}-proj${lastversion_proj_tag}-gdal${lastversion_gdal_tag}-cgal${lastversion_cgal_tag}-sfcgal${lastversion_sfcgal_tag}"
+
                     tags+=" ${mainTags}-postgis${lastversion_postgis_tag}-geos${lastversion_geos_tag}-proj${lastversion_proj_tag}-gdal${lastversion_gdal_tag}-cgal${lastversion_cgal_tag}-sfcgal${lastversion_sfcgal_tag}-${variant}"
+
+                    lastversion_postgis_tag2d=$(extract_version_up_to_two_digits "$lastversion_postgis_tag")
+                    lastversion_proj_tag2d=$(extract_version_up_to_two_digits "$lastversion_proj_tag")
+                    lastversion_geos_tag2d=$(extract_version_up_to_two_digits "$lastversion_geos_tag")
+                    lastversion_gdal_tag2d=$(extract_version_up_to_two_digits "$lastversion_gdal_tag")
+                    lastversion_cgal_tag2d=$(extract_version_up_to_two_digits "$lastversion_cgal_tag")
+                    lastversion_sfcgal_tag2d=$(extract_version_up_to_two_digits "$lastversion_sfcgal_tag")
+
+                    tags+=" ${mainTags}-postgis${lastversion_postgis_tag2d}-geos${lastversion_geos_tag2d}-proj${lastversion_proj_tag2d}-gdal${lastversion_gdal_tag2d}-cgal${lastversion_cgal_tag2d}-sfcgal${lastversion_sfcgal_tag2d}-${variant}"
                 fi
 
                 if [[ "master" != "$postgisVersion" && "recent" != "$postgisVersion" && "${postgisDocSrc[$variant]}" != "${postgisDockerTag}" ]]; then

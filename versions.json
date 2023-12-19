@@ -248,7 +248,7 @@
   },
   "15-recent": {
     "bookworm": {
-      "tags": "15-recent-bookworm 15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0 15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm 15-recent",
+      "tags": "15-recent-bookworm 15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm 15-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm 15-recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "15",
@@ -369,7 +369,7 @@
   },
   "16-recent": {
     "bookworm": {
-      "tags": "16-recent-bookworm 16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0 16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm 16-recent recent",
+      "tags": "16-recent-bookworm 16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm 16-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm 16-recent recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "16",

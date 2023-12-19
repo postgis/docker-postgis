@@ -326,17 +326,17 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-recent-bookworm \
     --target ${dockername}:15-recent-bookworm || true
 
-echo "manifest: ${dockername}:15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0 \
-    --target ${dockername}:15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0 || true
-
 echo "manifest: ${dockername}:15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm \
     --target ${dockername}:15-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm || true
+
+echo "manifest: ${dockername}:15-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm \
+    --target ${dockername}:15-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm || true
 
 echo "manifest: ${dockername}:15-recent"
 manifest-tool push from-args \
@@ -472,17 +472,17 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-recent-bookworm \
     --target ${dockername}:16-recent-bookworm || true
 
-echo "manifest: ${dockername}:16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0 \
-    --target ${dockername}:16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0 || true
-
 echo "manifest: ${dockername}:16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm \
     --target ${dockername}:16-recent-postgis3.4.1-geos3.12.1-proj9.3.1-gdal3.8.1-cgal5.6-sfcgal1.5.0-bookworm || true
+
+echo "manifest: ${dockername}:16-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm \
+    --target ${dockername}:16-recent-postgis3.4-geos3.12-proj9.3-gdal3.8-cgal5.6-sfcgal1.5-bookworm || true
 
 echo "manifest: ${dockername}:16-recent"
 manifest-tool push from-args \
