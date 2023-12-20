@@ -1,8 +1,10 @@
 name: "update_dockerfiles"
 # updating the image code and pushing to the local registry
 on:
-    schedule:
-        - cron: '15 8 * * 1'
+  push:
+  pull_request:
+  schedule:
+      - cron: '15 8 * * 1'
 
 jobs:
   update_dockerfiles:

@@ -1,10 +1,10 @@
 name: "Localtest"
 # testing the workflow
 on:
-    push:
-    pull_request:
-    schedule:
-        - cron: '15 5 * * 1'
+  push:
+  pull_request:
+  schedule:
+      - cron: '15 5 * * 1'
 
 jobs:
   localtest:

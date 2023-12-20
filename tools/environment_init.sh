@@ -106,20 +106,30 @@ function check_image_exists() {
     # Check if dockername contains 'localhost:5000'
     if [[ $dockername == *"localhost:5000"* ]]; then
         echo "The name contains 'localhost:5000' ; insecure and plain-http mode is enabled !"
-        secure_opt=" --insecure --plain-http "
+        secure_opt=(--insecure --plain-http)
     else
-        secure_opt=""
+        secure_opt=()
     fi
 
     # Attempt to inspect the image using manifest-tool. Capture the output, including any errors.
-    output=$(manifest-tool "${secure_opt}" inspect "$image_name" 2>&1 || true)
+    output=$(manifest-tool "${secure_opt[@]}" inspect "$image_name" 2>&1 || true)
+
+    echo ""
+    echo "--[ manifest-tool inspect $image_name ]---"
+    echo "$output"
+    echo "--[ manifest-tool inspect $image_name ]---"
+    echo ""
+
     # Check the output for a "not found" message, which indicates the image does not exist.
     if echo "$output" | grep -q "not found"; then
         echo "The Docker image '$image_name' does not exist."
         return 1 # Return an exit code of 1 to signify the image does not exist.
-    else
+    elif echo "$output" | grep -q "digest"; then
         echo "The Docker image '$image_name' exists."
-        return 0 # # Return an exit code of 0 to signify the image exists.
+        return 0
+    else
+        echo "unknow error"
+        return 1
     fi
 }
 
