@@ -1,0 +1,26 @@
+name: "update_dockerfiles"
+# updating the image code and pushing to the local registry
+on:
+    schedule:
+        - cron: '15 8 * * 1'
+
+jobs:
+  update_dockerfiles:
+    name: "update_dockerfiles"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker ps -a
+      - name: Login to dockerhub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      - run: pip3 install --upgrade pip
+      - run: pip3 install --upgrade lastversion
+      - run: tools/install_manifest-tool.sh
+      - run: tools/environment_init.sh
+      - run: ./update.sh
+      - run: git status
+      - run: git diff
+      - run: git diff versions.json
