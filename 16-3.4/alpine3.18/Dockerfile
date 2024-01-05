@@ -116,6 +116,8 @@ RUN set -eux \
         pcre2 \
         protobuf-c \
         \
+        # for postgis_restore.pl ; ref: https://github.com/postgis/docker-postgis/issues/373
+        perl \
         # ca-certificates: for accessing remote raster files
         #   fix https://github.com/postgis/docker-postgis/issues/307
         ca-certificates \
