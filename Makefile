@@ -33,7 +33,7 @@ ifeq ($(ENABLE_IMAGE_VERSION_ID),true)
 	# Note: Make sure to keep this synchronized with the corresponding section in ./tools/environment_init.sh
 	COMMIT_DATE=$(shell git log -1 --format=%cd --date=format:%Y%m%d)
 	COMMIT_HASH=$(shell git log -1 --pretty=format:%h)
-	BUILD_WEEK=$(shell date '+%Yw%U')
+	BUILD_WEEK=$(shell date '+%Yw%V')
 	IMAGE_VERSION_ID=-ver$(COMMIT_DATE)-$(COMMIT_HASH)-$(BUILD_WEEK)
 endif
 
