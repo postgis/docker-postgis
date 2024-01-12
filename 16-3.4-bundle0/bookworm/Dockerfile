@@ -32,8 +32,8 @@ ARG PGIS1_PGSQL_GZIP_CHECKOUT_SHA1=7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49
 
 ARG PGIS1_TIMESCALEDB_APACHE_ONLY=false
 ARG PGIS1_TIMESCALEDB_REPOSITORY=https://github.com/timescale/timescaledb.git
-ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.13.0
-ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=96f81a3106683f186f091ad88339c8c223f4363c
+ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.13.1
+ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=27398c44085ee4341e373351776e0052bd25bbc2
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL16_1_6_0
@@ -127,8 +127,31 @@ ARG PGIS1_TIMESCALEDB_REPOSITORY
 ARG PGIS1_TIMESCALEDB_CHECKOUT
 ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1
 
-#  Timescaledb not supported on pg16 yet
-
+# Install TimescaleDB; no Arm64 apt support, so build from source
+RUN set -eux \
+    && mkdir -p /timescaledb \
+    && cd timescaledb \
+    && git init \
+    && git remote add origin ${PGIS1_TIMESCALEDB_REPOSITORY} \
+    && git fetch --depth 1 origin ${PGIS1_TIMESCALEDB_CHECKOUT} \
+    && git checkout FETCH_HEAD \
+    # Verify that the commit hash matches the known good one
+    && if [ "$(git rev-parse HEAD)" != "$PGIS1_TIMESCALEDB_CHECKOUT_SHA1" ]; then exit 1; fi \
+    && git log -1 > /_timescaledb_last_commit.txt \
+    && ./bootstrap \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+            -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
+            \
+            -DAPACHE_ONLY=${PGIS1_TIMESCALEDB_APACHE_ONLY} \
+            -DREGRESS_CHECKS=OFF \
+            -DSEND_TELEMETRY_DEFAULT=NO \
+            -DTAP_CHECKS=OFF \
+            -DWARNINGS_AS_ERRORS=OFF \
+            -DENABLE_DEBUG_UTILS=OFF \
+    && cd build \
+    && make -j$(nproc) \
+    && make install
 
 FROM builder as builder-mobilitydb
 
@@ -177,21 +200,20 @@ RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
 RUN USE_PGXS=1 pgxn install sqlite_fdw
 
-#TODO
-# add https://github.com/bosth/geofdw
-# RUN pgxn install --verbose plv8 # todo: need to fix build
-# RUN USE_PGXS=1 pgxn install sqlite_fdw : todo check
-# RUN pgxn install --verbose pg_bm25  # need rust
-# RUN pgxn install --verbose orafce : todo check
-# add?? libpgosm ; https://github.com/developmentseed/osm-seed/blob/develop/images/db/lib/quad_tile/quad_tile.c
-
 FROM builder as builder-other
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
 
-# PG16 + hydra not supperted https://github.com/hydradatabase/hydra
+# Add hydradatabase
+RUN set -eux \
+    && git clone --depth 1  https://github.com/hydradatabase/hydra  \
+    && cd hydra/columnar \
+    && git checkout main \
+    && ./configure \
+    && make -j$(nproc) \
+    && make install
 
 # install pg_hint_plan
 RUN set -eux \
@@ -250,10 +272,6 @@ RUN set -eux \
         \
         postgis \
         postgresql \
-        postgresql-$PG_MAJOR-ogr-fdw \
-        postgresql-$PG_MAJOR-pgrouting \
-        postgresql-$PG_MAJOR-pgrouting-scripts \
-        postgresql-$PG_MAJOR-pgvector \
         postgresql-client-common \
         postgresql-common \
         postgresql-contrib \
@@ -269,6 +287,7 @@ RUN set -eux \
         pspg \
         vip-manager \
         \
+        postgresql-$PG_MAJOR-age \
         postgresql-$PG_MAJOR-asn1oid \
         postgresql-$PG_MAJOR-cron \
         postgresql-$PG_MAJOR-decoderbufs \
@@ -280,6 +299,7 @@ RUN set -eux \
         postgresql-$PG_MAJOR-icu-ext \
         postgresql-$PG_MAJOR-jsquery \
         postgresql-$PG_MAJOR-numeral \
+        postgresql-$PG_MAJOR-ogr-fdw \
         postgresql-$PG_MAJOR-partman \
         postgresql-$PG_MAJOR-periods \
         postgresql-$PG_MAJOR-pg-fact-loader \
@@ -287,16 +307,19 @@ RUN set -eux \
         postgresql-$PG_MAJOR-pg-stat-kcache \
         postgresql-$PG_MAJOR-pg-wait-sampling \
         postgresql-$PG_MAJOR-pgaudit \
-#       postgresql-$PG_MAJOR-pgdg-pgroonga \  # todo: check
         postgresql-$PG_MAJOR-pgl-ddl-deploy \
         postgresql-$PG_MAJOR-pglogical \
         postgresql-$PG_MAJOR-pgmp \
         postgresql-$PG_MAJOR-pgpcre \
         postgresql-$PG_MAJOR-pgq3 \
+        postgresql-$PG_MAJOR-pgrouting \
+        postgresql-$PG_MAJOR-pgrouting-scripts \
         postgresql-$PG_MAJOR-pgsphere \
         postgresql-$PG_MAJOR-pgtap \
+        postgresql-$PG_MAJOR-pgvector \        
         postgresql-$PG_MAJOR-pldebugger \
         postgresql-$PG_MAJOR-plpgsql-check \
+        postgresql-$PG_MAJOR-pointcloud \
         postgresql-$PG_MAJOR-prefix \
         postgresql-$PG_MAJOR-prioritize \
         postgresql-$PG_MAJOR-q3c \
@@ -304,11 +327,6 @@ RUN set -eux \
         postgresql-$PG_MAJOR-rum \
         postgresql-$PG_MAJOR-show-plans \
         postgresql-$PG_MAJOR-squeeze \
-#
-#  not yet available for 16
-#        postgresql-$PG_MAJOR-pointcloud \
-#        postgresql-$PG_MAJOR-age \
-        #
         # add MobilityDb missing dependency from libgsl-dev
         libgsl27 \
         # MeCab based tokenizer for pgdg-pgroonga
@@ -317,13 +335,6 @@ RUN set -eux \
         libmagic1 libmagic-mgc \
         # pgsodium
         libsodium23 \
-    \
-#    && pip3 install --upgrade pip \
-    \
-#    && pipx install geopy \
-#    && pipx install plpygis \
-#    && pipx install pygml \
-#    && pipx install shapely \
     \
     && rm -Rf /root/.cache/pip \
     && apt-get clean \
@@ -364,8 +375,8 @@ RUN set -eux \
 # add MobilityDB requirements
 RUN set -eux \
     && cp -v /usr/share/postgresql/postgresql.conf.sample /usr/share/postgresql/postgresql.conf.sample.orig; \
-    # add MobilityDB requirements;  ( TimescaleDB not yet supported on pg16 )
-	echo "shared_preload_libraries = 'pg_hint_plan,postgis-3,pg_cron,pg_stat_statements'" >>  /usr/share/postgresql/postgresql.conf.sample; \
+    # add MobilityDB and TimescaleDB requirements
+	echo "shared_preload_libraries = 'pg_hint_plan,postgis-3,timescaledb,pg_cron,pg_stat_statements'" >>  /usr/share/postgresql/postgresql.conf.sample; \
     # MobilityDB recomendation
 	echo "max_locks_per_transaction = 128" >>  /usr/share/postgresql/postgresql.conf.sample; \
     echo "timescaledb.telemetry_level=off" >>  /usr/share/postgresql/postgresql.conf.sample

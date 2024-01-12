@@ -32,8 +32,8 @@ ARG PGIS1_PGSQL_GZIP_CHECKOUT_SHA1=7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49
 
 ARG PGIS1_TIMESCALEDB_APACHE_ONLY=false
 ARG PGIS1_TIMESCALEDB_REPOSITORY=https://github.com/timescale/timescaledb.git
-ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.13.0
-ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=96f81a3106683f186f091ad88339c8c223f4363c
+ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.13.1
+ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=27398c44085ee4341e373351776e0052bd25bbc2
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL15_1_5_1
@@ -153,8 +153,6 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install
 
-
-
 FROM builder as builder-mobilitydb
 
 ARG PGIS1_MOBILITYDB_REPOSITORY
@@ -202,21 +200,13 @@ RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
 RUN USE_PGXS=1 pgxn install sqlite_fdw
 
-#TODO
-# add https://github.com/bosth/geofdw
-# RUN pgxn install --verbose plv8 # todo: need to fix build
-# RUN USE_PGXS=1 pgxn install sqlite_fdw : todo check
-# RUN pgxn install --verbose pg_bm25  # need rust
-# RUN pgxn install --verbose orafce : todo check
-# add?? libpgosm ; https://github.com/developmentseed/osm-seed/blob/develop/images/db/lib/quad_tile/quad_tile.c
-
 FROM builder as builder-other
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
 
-# add add https://github.com/hydradatabase/hydra
+# Add hydradatabase
 RUN set -eux \
     && git clone --depth 1  https://github.com/hydradatabase/hydra  \
     && cd hydra/columnar \
@@ -282,10 +272,6 @@ RUN set -eux \
         \
         postgis \
         postgresql \
-        postgresql-$PG_MAJOR-ogr-fdw \
-        postgresql-$PG_MAJOR-pgrouting \
-        postgresql-$PG_MAJOR-pgrouting-scripts \
-        postgresql-$PG_MAJOR-pgvector \
         postgresql-client-common \
         postgresql-common \
         postgresql-contrib \
@@ -301,6 +287,7 @@ RUN set -eux \
         pspg \
         vip-manager \
         \
+        postgresql-$PG_MAJOR-age \
         postgresql-$PG_MAJOR-asn1oid \
         postgresql-$PG_MAJOR-cron \
         postgresql-$PG_MAJOR-decoderbufs \
@@ -312,6 +299,7 @@ RUN set -eux \
         postgresql-$PG_MAJOR-icu-ext \
         postgresql-$PG_MAJOR-jsquery \
         postgresql-$PG_MAJOR-numeral \
+        postgresql-$PG_MAJOR-ogr-fdw \
         postgresql-$PG_MAJOR-partman \
         postgresql-$PG_MAJOR-periods \
         postgresql-$PG_MAJOR-pg-fact-loader \
@@ -319,16 +307,19 @@ RUN set -eux \
         postgresql-$PG_MAJOR-pg-stat-kcache \
         postgresql-$PG_MAJOR-pg-wait-sampling \
         postgresql-$PG_MAJOR-pgaudit \
-#       postgresql-$PG_MAJOR-pgdg-pgroonga \  # todo: check
         postgresql-$PG_MAJOR-pgl-ddl-deploy \
         postgresql-$PG_MAJOR-pglogical \
         postgresql-$PG_MAJOR-pgmp \
         postgresql-$PG_MAJOR-pgpcre \
         postgresql-$PG_MAJOR-pgq3 \
+        postgresql-$PG_MAJOR-pgrouting \
+        postgresql-$PG_MAJOR-pgrouting-scripts \
         postgresql-$PG_MAJOR-pgsphere \
         postgresql-$PG_MAJOR-pgtap \
+        postgresql-$PG_MAJOR-pgvector \        
         postgresql-$PG_MAJOR-pldebugger \
         postgresql-$PG_MAJOR-plpgsql-check \
+        postgresql-$PG_MAJOR-pointcloud \
         postgresql-$PG_MAJOR-prefix \
         postgresql-$PG_MAJOR-prioritize \
         postgresql-$PG_MAJOR-q3c \
@@ -336,9 +327,6 @@ RUN set -eux \
         postgresql-$PG_MAJOR-rum \
         postgresql-$PG_MAJOR-show-plans \
         postgresql-$PG_MAJOR-squeeze \
-        postgresql-$PG_MAJOR-age \
-        postgresql-$PG_MAJOR-pointcloud \
-        #
         # add MobilityDb missing dependency from libgsl-dev
         libgsl27 \
         # MeCab based tokenizer for pgdg-pgroonga
@@ -347,13 +335,6 @@ RUN set -eux \
         libmagic1 libmagic-mgc \
         # pgsodium
         libsodium23 \
-    \
-#    && pip3 install --upgrade pip \
-    \
-#    && pipx install geopy \
-#    && pipx install plpygis \
-#    && pipx install pygml \
-#    && pipx install shapely \
     \
     && rm -Rf /root/.cache/pip \
     && apt-get clean \
