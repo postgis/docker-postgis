@@ -16,3 +16,5 @@ version.json
 Dockerfile.*.template
 localetest.sh
 apply-*.sh
+
+trivy_cache

@@ -198,6 +198,30 @@ push-readme:
                   -e README_FILEPATH="/workspace/README.md" $(DOCKERHUB_DESC_IMG);
 
 
+#----------------------------------------------------------
+define scan-target
+scan-$(1)-$(2):
+	$(DOCKER) run \
+	  --pull always --rm -v $$(pwd)/trivy_cache:/root/.cache/ \
+	  aquasec/trivy:latest image --ignore-unfixed \
+	  $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):$(shell cat $(1)/$(2)/tags | cut -d' ' -f1)
+endef
+$(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call scan-target,$(word 1,$(subst /, ,$(dir))),$(word 2,$(subst /, ,$(dir))))))
+# --------------------------------------------------
+
+#----------------------------------------------------------
+define dive-target
+dive-$(1)-$(2):
+	$(DOCKER) run \
+	  --pull always --rm -it \
+	  -v /var/run/docker.sock:/var/run/docker.sock \
+	  -e CI=true \
+	  wagoodman/dive:latest \
+	  $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):$(shell cat $(1)/$(2)/tags | cut -d' ' -f1)
+endef
+$(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call dive-target,$(word 1,$(subst /, ,$(dir))),$(word 2,$(subst /, ,$(dir))))))
+# --------------------------------------------------
+
 
 # --------------------------------------------------
 # password: f62ba0 == echo -n "postgis" | md5sum | cut -c 1-6
@@ -304,6 +328,10 @@ help: check_variant
 	@echo $(foreach version,$(VERSIONS),' manifest-$(version)')
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' manifest-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
+	@echo '              [[ Scan the docker image, using aquasec/trivy ]]'
+	@echo $(foreach dir,$(DOCKERFILE_DIRS),' scan-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
+	@echo '              [[ Dive the docker image, using wagoodman/dive ]]'
+	@echo $(foreach dir,$(DOCKERFILE_DIRS),' dive-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo '              [[ Start the docker image ]]'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' start-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo '              [[ Stop the docker image ]]'
@@ -339,6 +367,8 @@ help: check_variant
 	$(foreach dir,$(DOCKERFILE_DIRS),'  push-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \
 	$(foreach version,$(VERSIONS),' manifest-$(version)') \
 	$(foreach dir,$(DOCKERFILE_DIRS),'  manifest-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \
+	$(foreach dir,$(DOCKERFILE_DIRS),'  scan-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \
+	$(foreach dir,$(DOCKERFILE_DIRS),'  dive-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \
 	$(foreach dir,$(DOCKERFILE_DIRS),' start-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \
 	$(foreach dir,$(DOCKERFILE_DIRS),'  stop-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \
 	$(foreach dir,$(DOCKERFILE_DIRS),'  psql-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \

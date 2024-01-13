@@ -120,6 +120,14 @@ jobs:
       if: env.IMAGE_EXISTS == 'false'
       run: make test-${{ matrix.version }}-${{ matrix.variant }}
 
+    - name: "make scan-${{ matrix.version }}-${{ matrix.variant }}"
+      if: env.IMAGE_EXISTS == 'false'
+      run: make scan-${{ matrix.version }}-${{ matrix.variant }} || true
+
+    - name: "make dive-${{ matrix.version }}-${{ matrix.variant }}"
+      if: env.IMAGE_EXISTS == 'false'
+      run: make dive-${{ matrix.version }}-${{ matrix.variant }} || true
+
     - run: make dockerlist
 
     - name: Push docker image to dockerhub

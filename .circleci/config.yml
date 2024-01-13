@@ -51,6 +51,8 @@ jobs:
 
       - run: make -n test-<< parameters.target-version-variant >>
       - run: make test-<< parameters.target-version-variant >>
+      - run: make scan-<< parameters.target-version-variant >> || true
+      - run: make dive-<< parameters.target-version-variant >> || true
       - run: docker images
 
       - run:

@@ -2,3 +2,4 @@
 .template-helper-functions.jq
 _*
 .vscode/
+trivy_cache
