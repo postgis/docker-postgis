@@ -213,7 +213,7 @@ $(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call scan-target,$(word 1,$(subst /, ,
 define dive-target
 dive-$(1)-$(2):
 	$(DOCKER) run \
-	  --pull always --rm -it \
+	  --pull always --rm \
 	  -v /var/run/docker.sock:/var/run/docker.sock \
 	  -e CI=true \
 	  wagoodman/dive:latest \
@@ -267,7 +267,7 @@ $(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call clean-target,$(word 1,$(subst /, 
 all: check_variant update build test
 
 dockerlist:
-	docker images | grep "${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}" || true
+	docker images | grep "${REPO_NAME}/${IMAGE_NAME}" || true
 
 update:
 	@echo '::Updating Dockerfiles'
@@ -312,33 +312,33 @@ imageclean_${REPO_NAME}_${IMAGE_NAME}:
 help: check_variant
 	@echo ' Available make targets:'
 	@echo '------------------------------------ '
-	@echo 'build        : Build the docker image versions and variants'
+	@echo '# build        : Build the docker image versions and variants'
 	@echo $(foreach version,$(VERSIONS),' build-$(version)')
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' build-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
-	@echo 'test         : Test the docker image versions and variants'
+	@echo '# test         : Test the docker image versions and variants'
 	@echo $(foreach version,$(VERSIONS),' test-$(version)')
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' test-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
-	@echo 'push         : Push to the registry the docker image versions and variants'
+	@echo '# push         : Push to the registry the docker image versions and variants'
 	@echo $(foreach version,$(VERSIONS),' push-$(version)')
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' push-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
-	@echo 'manifest     : Manifest registry the docker image versions and variants'
+	@echo '# manifest     : Manifest registry the docker image versions and variants'
 	@echo $(foreach version,$(VERSIONS),' manifest-$(version)')
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' manifest-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
-	@echo '              [[ Scan the docker image, using aquasec/trivy ]]'
+	@echo '# Scan the docker image, using aquasec/trivy'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' scan-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
-	@echo '              [[ Dive the docker image, using wagoodman/dive ]]'
+	@echo '# Dive the docker image, using wagoodman/dive'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' dive-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
-	@echo '              [[ Start the docker image ]]'
+	@echo '# Start the docker image'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' start-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
-	@echo '              [[ Stop the docker image ]]'
+	@echo '# Stop the docker image'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' stop-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
-	@echo '              [[ psql exec the docker image ]]'
+	@echo '# psql exec the docker image'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' psql-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
-	@echo '              [[ clean docker image and volume ]]'
+	@echo '# clean docker image and volume'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' clean-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
 	@echo 'all          : Local run: "update" "build" "test" (without push)'

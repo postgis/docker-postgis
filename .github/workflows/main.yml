@@ -128,7 +128,7 @@ jobs:
       if: env.IMAGE_EXISTS == 'false'
       run: make dive-${{ matrix.version }}-${{ matrix.variant }} || true
 
-    - run: make dockerlist
+    - run: docker images
 
     - name: Push docker image to dockerhub
       if: ${{ (env.IMAGE_EXISTS == 'false') && (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
