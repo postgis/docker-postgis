@@ -203,7 +203,7 @@ define scan-target
 scan-$(1)-$(2):
 	$(DOCKER) run \
 	  --pull always --rm -v $$(pwd)/trivy_cache:/root/.cache/ \
-	  aquasec/trivy:latest image --ignore-unfixed \
+	  ghcr.io/aquasecurity/trivy:latest image --ignore-unfixed \
 	  $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):$(shell cat $(1)/$(2)/tags | cut -d' ' -f1)
 endef
 $(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call scan-target,$(word 1,$(subst /, ,$(dir))),$(word 2,$(subst /, ,$(dir))))))
@@ -212,12 +212,8 @@ $(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call scan-target,$(word 1,$(subst /, ,
 #----------------------------------------------------------
 define dive-target
 dive-$(1)-$(2):
-	$(DOCKER) run \
-	  --pull always --rm \
-	  -v /var/run/docker.sock:/var/run/docker.sock \
-	  -e CI=true \
-	  wagoodman/dive:latest \
-	  $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):$(shell cat $(1)/$(2)/tags | cut -d' ' -f1)
+	CI=true tools/dive \
+	$(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):$(shell cat $(1)/$(2)/tags | cut -d' ' -f1)
 endef
 $(foreach dir,$(DOCKERFILE_DIRS),$(eval $(call dive-target,$(word 1,$(subst /, ,$(dir))),$(word 2,$(subst /, ,$(dir))))))
 # --------------------------------------------------

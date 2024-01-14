@@ -35,6 +35,7 @@ jobs:
       - run: pip3 install --upgrade pip
       - run: pip3 install --upgrade lastversion
       - run: tools/install_manifest-tool.sh
+      - run: tools/install_dive.sh
       - run: tools/environment_init.sh
       - run: make check_version
       - run:
