@@ -10,7 +10,7 @@ versions=$(jq 'keys[]' "$input_file")
 distinct_variants=$(jq -r 'to_entries[] | .value | keys[]' "$input_file" | sort -u)
 
 rm -f _dockerlists_*.md
-for readme_group in $distinct_variants recent bundle0 test; do
+for readme_group in $distinct_variants recent locked bundle0 test; do
     echo "init _dockerlists_${readme_group}.md"
     echo "| \`$dockername:\` tags | Dockerfile | Arch | OS | Postgres | PostGIS |" >>_dockerlists_"${readme_group}".md
     echo "| ---- | :-: | :-: | :-: | :-: | :-: |" >>_dockerlists_"${readme_group}".md
@@ -31,7 +31,7 @@ for version in $versions; do
 
         if [[ "$postgis" == "master" ]]; then
             POSTGIS_DOC_VERSION="development: postgis, geos, proj, gdal, cgal, sfcgal"
-        elif [[ "$postgis" == "recent" ]]; then
+        elif [[ "$postgis" == "recent" || "$postgis" == "locked"  ]]; then
 
             POSTGIS_TAG=$(jq -r ".\"$version\".\"$variant\".POSTGIS_CHECKOUT" "$input_file")
             PROJ_TAG=$(jq -r ".\"$version\".\"$variant\".PROJ_CHECKOUT" "$input_file")
@@ -62,7 +62,7 @@ echo "|-------------------------|"
 echo "|-   Generated images    -|"
 echo "|-------------------------|"
 
-for readme_group in $distinct_variants recent bundle0 test; do
+for readme_group in $distinct_variants recent locked bundle0 test; do
     echo " "
     echo "---- ${readme_group} ----"
     cat _dockerlists_"${readme_group}".md
@@ -73,7 +73,7 @@ done
 TODAY=$(date +%Y-%m-%d)
 sed -i -r "s/(## Versions) \([0-9]{4}-[0-9]{2}-[0-9]{2}\)/\1 ($TODAY)/g" README.md
 # Replace content between the special comments in README.md for each readme_group
-for readme_group in $distinct_variants recent bundle0 test; do
+for readme_group in $distinct_variants recent locked bundle0 test; do
     echo "## ${readme_group} ##"
     awk -v readme_group="$readme_group" -v content="$(<_dockerlists_"${readme_group}".md)" '
     $0 ~ "<!-- "readme_group"_begin  -->" {print; print content; f=1; next}

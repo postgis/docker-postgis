@@ -15,19 +15,19 @@ ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
 ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
-ARG PGIS1_POSTGIS_CHECKOUT=81381c6e5d313d6888bd3a880ddaef99783a0062
+ARG PGIS1_POSTGIS_CHECKOUT=77bede5e744a56569e63b0a22290a28518115a3d
 ARG PGIS1_GEOS_CHECKOUT=8d87edcd51653b47ca955cc3a9ac744f41988d92
-ARG PGIS1_GDAL_CHECKOUT=527b897e632fc83457c9cf0c6a8221a48519c23c
-ARG PGIS1_PROJ_CHECKOUT=5920e2998318189970c0fe1e2db60f643515b9ea
+ARG PGIS1_GDAL_CHECKOUT=a79a07ccef41519a9185a4b4cda8f469ccdf9c30
+ARG PGIS1_PROJ_CHECKOUT=03a4ee47bffcc120815051ca6b332ac6626d821a
 ARG PGIS1_SFCGAL_CHECKOUT=61f3b08ade49493b56c6bafa98c7c1f84addbc10
-ARG PGIS1_CGAL_CHECKOUT=11fc1943fbc75135d3ec5776cebab1f4aaa43fb6
+ARG PGIS1_CGAL_CHECKOUT=7249b2e3ed815d5516faa58034d7a02bbcb9a909
 
-ARG PGIS1_POSTGIS_CHECKOUT_SHA1=81381c6e5d313d6888bd3a880ddaef99783a0062
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=77bede5e744a56569e63b0a22290a28518115a3d
 ARG PGIS1_GEOS_CHECKOUT_SHA1=8d87edcd51653b47ca955cc3a9ac744f41988d92
-ARG PGIS1_GDAL_CHECKOUT_SHA1=527b897e632fc83457c9cf0c6a8221a48519c23c
-ARG PGIS1_PROJ_CHECKOUT_SHA1=5920e2998318189970c0fe1e2db60f643515b9ea
+ARG PGIS1_GDAL_CHECKOUT_SHA1=a79a07ccef41519a9185a4b4cda8f469ccdf9c30
+ARG PGIS1_PROJ_CHECKOUT_SHA1=03a4ee47bffcc120815051ca6b332ac6626d821a
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1=61f3b08ade49493b56c6bafa98c7c1f84addbc10
-ARG PGIS1_CGAL_CHECKOUT_SHA1=11fc1943fbc75135d3ec5776cebab1f4aaa43fb6
+ARG PGIS1_CGAL_CHECKOUT_SHA1=7249b2e3ed815d5516faa58034d7a02bbcb9a909
 
 ARG PGIS1_BOOST_VERSION=1.74.0
 
@@ -281,7 +281,7 @@ RUN set -eux \
         set -eux \
         && mkdir build \
         && cd build \
-        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules                          
+        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
         && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
             -DBUILD_DOCS=OFF \
             \
@@ -501,10 +501,12 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
-    && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
-    && projsync --system-directory --file us_noaa_eshpgn \
-    && projsync --system-directory --file us_noaa_prvi \
-    && projsync --system-directory --file us_noaa_wmhpgn \
+    && if command -v projsync >/dev/null 2>&1; then \
+           projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
+        && projsync --system-directory --file us_noaa_eshpgn \
+        && projsync --system-directory --file us_noaa_prvi \
+        && projsync --system-directory --file us_noaa_wmhpgn ; \
+    fi \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \

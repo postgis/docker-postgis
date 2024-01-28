@@ -280,7 +280,7 @@ RUN set -eux \
         set -eux \
         && mkdir build \
         && cd build \
-        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules                          
+        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
         && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
             -DBUILD_DOCS=OFF \
             \
@@ -508,10 +508,12 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
-    && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
-    && projsync --system-directory --file us_noaa_eshpgn \
-    && projsync --system-directory --file us_noaa_prvi \
-    && projsync --system-directory --file us_noaa_wmhpgn \
+    && if command -v projsync >/dev/null 2>&1; then \
+           projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
+        && projsync --system-directory --file us_noaa_eshpgn \
+        && projsync --system-directory --file us_noaa_prvi \
+        && projsync --system-directory --file us_noaa_wmhpgn ; \
+    fi \
 # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \

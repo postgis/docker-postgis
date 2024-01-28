@@ -30,7 +30,7 @@ This image ensures that the default database created by the parent `postgres` im
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
 
-## Versions (2024-01-23)
+## Versions (2024-01-28)
 
 We provide multi-platform image support for the following architectures:
 
@@ -122,10 +122,24 @@ Please note that the included package list is subject to change as we continue t
 <!-- alpine3.18_begin  -->
 | `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
+| [`12-3.0-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.0-alpine3.18), [`12-3.0.10-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.0.10-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.0/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.0.10 |
+| [`12-3.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.1-alpine3.18), [`12-3.1.10-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.1.10-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.1/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.1.10 |
+| [`12-3.2-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.2-alpine3.18), [`12-3.2.6-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.2.6-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.2/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.2.6 |
+| [`12-3.3-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.3-alpine3.18), [`12-3.3.5-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.3.5-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.3/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.3.5 |
 | [`12-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4-alpine3.18), [`12-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=12-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/12-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 12 | 3.4.1 |
+| [`13-3.0-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.0-alpine3.18), [`13-3.0.10-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.0.10-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.0/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.0.10 |
+| [`13-3.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.1-alpine3.18), [`13-3.1.10-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.1.10-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.1/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.1.10 |
+| [`13-3.2-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.2-alpine3.18), [`13-3.2.6-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.2.6-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.2/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.2.6 |
+| [`13-3.3-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.3-alpine3.18), [`13-3.3.5-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.3.5-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.3/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.3.5 |
 | [`13-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4-alpine3.18), [`13-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 13 | 3.4.1 |
+| [`14-3.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.1-alpine3.18), [`14-3.1.10-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.1.10-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.1/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.1.10 |
+| [`14-3.2-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.2-alpine3.18), [`14-3.2.6-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.2.6-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.2/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.2.6 |
+| [`14-3.3-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.3-alpine3.18), [`14-3.3.5-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.3.5-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.3/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.3.5 |
 | [`14-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4-alpine3.18), [`14-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 14 | 3.4.1 |
+| [`15-3.2-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.2-alpine3.18), [`15-3.2.6-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.2.6-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.2/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 15 | 3.2.6 |
+| [`15-3.3-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.3-alpine3.18), [`15-3.3.5-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.3.5-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.3/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 15 | 3.3.5 |
 | [`15-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine3.18), [`15-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 15 | 3.4.1 |
+| [`16-3.3-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.3-alpine3.18), [`16-3.3.5-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.3.5-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.3/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 16 | 3.3.5 |
 | [`16-3.4-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine3.18), [`16-3.4.1-alpine3.18`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.1-alpine3.18) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4/alpine3.18/Dockerfile) | amd64 arm64 | alpine3.18 | 16 | 3.4.1 |
 <!-- alpine3.18_end  -->
 
@@ -144,6 +158,16 @@ Please note that the included package list is subject to change as we continue t
 | [`15-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine3.19), [`15-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4.1-alpine3.19), [`15-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 15 | 3.4.1 |
 | [`16-3.4-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine3.19), [`16-3.4.1-alpine3.19`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.1-alpine3.19), [`16-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine), [`alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4/alpine3.19/Dockerfile) | amd64 arm64 | alpine3.19 | 16 | 3.4.1 |
 <!-- alpine3.19_end  -->
+
+### 🧪Locked ( experimental )
+
+* Locked old postgis versions for testing.
+
+<!-- locked_begin  -->
+| `imresamu/postgis-amd64:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
+| ---- | :-: | :-: | :-: | :-: | :-: |
+| [`14-l3.1.9gcp-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-l3.1.9gcp-bookworm), [`14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-l3.1.9gcp/bookworm/Dockerfile) | amd64 arm64 | bookworm | 14 | null |
+<!-- locked_end  -->
 
 ### 📋Test images
 

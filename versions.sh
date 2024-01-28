@@ -396,6 +396,13 @@ for version in "${versions[@]}"; do
     fi
     echo " "
 
+    # if the first letter of "postgisVersion" is "l" then
+    # the version is locked and we use the definition from locked.yml
+    if [[ "${postgisVersion:0:1}" == "l" ]]; then
+        echo " ---> locked ; definition from locked.yml !"
+        continue
+    fi
+
     if [[ "master" == "$postgisVersion" || "recent" == "$postgisVersion" ]]; then
         srcVersion=""
         srcSha256=""
@@ -702,6 +709,9 @@ for version in "${versions[@]}"; do
         fi
     done
 done
+
+# add locked configurations to _versions.yml file
+cat locked.yml >> _versions.yml
 
 # convert yaml to json
 yaml2json_pretty <./_versions.yml >./_versions.json

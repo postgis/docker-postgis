@@ -1,0 +1,28 @@
+
+# unique locked versions we want to build
+# initialize directory with : touch 14-l3.1.9gcp/bookworm/Dockerfile
+# this file will be append to  version.json
+
+'14-l3.1.9gcp':
+  'bookworm':
+    _comment: "source: ./locked.yml"
+    tags: '14-l3.1.9gcp-bookworm 14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm'
+    postgis: 'l3.1.9gcp'
+    readme_group: 'locked'
+    PG_MAJOR: '14'
+    PG_DOCKER: '14'
+    arch: 'amd64 arm64'
+    template: 'Dockerfile.master.template'
+    POSTGIS_CHECKOUT: 'tags/3.1.9'
+    POSTGIS_CHECKOUT_SHA1: '95a641b1747721d7004c5f0133b918d034035319'
+    PROJ_CHECKOUT: 'tags/6.3.1'
+    PROJ_CHECKOUT_SHA1: '0e993d9744ecaa2f146bf62c43aecc61809a43ef'
+    GDAL_CHECKOUT: 'tags/v3.6.4'
+    GDAL_CHECKOUT_SHA1: '7ca88116f5a46d429251361634eb24629f315076'
+    GEOS_CHECKOUT: 'tags/3.6.6'
+    GEOS_CHECKOUT_SHA1: '36ea3034fb8719a639a7e7727e54ec8ab2e8a196'
+    SFCGAL_CHECKOUT: 'tags/v1.5.1'
+    SFCGAL_CHECKOUT_SHA1: '61f3b08ade49493b56c6bafa98c7c1f84addbc10'
+    CGAL_CHECKOUT: 'tags/v5.6'
+    CGAL_CHECKOUT_SHA1: 'de4fa0d7d57b5a997012f2804161386ff4bc0d0f'
+    BOOST_VERSION: '1.74.0'
