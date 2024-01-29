@@ -48,7 +48,10 @@ RUN set -eux \
         libxml2-dev \
         libxml2-utils \
         make \
-        pcre2-dev \
+        # Note: PCRE2 is not supported in older versions of PostGIS.
+        # To ensure compatibility with PostGIS version 3.0, PCRE 1 is required.
+        # If PCRE2 support is needed, please submit an issue on the docker-postgis GitHub repository.
+        pcre-dev \
         perl \
         protobuf-c-dev \
     \
@@ -85,7 +88,7 @@ RUN set -eux \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
+    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
@@ -113,7 +116,7 @@ RUN set -eux \
         \
         json-c \
         libstdc++ \
-        pcre2 \
+        pcre \
         protobuf-c \
         \
         # for postgis_restore.pl ; ref: https://github.com/postgis/docker-postgis/issues/373
