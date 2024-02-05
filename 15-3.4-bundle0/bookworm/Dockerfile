@@ -87,22 +87,6 @@ RUN set -eux \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}
-RUN arch=$(uname -m) && \
-    DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed 's/tags\///') && \
-    case "$arch" in \
-        x86_64) \
-            duck_binary="duckdb_cli-linux-amd64.zip" ;; \
-        aarch64) \
-            duck_binary="duckdb_cli-linux-arm64.zip" ;; \
-        *) \
-            echo "Unsupported architecture: $arch"; exit 1 ;; \
-    esac && \
-    wget https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/$duck_binary \
-    && unzip $duck_binary -d /usr/local/bin \
-    && rm $duck_binary \
-    && duckdb --version
-
 FROM builder as builder-http-gzip
 
 ARG PGIS1_PGSQL_HTTP_REPOSITORY
@@ -234,6 +218,12 @@ RUN set -eux \
     && git checkout main \
     && export COLUMNAR_O3=1 \
     && ./configure \
+    && make -j$(nproc) \
+    && make install
+
+RUN set -eux \
+    && git clone --depth 1  https://github.com/hydradatabase/pg_stringtheory \
+    && cd pg_stringtheory \
     && make -j$(nproc) \
     && make install
 
@@ -377,19 +367,19 @@ RUN set -eux \
 
 ARG PGIS1_DUCKDB_CHECKOUT
 ENV PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}
-RUN arch=$(uname -m) && \
-    DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed 's/tags\///') && \
-    echo "DUCKDB_VERSION=${DUCKDB_VERSION}" && \
-    echo "PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}" && \
-    case "$arch" in \
+RUN arch=$(uname -m) \
+    && DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed 's/tags\///') \
+    && echo "DUCKDB_VERSION=${DUCKDB_VERSION}" \
+    && echo "PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}" \
+    && case "$arch" in \
         x86_64) \
             duck_binary="duckdb_cli-linux-amd64.zip" ;; \
         aarch64) \
-            duck_binary="duckdb_cli-linux-arm64.zip" ;; \
+            duck_binary="duckdb_cli-linux-aarch64.zip" ;; \
         *) \
             echo "Unsupported architecture: $arch"; exit 1 ;; \
-    esac && \
-    wget https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/$duck_binary \
+    esac \
+    && wget https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/$duck_binary \
     && unzip $duck_binary -d /usr/local/bin \
     && rm $duck_binary \
     && duckdb --version
