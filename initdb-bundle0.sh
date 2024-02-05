@@ -6,4 +6,4 @@ set -e
 export PGUSER="$POSTGRES_USER"
 
 # install pg-svg-lib
-"${psql[@]}" < /pg_svg/pg-svg-lib.sql
+"${psql[@]}" </pg_svg/pg-svg-lib.sql

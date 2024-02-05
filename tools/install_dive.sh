@@ -20,7 +20,7 @@ fi
 rm -f "tools/dive"
 rm -f "tools/dive_${version}_linux_${IMAGE_ARCH}.tar.gz"
 wget https://github.com/wagoodman/dive/releases/download/v${version}/dive_${version}_linux_${IMAGE_ARCH}.tar.gz -O tools/dive_${version}_linux_${IMAGE_ARCH}.tar.gz
-echo "${checksum}"| sha256sum --check 
+echo "${checksum}" | sha256sum --check
 tar -xzf "tools/dive_${version}_linux_${IMAGE_ARCH}.tar.gz" -C "tools/"
 chmod +x "tools/dive"
 rm -f "tools/dive_${version}_linux_${IMAGE_ARCH}.tar.gz"

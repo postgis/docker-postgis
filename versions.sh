@@ -721,7 +721,7 @@ for version in "${versions[@]}"; do
 done
 
 # add locked configurations to _versions.yml file
-cat locked.yml >> _versions.yml
+cat locked.yml >>_versions.yml
 
 # convert yaml to json
 yaml2json_pretty <./_versions.yml >./_versions.json

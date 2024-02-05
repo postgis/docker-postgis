@@ -31,7 +31,7 @@ for version in $versions; do
 
         if [[ "$postgis" == "master" ]]; then
             POSTGIS_DOC_VERSION="development: postgis, geos, proj, gdal, cgal, sfcgal"
-        elif [[ "$postgis" == "recent" || "$postgis" == "locked"  ]]; then
+        elif [[ "$postgis" == "recent" || "$postgis" == "locked" ]]; then
 
             POSTGIS_TAG=$(jq -r ".\"$version\".\"$variant\".POSTGIS_CHECKOUT" "$input_file")
             PROJ_TAG=$(jq -r ".\"$version\".\"$variant\".PROJ_CHECKOUT" "$input_file")

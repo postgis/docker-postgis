@@ -71,15 +71,13 @@ SELECT mobilitydb_full_version();
 SELECT pgr_full_version();
 " | psql
 
-
 imagetag=$(echo "${1}" | cut -d':' -f2)
 mkdir -p ./tmp
+
 echo "
 COPY (
-  SELECT 
-     name, default_version, comment 
+  SELECT
+     name, default_version, comment
   FROM pg_available_extensions ORDER BY 1
 ) TO STDOUT WITH CSV HEADER;
-" | psql > ./tmp/${imagetag}__pg_available_extensions.csv
-
-
+" | psql >./tmp/"${imagetag}"__pg_available_extensions.csv
