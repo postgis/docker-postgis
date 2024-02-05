@@ -18,3 +18,4 @@ localetest.sh
 apply-*.sh
 
 trivy_cache
+tmp/

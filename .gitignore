@@ -3,3 +3,4 @@
 _*
 .vscode/
 trivy_cache
+tmp/ 

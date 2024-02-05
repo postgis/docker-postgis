@@ -35,6 +35,10 @@ else
 fi
 export IMAGE_ARCH
 
+# create README.md image name ( no arch!)
+README_IMAGE_NAME="${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}"
+export README_IMAGE_NAME
+
 # Modify IMAGE_NAME if ENABLE_IMAGE_ARCH is set to true
 if [[ "${ENABLE_IMAGE_ARCH:-}" == "true" ]]; then
     IMAGE_NAME="${IMAGE_NAME}-${IMAGE_ARCH}"

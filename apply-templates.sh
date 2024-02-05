@@ -59,11 +59,16 @@ for version; do
 
         template="$(jq -r '.[env.version][env.variant].template' versions.json)"
         echo "  template=$template"
+
+        initfile="$(jq -r '.[env.version][env.variant].initfile' versions.json)"
+        echo "  initfile=$initfile"
+
         tags="$(jq -r '.[env.version][env.variant].tags' versions.json)"
         echo "  tags=$tags"
 
+        cp -a "$initfile" "$dir/"
         if [ -z "$bundleType" ]; then
-            cp -a initdb-postgis.sh update-postgis.sh "$dir/"
+            cp -a update-postgis.sh "$dir/"
         fi
 
         echo "$tags" >"$dir/tags"

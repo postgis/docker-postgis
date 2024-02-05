@@ -246,6 +246,7 @@ get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobility
 get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http" releases norepo ""
 get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip" releases norepo ""
 get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb" releases norepo ""
+get_latest_version_and_hash "https://github.com/duckdb/duckdb" "duckdb" releases norepo ""
 
 get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis" releases norepo ""
 get_latest_version_and_hash "https://github.com/CGAL/cgal" "cgal" releases norepo "${CGAL_CHECKOUT_LOCK}"
@@ -576,6 +577,7 @@ for version in "${versions[@]}"; do
                     {
                         printf "    arch: '%s'\n" "amd64 arm64"
                         printf "    template: '%s'\n" "Dockerfile.master.template"
+                        printf "    initfile: '%s'\n" "initdb-postgis.sh"
 
                         printf "    POSTGIS_CHECKOUT: '%s'\n" "$postgisGitHash"
                         printf "    POSTGIS_CHECKOUT_SHA1: '%s'\n" "$postgisGitHash"
@@ -597,6 +599,7 @@ for version in "${versions[@]}"; do
                     {
                         printf "    arch: '%s'\n" "amd64 arm64"
                         printf "    template: '%s'\n" "Dockerfile.master.template"
+                        printf "    initfile: '%s'\n" "initdb-postgis.sh"
 
                         printf "    POSTGIS_CHECKOUT: 'tags/%s'\n" "$lastversion_postgis"
                         printf "    POSTGIS_CHECKOUT_SHA1: '%s'\n" "$lastversion_postgis_sha1"
@@ -625,8 +628,11 @@ for version in "${versions[@]}"; do
 
                         if [ -z "$bundleType" ]; then
                             printf "    template: '%s'\n" "Dockerfile.debian.template"
+                            printf "    initfile: '%s'\n" "initdb-postgis.sh"
                         else
                             printf "    template: '%s'\n" "Dockerfile.${bundleType}.template"
+                            printf "    initfile: '%s'\n" "initdb-${bundleType}.sh"
+
                             printf "    MOBILITYDB_CHECKOUT:  'tags/%s'\n" "$lastversion_mobilitydb"
                             printf "    MOBILITYDB_CHECKOUT_SHA1:  '%s'\n" "$lastversion_mobilitydb_sha1"
 
@@ -638,6 +644,9 @@ for version in "${versions[@]}"; do
 
                             printf "    TIMESCALEDB_CHECKOUT: 'tags/%s'\n" "$lastversion_timescaledb"
                             printf "    TIMESCALEDB_CHECKOUT_SHA1: '%s'\n" "$lastversion_timescaledb_sha1"
+
+                            printf "    DUCKDB_CHECKOUT: 'tags/%s'\n" "$lastversion_duckdb"
+                            printf "    DUCKDB_CHECKOUT_SHA1: '%s'\n" "$lastversion_duckdb_sha1"
 
                             lastversion_pg_hint_plan="lastversion_pg_hint_planREL${postgresVersion}"
                             lastversion_pg_hint_plan_sha1="lastversion_pg_hint_planREL${postgresVersion}_sha1"
@@ -697,6 +706,7 @@ for version in "${versions[@]}"; do
                     printf "    postgis: '%s'\n" "${postgisDockerTag}"
                     printf "    arch: '%s'\n" "amd64 arm64"
                     printf "    template: '%s'\n" "Dockerfile.alpine.template"
+                    printf "    initfile: '%s'\n" "initdb-postgis.sh"
                     printf "    PG_MAJOR: '%s'\n" "$postgresVersion"
                     printf "    PG_DOCKER: '%s'\n" "${postgresLastMainTags[$postgresVersion]}"
                     printf "    POSTGIS_VERSION: '%s'\n" "$srcVersion"

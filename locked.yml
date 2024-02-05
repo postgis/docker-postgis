@@ -1,7 +1,7 @@
 
 # unique locked versions we want to build
 # initialize directory with : touch 14-l3.1.9gcp/bookworm/Dockerfile
-# this file will be append to  version.json
+# this file will be append to 'version.json'
 
 '14-l3.1.9gcp':
   'bookworm':
@@ -13,6 +13,7 @@
     PG_DOCKER: '14'
     arch: 'amd64 arm64'
     template: 'Dockerfile.master.template'
+    initfile: 'initdb-postgis.sh'
     POSTGIS_CHECKOUT: 'tags/3.1.9'
     POSTGIS_CHECKOUT_SHA1: '95a641b1747721d7004c5f0133b918d034035319'
     PROJ_CHECKOUT: 'tags/6.3.1'

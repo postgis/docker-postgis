@@ -19,8 +19,8 @@ ARG IMAGE_NAME=postgis-amd64
 ARG PGIS1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:16-3.4-bookworm
 
 ARG PGIS1_MOBILITYDB_REPOSITORY=https://github.com/MobilityDB/MobilityDB.git
-ARG PGIS1_MOBILITYDB_CHECKOUT=tags/v1.1.0-beta1
-ARG PGIS1_MOBILITYDB_CHECKOUT_SHA1=641d0818542acbfadbfbb54b131a3af75f8dc809
+ARG PGIS1_MOBILITYDB_CHECKOUT=tags/v1.1.0rc1
+ARG PGIS1_MOBILITYDB_CHECKOUT_SHA1=ce47e74d0afa2285997cb5f4b40f23da8fd4f191
 
 ARG PGIS1_PGSQL_HTTP_REPOSITORY=https://github.com/pramsey/pgsql-http.git
 ARG PGIS1_PGSQL_HTTP_CHECKOUT=tags/v1.6.0
@@ -39,7 +39,11 @@ ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL16_1_6_0
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1=fa0a461af929c06f7c96956369458456c26e7ad9
 
+ARG PGIS1_DUCKDB_CHECKOUT=tags/v0.9.2
+
 FROM ${PGIS1_BASE_IMAGE} AS builder
+
+ARG PGIS1_DUCKDB_CHECKOUT
 
 RUN set -eux \
     && apt-get update \
@@ -50,6 +54,7 @@ RUN set -eux \
       bison \
       build-essential \
       cmake \
+      curl \
       g++ \
       git \
       make \
@@ -82,6 +87,21 @@ RUN set -eux \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}
+RUN arch=$(uname -m) && \
+    DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed 's/tags\///') && \
+    case "$arch" in \
+        x86_64) \
+            duck_binary="duckdb_cli-linux-amd64.zip" ;; \
+        aarch64) \
+            duck_binary="duckdb_cli-linux-arm64.zip" ;; \
+        *) \
+            echo "Unsupported architecture: $arch"; exit 1 ;; \
+    esac && \
+    wget https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/$duck_binary \
+    && unzip $duck_binary -d /usr/local/bin \
+    && rm $duck_binary \
+    && duckdb --version
 
 FROM builder as builder-http-gzip
 
@@ -207,13 +227,18 @@ ARG PGIS1_PG_HINT_PLAN_CHECKOUT
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
 
 # Add hydradatabase
+# TODO hydradatabase version!
 RUN set -eux \
     && git clone --depth 1  https://github.com/hydradatabase/hydra  \
     && cd hydra/columnar \
     && git checkout main \
+    && export COLUMNAR_O3=1 \
     && ./configure \
     && make -j$(nproc) \
     && make install
+
+# pg_quack is not available for PG16
+# - https://github.com/hydradatabase/pg_quack/issues/3
 
 # install pg_hint_plan
 RUN set -eux \
@@ -233,6 +258,11 @@ RUN set -eux \
     && cd postgres_dba  \
     && rm -rf .git
 
+RUN set -eux \
+    && git clone --depth 1 https://github.com/dr-jts/pg_svg.git \
+    && cd pg_svg  \
+    && rm -rf .git
+    #install:  psql < /pg_svg/pg-svg-lib.sql
 
 FROM ${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:16-3.4-bookworm
 
@@ -316,7 +346,7 @@ RUN set -eux \
         postgresql-$PG_MAJOR-pgrouting-scripts \
         postgresql-$PG_MAJOR-pgsphere \
         postgresql-$PG_MAJOR-pgtap \
-        postgresql-$PG_MAJOR-pgvector \        
+        postgresql-$PG_MAJOR-pgvector \
         postgresql-$PG_MAJOR-pldebugger \
         postgresql-$PG_MAJOR-plpgsql-check \
         postgresql-$PG_MAJOR-pointcloud \
@@ -340,6 +370,34 @@ RUN set -eux \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+ARG PGIS1_DUCKDB_CHECKOUT
+ENV PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}
+RUN arch=$(uname -m) && \
+    DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed 's/tags\///') && \
+    echo "DUCKDB_VERSION=${DUCKDB_VERSION}" && \
+    echo "PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}" && \
+    case "$arch" in \
+        x86_64) \
+            duck_binary="duckdb_cli-linux-amd64.zip" ;; \
+        aarch64) \
+            duck_binary="duckdb_cli-linux-arm64.zip" ;; \
+        *) \
+            echo "Unsupported architecture: $arch"; exit 1 ;; \
+    esac && \
+    wget https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/$duck_binary \
+    && unzip $duck_binary -d /usr/local/bin \
+    && rm $duck_binary \
+    && duckdb --version
+
+# install extensions
+# https://duckdb.org/docs/extensions/overview.html
+ENV DUCKDB_EXTENSIONS="arrow autocomplete excel fts httpfs icu inet json parquet postgres_scanner spatial sqlite_scanner substrait tpcds tpch visualizer"
+RUN for e in ${DUCKDB_EXTENSIONS} ; do \
+        echo "Installing $e ..."; \
+        duckdb -c "INSTALL $e;"; \
+        echo "LOAD $e;" >> $HOME/.duckdbrc; \
+    done
+
 # Install from stages
 COPY --from=builder-http-gzip   /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
 COPY --from=builder-http-gzip   /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
@@ -356,7 +414,8 @@ COPY --from=builder-pgxn        /usr/lib/postgresql/$PG_MAJOR/lib          /usr/
 COPY --from=builder-other       /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
 COPY --from=builder-other       /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
 
-COPY --from=builder-other /postgres_dba                              /postgres_dba
+COPY --from=builder-other /postgres_dba    /postgres_dba
+COPY --from=builder-other /pg_svg          /pg_svg
 
 # check any missing dependencies
 RUN set -eux \
@@ -383,3 +442,5 @@ RUN set -eux \
 
 # for postgres_dba Use ":dba" to see menu
 RUN printf "%s %s %s %s\n" \\set dba \'\\\\i /postgres_dba/start.psql\' >> ~/.psqlrc
+
+COPY ./initdb-bundle0.sh /docker-entrypoint-initdb.d/11_bundle0.sh
