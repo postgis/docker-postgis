@@ -15,19 +15,19 @@ ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
 ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
-ARG PGIS1_POSTGIS_CHECKOUT=fcdf1f229798936166f8b859d4aeb76a2cf5fc39
-ARG PGIS1_GEOS_CHECKOUT=8d87edcd51653b47ca955cc3a9ac744f41988d92
-ARG PGIS1_GDAL_CHECKOUT=51bf34064205f5bd78cc5e592feec902ce55f111
-ARG PGIS1_PROJ_CHECKOUT=a3b225fc9e8ae4423449c2862833bf747a4573ad
-ARG PGIS1_SFCGAL_CHECKOUT=61f3b08ade49493b56c6bafa98c7c1f84addbc10
-ARG PGIS1_CGAL_CHECKOUT=7249b2e3ed815d5516faa58034d7a02bbcb9a909
+ARG PGIS1_POSTGIS_CHECKOUT=master
+ARG PGIS1_GEOS_CHECKOUT=main
+ARG PGIS1_GDAL_CHECKOUT=master
+ARG PGIS1_PROJ_CHECKOUT=master
+ARG PGIS1_SFCGAL_CHECKOUT=master
+ARG PGIS1_CGAL_CHECKOUT=5.6.x-branch
 
-ARG PGIS1_POSTGIS_CHECKOUT_SHA1=fcdf1f229798936166f8b859d4aeb76a2cf5fc39
-ARG PGIS1_GEOS_CHECKOUT_SHA1=8d87edcd51653b47ca955cc3a9ac744f41988d92
-ARG PGIS1_GDAL_CHECKOUT_SHA1=51bf34064205f5bd78cc5e592feec902ce55f111
-ARG PGIS1_PROJ_CHECKOUT_SHA1=a3b225fc9e8ae4423449c2862833bf747a4573ad
-ARG PGIS1_SFCGAL_CHECKOUT_SHA1=61f3b08ade49493b56c6bafa98c7c1f84addbc10
-ARG PGIS1_CGAL_CHECKOUT_SHA1=7249b2e3ed815d5516faa58034d7a02bbcb9a909
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=nocheck
+ARG PGIS1_GEOS_CHECKOUT_SHA1=nocheck
+ARG PGIS1_GDAL_CHECKOUT_SHA1=nocheck
+ARG PGIS1_PROJ_CHECKOUT_SHA1=nocheck
+ARG PGIS1_SFCGAL_CHECKOUT_SHA1=nocheck
+ARG PGIS1_CGAL_CHECKOUT_SHA1=nocheck
 
 ARG PGIS1_BOOST_VERSION=1.74.0
 
@@ -132,8 +132,17 @@ RUN set -eux \
     && git remote add origin ${PGIS1_CGAL_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_CGAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_CGAL_CHECKOUT_SHA1" ]; then exit 1; fi \
+    # Skip SHA1 check if PGIS1_CGAL_CHECKOUT_SHA1 is empty or 'nocheck'
+    # Otherwise, verify that the commit hash matches PGIS1_CGAL_CHECKOUT_SHA1
+    && if [ -z "${PGIS1_CGAL_CHECKOUT_SHA1}" ] \
+       || [ "${PGIS1_CGAL_CHECKOUT_SHA1}" = "nocheck" ]; then \
+         echo "Skipping CGAL SHA1 check"; \
+       else \
+         if [ "$(git rev-parse HEAD)" != "${PGIS1_CGAL_CHECKOUT_SHA1}" ]; then \
+           echo "CGAL SHA1 problem! Stop!"; \
+           exit 1; \
+         fi; \
+       fi \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && mkdir SFCGAL \
@@ -142,8 +151,17 @@ RUN set -eux \
     && git remote add origin ${PGIS1_SFCGAL_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_SFCGAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_SFCGAL_CHECKOUT_SHA1" ]; then exit 1; fi \
+    # Skip SHA1 check if PGIS1_SFCGAL_CHECKOUT_SHA1 is empty or 'nocheck'
+    # Otherwise, verify that the commit hash matches PGIS1_SFCGAL_CHECKOUT_SHA1
+    && if [ -z "${PGIS1_SFCGAL_CHECKOUT_SHA1}" ] \
+       || [ "${PGIS1_SFCGAL_CHECKOUT_SHA1}" = "nocheck" ]; then \
+         echo "Skipping SFCGAL SHA1 check"; \
+       else \
+         if [ "$(git rev-parse HEAD)" != "${PGIS1_SFCGAL_CHECKOUT_SHA1}" ]; then \
+           echo "SFCGAL SHA1 problem! Stop!"; \
+           exit 1; \
+         fi; \
+       fi \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -178,8 +196,17 @@ RUN set -eux \
     && git remote add origin ${PGIS1_PROJ_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_PROJ_CHECKOUT} \
     && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_PROJ_CHECKOUT_SHA1" ]; then exit 1; fi \
+    # Skip SHA1 check if PGIS1_PROJ_CHECKOUT_SHA1 is empty or 'nocheck'
+    # Otherwise, verify that the commit hash matches PGIS1_PROJ_CHECKOUT_SHA1
+    && if [ -z "${PGIS1_PROJ_CHECKOUT_SHA1}" ] \
+       || [ "${PGIS1_PROJ_CHECKOUT_SHA1}" = "nocheck" ]; then \
+         echo "Skipping PROJ SHA1 check"; \
+       else \
+         if [ "$(git rev-parse HEAD)" != "${PGIS1_PROJ_CHECKOUT_SHA1}" ]; then \
+           echo "PROJ SHA1 problem! Stop!"; \
+           exit 1; \
+         fi; \
+       fi \
     && git log -1 > /_pgis_proj_last_commit.txt \
     # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
     && if [ -f "autogen.sh" ] ; then \
@@ -221,8 +248,17 @@ RUN set -eux \
     && git remote add origin ${PGIS1_GEOS_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_GEOS_CHECKOUT} \
     && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_GEOS_CHECKOUT_SHA1" ]; then exit 1; fi \
+    # Skip SHA1 check if PGIS1_GEOS_CHECKOUT_SHA1 is empty or 'nocheck'
+    # Otherwise, verify that the commit hash matches PGIS1_GEOS_CHECKOUT_SHA1
+    && if [ -z "${PGIS1_GEOS_CHECKOUT_SHA1}" ] \
+       || [ "${PGIS1_GEOS_CHECKOUT_SHA1}" = "nocheck" ]; then \
+         echo "Skipping GEOS SHA1 check"; \
+       else \
+         if [ "$(git rev-parse HEAD)" != "${PGIS1_GEOS_CHECKOUT_SHA1}" ]; then \
+           echo "GEOS SHA1 problem! Stop!"; \
+           exit 1; \
+         fi; \
+       fi \
     && git log -1 > /_pgis_geos_last_commit.txt \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -258,8 +294,17 @@ RUN set -eux \
     && git remote add origin ${PGIS1_GDAL_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_GDAL_CHECKOUT} \
     && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_GDAL_CHECKOUT_SHA1" ]; then exit 1; fi \
+    # Skip SHA1 check if PGIS1_GDAL_CHECKOUT_SHA1 is empty or 'nocheck'
+    # Otherwise, verify that the commit hash matches PGIS1_GDAL_CHECKOUT_SHA1
+    && if [ -z "${PGIS1_GDAL_CHECKOUT_SHA1}" ] \
+       || [ "${PGIS1_GDAL_CHECKOUT_SHA1}" = "nocheck" ]; then \
+         echo "Skipping GDAL SHA1 check"; \
+       else \
+         if [ "$(git rev-parse HEAD)" != "${PGIS1_GDAL_CHECKOUT_SHA1}" ]; then \
+           echo "GDAL SHA1 problem! Stop!"; \
+           exit 1; \
+         fi; \
+       fi \
     && git log -1 > /_pgis_gdal_last_commit.txt \
     \
     # gdal project directory structure - has been changed !
@@ -490,8 +535,17 @@ RUN set -eux \
     && git remote add origin ${PGIS1_POSTGIS_REPOSITORY} \
     && git fetch --depth 1 origin ${PGIS1_POSTGIS_CHECKOUT} \
     && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_POSTGIS_CHECKOUT_SHA1" ]; then exit 1; fi \
+    # Skip SHA1 check if PGIS1_POSTGIS_CHECKOUT_SHA1 is empty or 'nocheck'
+    # Otherwise, verify that the commit hash matches PGIS1_POSTGIS_CHECKOUT_SHA1
+    && if [ -z "${PGIS1_POSTGIS_CHECKOUT_SHA1}" ] \
+       || [ "${PGIS1_POSTGIS_CHECKOUT_SHA1}" = "nocheck" ]; then \
+         echo "Skipping POSTGIS SHA1 check"; \
+       else \
+         if [ "$(git rev-parse HEAD)" != "${PGIS1_POSTGIS_CHECKOUT_SHA1}" ]; then \
+           echo "POSTGIS SHA1 problem! Stop!"; \
+           exit 1; \
+         fi; \
+       fi \
     && git log -1 > /_pgis_last_commit.txt \
     && ./autogen.sh \
 # configure options taken from:

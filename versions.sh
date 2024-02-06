@@ -27,12 +27,25 @@ postgres_latest="16"
 postgis_versions="3.0 3.1 3.2 3.3 3.4"
 postgres_versions="11 12 13 14 15 16"
 
-# locking versions for dependencies
+
+# MASTER_BRANCH_MODE='flexible'=if you want to use the latest version of the dependencies - automatically
+#   if not set, it will use the locked version, and the checkout hash will be used
+MASTER_BRANCH_MODE="flexible"
+
+POSTGIS_BRANCH="master"
+GEOS_BRANCH="main"
+GDAL_BRANCH="master"
+PROJ_BRANCH="master"
+SFCGAL_BRANCH="master"
+CGAL_BRANCH="5.6.x-branch"
+
+# locked:  extra locking versions for dependencies
 CGAL_CHECKOUT_LOCK=""
 SFCGAL_CHECKOUT_LOCK=""
 GEOS_CHECKOUT_LOCK=""
 PROJ_CHECKOUT_LOCK=""
 GDAL_CHECKOUT_LOCK=""
+
 
 declare -A postgisDebPkgNameVersionSuffixes=(
     [3.0]='3'
@@ -579,18 +592,33 @@ for version in "${versions[@]}"; do
                         printf "    template: '%s'\n" "Dockerfile.master.template"
                         printf "    initfile: '%s'\n" "initdb-postgis.sh"
 
-                        printf "    POSTGIS_CHECKOUT: '%s'\n" "$postgisGitHash"
-                        printf "    POSTGIS_CHECKOUT_SHA1: '%s'\n" "$postgisGitHash"
-                        printf "    CGAL_CHECKOUT: '%s'\n" "$cgal5XGitHash"
-                        printf "    CGAL_CHECKOUT_SHA1: '%s'\n" "$cgal5XGitHash"
-                        printf "    SFCGAL_CHECKOUT: '%s'\n" "$sfcgalGitHash"
-                        printf "    SFCGAL_CHECKOUT_SHA1: '%s'\n" "$sfcgalGitHash"
-                        printf "    PROJ_CHECKOUT: '%s'\n" "$projGitHash"
-                        printf "    PROJ_CHECKOUT_SHA1: '%s'\n" "$projGitHash"
-                        printf "    GDAL_CHECKOUT: '%s'\n" "$gdalGitHash"
-                        printf "    GDAL_CHECKOUT_SHA1: '%s'\n" "$gdalGitHash"
-                        printf "    GEOS_CHECKOUT: '%s'\n" "$geosGitHash"
-                        printf "    GEOS_CHECKOUT_SHA1: '%s'\n" "$geosGitHash"
+                        if [[ "$MASTER_BRANCH_MODE" == "flexible" ]]; then
+                            printf "    POSTGIS_CHECKOUT: '%s'\n" "$POSTGIS_BRANCH"
+                            printf "    POSTGIS_CHECKOUT_SHA1: 'nocheck'\n"
+                            printf "    CGAL_CHECKOUT: '%s'\n" "$CGAL_BRANCH"
+                            printf "    CGAL_CHECKOUT_SHA1: 'nocheck'\n"
+                            printf "    SFCGAL_CHECKOUT: '%s'\n" "$SFCGAL_BRANCH"
+                            printf "    SFCGAL_CHECKOUT_SHA1: 'nocheck'\n"
+                            printf "    PROJ_CHECKOUT: '%s'\n" "$PROJ_BRANCH"
+                            printf "    PROJ_CHECKOUT_SHA1: 'nocheck'\n"
+                            printf "    GDAL_CHECKOUT: '%s'\n" "$GDAL_BRANCH"
+                            printf "    GDAL_CHECKOUT_SHA1: 'nocheck'\n"
+                            printf "    GEOS_CHECKOUT: '%s'\n" "$GEOS_BRANCH"
+                            printf "    GEOS_CHECKOUT_SHA1: 'nocheck'\n"
+                        else
+                            printf "    POSTGIS_CHECKOUT: '%s'\n" "$postgisGitHash"
+                            printf "    POSTGIS_CHECKOUT_SHA1: '%s'\n" "$postgisGitHash"
+                            printf "    CGAL_CHECKOUT: '%s'\n" "$cgal5XGitHash"
+                            printf "    CGAL_CHECKOUT_SHA1: '%s'\n" "$cgal5XGitHash"
+                            printf "    SFCGAL_CHECKOUT: '%s'\n" "$sfcgalGitHash"
+                            printf "    SFCGAL_CHECKOUT_SHA1: '%s'\n" "$sfcgalGitHash"
+                            printf "    PROJ_CHECKOUT: '%s'\n" "$projGitHash"
+                            printf "    PROJ_CHECKOUT_SHA1: '%s'\n" "$projGitHash"
+                            printf "    GDAL_CHECKOUT: '%s'\n" "$gdalGitHash"
+                            printf "    GDAL_CHECKOUT_SHA1: '%s'\n" "$gdalGitHash"
+                            printf "    GEOS_CHECKOUT: '%s'\n" "$geosGitHash"
+                            printf "    GEOS_CHECKOUT_SHA1: '%s'\n" "$geosGitHash"
+                        fi
 
                         printf "    BOOST_VERSION: '%s'\n" "${boostVersion[$variant]}"
                     } >>_versions.yml
