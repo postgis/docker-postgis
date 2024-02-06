@@ -213,17 +213,11 @@ ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
 # Add hydradatabase
 # TODO hydradatabase version!
 RUN set -eux \
-    && git clone --depth 1  https://github.com/hydradatabase/hydra  \
+    && git clone --depth 1 https://github.com/hydradatabase/hydra  \
     && cd hydra/columnar \
     && git checkout main \
     && export COLUMNAR_O3=1 \
     && ./configure \
-    && make -j$(nproc) \
-    && make install
-
-RUN set -eux \
-    && git clone --depth 1  https://github.com/hydradatabase/pg_stringtheory \
-    && cd pg_stringtheory \
     && make -j$(nproc) \
     && make install
 

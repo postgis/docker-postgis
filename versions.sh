@@ -27,7 +27,6 @@ postgres_latest="16"
 postgis_versions="3.0 3.1 3.2 3.3 3.4"
 postgres_versions="11 12 13 14 15 16"
 
-
 # MASTER_BRANCH_MODE='flexible'=if you want to use the latest version of the dependencies - automatically
 #   if not set, it will use the locked version, and the checkout hash will be used
 MASTER_BRANCH_MODE="flexible"
@@ -45,7 +44,6 @@ SFCGAL_CHECKOUT_LOCK=""
 GEOS_CHECKOUT_LOCK=""
 PROJ_CHECKOUT_LOCK=""
 GDAL_CHECKOUT_LOCK=""
-
 
 declare -A postgisDebPkgNameVersionSuffixes=(
     [3.0]='3'
