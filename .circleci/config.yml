@@ -30,24 +30,13 @@ jobs:
           docker-username: DOCKERHUB_USERNAME
           docker-password: DOCKERHUB_ACCESS_TOKEN
 
-        - run:
-            name: Check Docker Hub Rate Limits
-            command: |
-              # Use a lightweight image for checking rate limits
-              IMAGE_TO_PULL="hello-world"
-
-              # Pulling the image to trigger rate limit headers
-              docker pull $IMAGE_TO_PULL
-
-              # Using curl to fetch just the HTTP headers and grep to extract rate limit info
-              # Note: Replace `library/$IMAGE_TO_PULL` with the appropriate image path if using a different image
-              TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/$IMAGE_TO_PULL:pull" | jq -r .token)
-              HEADERS=$(curl -I -H "Authorization: Bearer $TOKEN" https://registry-1.docker.io/v2/library/$IMAGE_TO_PULL/manifests/latest)
-
-              echo "Rate Limit Info:"
-              echo "$HEADERS" | grep -i "RateLimit-Limit"
-              echo "$HEADERS" | grep -i "RateLimit-Remaining"
-              echo "$HEADERS" | grep -i "RateLimit-Reset"
+      - run:
+          name: Docker Ratelimit Check
+          command: |
+            TOKEN=$(curl --user "$DOCKERHUB_USERNAME:$DOCKERHUB_ACCESS_TOKEN" "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull" | jq -r .token)
+            HEADERS=$(curl --head -H "Authorization: Bearer $TOKEN" https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest)
+            echo "Rate Limit Info:"
+            echo "$HEADERS" | grep ratelimit
 
       - run: uname -a
       - run: docker --version
