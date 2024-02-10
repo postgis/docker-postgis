@@ -36,7 +36,6 @@ jobs:
             echo 'pipeline.trigger_source: <<pipeline.trigger_source>>'
             echo 'pipeline.schedule.name:<< pipeline.schedule.name >>'
             echo 'pipeline.schedule.id:<< pipeline.schedule.id >>'
-            echo 'pipeline.trigger_parameters.github_app.type:<< pipeline.trigger_parameters.github_app.type >>'
 
       - docker/check:
           registry: docker.io
