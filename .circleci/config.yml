@@ -5,7 +5,7 @@ version: 2.1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/docker
-  docker: circleci/docker@2.4.0
+  docker: circleci/docker@2.5.0
   # https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@2.1.1
   # https://circleci.com/developer/orbs/orb/circleci/shellcheck
@@ -31,7 +31,8 @@ jobs:
           docker-password: DOCKERHUB_ACCESS_TOKEN
 
       - run:
-          name: Docker Ratelimit Check
+          name: Docker Ratelimit Check - before
+          # https://docs.docker.com/docker-hub/download-rate-limit/
           command: |
             TOKEN=$(curl --user "$DOCKERHUB_USERNAME:$DOCKERHUB_ACCESS_TOKEN" "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull" | jq -r .token)
             HEADERS=$(curl --head -H "Authorization: Bearer $TOKEN" https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest)
@@ -82,6 +83,16 @@ jobs:
               make manifest-<< parameters.target-version-variant >>
               echo "...push and manifest done..."
             fi
+
+      - run:
+          name: Docker Ratelimit Check - after
+          # https://docs.docker.com/docker-hub/download-rate-limit/
+          command: |
+            TOKEN=$(curl --user "$DOCKERHUB_USERNAME:$DOCKERHUB_ACCESS_TOKEN" "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull" | jq -r .token)
+            HEADERS=$(curl --head -H "Authorization: Bearer $TOKEN" https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest)
+            echo "Rate Limit Info:"
+            echo "$HEADERS" | grep ratelimit
+
 
 workflows:
   build-deploy:
