@@ -25,6 +25,20 @@ jobs:
         type: string
     steps:
       - checkout
+
+      - run:
+          name: Display pipeline.* values
+          command: |
+            echo 'pipeline.git.branch: <<pipeline.git.branch>>'
+            echo 'pipeline.git.revision: <<pipeline.git.revision>>'
+            echo 'pipeline.id: <<pipeline.id>>'
+            echo 'pipeline.project.git_url: <<pipeline.project.git_url>>'
+            echo 'pipeline.trigger_source: <<pipeline.trigger_source>>'
+            echo 'pipeline.schedule.name:<< pipeline.schedule.name >>'
+            echo 'pipeline.schedule.id:<< pipeline.schedule.id >>'
+            echo 'pipeline.trigger_parameters.circleci.event_type:<< pipeline.trigger_parameters.circleci.event_type >>'
+            echo 'pipeline.trigger_parameters.github_app.type:<< pipeline.trigger_parameters.github_app.type >>'
+
       - docker/check:
           registry: docker.io
           docker-username: DOCKERHUB_USERNAME
@@ -48,6 +62,7 @@ jobs:
       - run: tools/install_dive.sh
       - run: tools/environment_init.sh
       - run: make check_version
+
       - run:
           name: Conditional Docker Check - Halt if not on master branch or if it's a PR or Weekly image exists
           command: |
@@ -96,7 +111,8 @@ jobs:
 
 workflows:
   build-deploy:
-#   AND triggered by weekly from the app.circleci.com UI
+#   AND triggered by the app.circleci.com UI
+#   daily run : Repeats everyday every month ; 6:00am UTC, 1 (once per hour).
     jobs:
       - build-arm64:
           matrix:

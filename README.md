@@ -36,7 +36,7 @@ We provide multi-platform image support for the following architectures:
 
 - `amd64`: Also known as x86-64.
   -  Use `--platform=linux/amd64` when specifying the platform.
-- `arm64`: Also known as AArch64.
+- `arm64`: Also known as AArch64.  
   - Use `--platform=linux/arm64` when specifying the platform.
 
 Notes:
@@ -44,12 +44,20 @@ Notes:
 - The `arm64` architecture support is still experimental. Please refer to the 'arch' column in the version information to determine whether an `arm64` version is available for a specific release.
 - We currently do not support 32-bit architectures. Our images are only available for 64-bit architectures.
 
+## Build Status
+
+| Arch | Build system | Status|
+| ---- | :-:          | :-:   |
+| Amd64| [GithubCI-logs](https://github.com/ImreSamu/docker-postgis/actions/workflows/main.yml)     | [![Build PostGIS images](https://github.com/ImreSamu/docker-postgis/actions/workflows/main.yml/badge.svg)](https://github.com/ImreSamu/docker-postgis/actions/workflows/main.yml) |
+| Arm64 | [CircleCI-logs](https://app.circleci.com/pipelines/github/ImreSamu/docker-postgis) | [![CircleCI](https://dl.circleci.com/status-badge/img/gh/ImreSamu/docker-postgis/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/ImreSamu/docker-postgis/tree/master) |
+
 ### 🌟Recommended Versions for New Users
 
 For those new to PostGIS, we recommend the following image versions:
 
-- `imresamu/postgis:15-3.4`: This image includes a minimal setup of PostgreSQL with the PostGIS extension.
-- `imresamu/postgis:15-3.4-bundle`: This image includes additional geospatial-related extras along with PostgreSQL and PostGIS.
+- `imresamu/postgis:16-3.4`: This image includes a minimal setup of PostgreSQL with the PostGIS extension.
+- `imresamu/postgis:16-recent-bookworm`: (experimental) Latest postgis with the latest geos,proj,gdal,sfcgal
+- `imresamu/postgis:16-3.4-bundle0-bookworm`: (experimental) This image includes additional geospatial-related extras along with PostgreSQL and PostGIS.
 
 ### 🥇Debian - bookworm  (recommended)
 
