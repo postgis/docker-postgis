@@ -284,7 +284,7 @@ ENV PGIS1_GDAL_CHECKOUT ${PGIS1_GDAL_CHECKOUT}
 ARG PGIS1_GDAL_CHECKOUT_SHA1
 
 
-# 
+#
 
 ## GDAL_build-end
 
@@ -467,6 +467,9 @@ RUN set -eux \
     && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
+# Specify GDAL config path for PostGIS build
+ENV GDAL_CONFIG /usr/local/bin/gdal-config
+
 # temporary workaround for : nitdb: invalid locale settings; check LANG and LC_* environment variables
 #   https://github.com/docker-library/postgres/issues/1112#issuecomment-1746076388
 RUN set -eux \
@@ -528,6 +531,7 @@ RUN set -eux \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
+    && ldconfig \
     && ./configure \
         --enable-lto \
     && make -j$(nproc) \
