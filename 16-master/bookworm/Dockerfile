@@ -29,12 +29,16 @@ ARG PGIS1_PROJ_CHECKOUT_SHA1=nocheck
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1=nocheck
 ARG PGIS1_CGAL_CHECKOUT_SHA1=nocheck
 
+ARG PGIS1_GDAL_BUILD=with_extra
+
 ARG PGIS1_BOOST_VERSION=1.74.0
 
 ARG PGIS1_CMAKE_BUILD_TYPE=Release
 
+# gdal_build:
 ARG PGIS1_ARROW_VERSION=15.0.0-1
 ARG PGIS1_ARROW_SOVERSION=1500
+# --
 
 FROM ${PGIS1_BASE_IMAGE} as builder
 
@@ -42,31 +46,6 @@ WORKDIR /
 
 ARG PGIS1_BOOST_VERSION
 ENV PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
-
-ARG PGIS1_ARROW_VERSION
-ARG PGIS1_ARROW_SOVERSION
-
-# Install Arrow C++
-#  also check the "Build final image" section too, for the final installation
-RUN set -eux \
-    # add backports \
-    && echo 'deb http://deb.debian.org/debian bookworm-backports main' > /etc/apt/sources.list.d/backports.list \
-    \
-    && apt-get update \
-    && apt install -y -V ca-certificates wget \
-    && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
-    && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
-    && apt-get update \
-    && apt-cache showpkg libarrow-dev \
-    && apt-get install -y --no-install-recommends \
-      # Install Arrow C++ \
-      libarrow${PGIS1_ARROW_SOVERSION} \
-      libparquet${PGIS1_ARROW_SOVERSION} \
-      libarrow-dataset${PGIS1_ARROW_SOVERSION} \
-      libarrow-dev=${PGIS1_ARROW_VERSION} \
-      libparquet-dev=${PGIS1_ARROW_VERSION} \
-      libarrow-acero-dev=${PGIS1_ARROW_VERSION} \
-      libarrow-dataset-dev=${PGIS1_ARROW_VERSION}
 
 # apt-get install
 RUN set -eux \
@@ -120,19 +99,8 @@ RUN set -eux \
       protobuf-c-compiler \
       xsltproc \
       # gdal+
-      libblosc-dev \
-      libcfitsio-dev \
-      libfreexl-dev \
-      libfyba-dev \
-      libhdf5-dev \
-      libkml-dev \
       liblz4-dev \
       liblzma-dev \
-      libnetcdf-dev \
-      libopenjp2-7-dev \
-      libqhull-dev \
-      libspatialite-dev \
-      libheif-dev \
       libwebp-dev \
       libzstd-dev
 
@@ -316,10 +284,20 @@ ARG PGIS1_GDAL_CHECKOUT
 ENV PGIS1_GDAL_CHECKOUT ${PGIS1_GDAL_CHECKOUT}
 ARG PGIS1_GDAL_CHECKOUT_SHA1
 
+
 ARG PGIS1_ARROW_VERSION
 ARG PGIS1_ARROW_SOVERSION
-
-RUN apt-get install -y --no-install-recommends \
+# Install Arrow C++
+#  also check the "Build final image" section too, for the final installation
+RUN set -eux \
+    # add backports \
+    && apt-get update \
+    && apt install -y -V ca-certificates wget \
+    && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
+    && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
+    && apt-get update \
+    && apt-cache showpkg libarrow-dev \
+    && apt-get install -y --no-install-recommends \
       # Install Arrow C++ \
       libarrow${PGIS1_ARROW_SOVERSION} \
       libparquet${PGIS1_ARROW_SOVERSION} \
@@ -327,7 +305,21 @@ RUN apt-get install -y --no-install-recommends \
       libarrow-dev=${PGIS1_ARROW_VERSION} \
       libparquet-dev=${PGIS1_ARROW_VERSION} \
       libarrow-acero-dev=${PGIS1_ARROW_VERSION} \
-      libarrow-dataset-dev=${PGIS1_ARROW_VERSION}
+      libarrow-dataset-dev=${PGIS1_ARROW_VERSION} \
+      \
+      libblosc-dev \
+      libcfitsio-dev \
+      libfreexl-dev \
+      libfyba-dev \
+      libhdf5-dev \
+      libheif-dev \
+      libkml-dev \
+      libnetcdf-dev \
+      libopenjp2-7-dev \
+      libqhull-dev \
+      libspatialite-dev
+
+## GDAL_build-end
 
 RUN set -eux \
     && ldconfig \
@@ -378,34 +370,35 @@ RUN set -eux \
             \
             -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
             -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
-            -DGDAL_USE_ARROW=ON \
-            -DGDAL_USE_ARROWDATASET=ON \
-            -DGDAL_USE_BLOSC=ON \
-            -DGDAL_USE_CFITSIO=ON \
             -DGDAL_USE_CURL=ON \
             -DGDAL_USE_DEFLATE=ON \
             -DGDAL_USE_EXPAT=ON \
-            -DGDAL_USE_FREEXL=ON \
-            -DGDAL_USE_FYBA=ON \
             -DGDAL_USE_GEOS=ON \
-            -DGDAL_USE_HDF5=ON \
-            -DGDAL_USE_HEIF=ON \
             -DGDAL_USE_JSONC=ON \
-            -DGDAL_USE_LERC_INTERNAL=ON \
-            -DGDAL_USE_LIBKML=ON \
             -DGDAL_USE_LIBLZMA=ON \
             -DGDAL_USE_LZ4=ON \
-            -DGDAL_USE_NETCDF=ON \
-            -DGDAL_USE_OPENJPEG=ON \
-            -DGDAL_USE_PARQUET=ON \
             -DGDAL_USE_POSTGRESQL=ON \
-            -DGDAL_USE_QHULL=ON \
-            -DGDAL_USE_SPATIALITE=ON \
             -DGDAL_USE_SQLITE3=ON \
             -DGDAL_USE_TIFF=ON \
             -DGDAL_USE_WEBP=ON \
             -DGDAL_USE_ZLIB=ON \
             -DGDAL_USE_ZSTD=ON \
+            \
+            -DGDAL_USE_ARROW=ON \
+            -DGDAL_USE_ARROWDATASET=ON \
+            -DGDAL_USE_BLOSC=ON \
+            -DGDAL_USE_CFITSIO=ON \
+            -DGDAL_USE_FREEXL=ON \
+            -DGDAL_USE_FYBA=ON \
+            -DGDAL_USE_HDF5=ON \
+            -DGDAL_USE_HEIF=ON \
+            -DGDAL_USE_LERC_INTERNAL=ON \
+            -DGDAL_USE_LIBKML=ON \
+            -DGDAL_USE_NETCDF=ON \
+            -DGDAL_USE_OPENJPEG=ON \
+            -DGDAL_USE_PARQUET=ON \
+            -DGDAL_USE_QHULL=ON \
+            -DGDAL_USE_SPATIALITE=ON \
         ; \
     fi \
     \
@@ -438,16 +431,15 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
 ARG PGIS1_CMAKE_BUILD_TYPE
 ARG PGIS1_BASE_IMAGE
 ARG PGIS1_BOOST_VERSION
-ARG PGIS1_ARROW_SOVERSION
 
 ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
     PGIS1_BASE_IMAGE=${PGIS1_BASE_IMAGE} \
     PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
+# Install Arrow + Parquet + other GDAL extra dependencies
+ARG PGIS1_ARROW_SOVERSION
 RUN set -eux \
-    # add backports \
-    && echo 'deb http://deb.debian.org/debian bookworm-backports main' > /etc/apt/sources.list.d/backports.list \
-    # Install Arrow C++
+    # Install Arrow + Parquet
     && apt-get update \
     && apt-get install -y -V ca-certificates wget \
     && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
@@ -457,6 +449,29 @@ RUN set -eux \
       libarrow${PGIS1_ARROW_SOVERSION} \
       libparquet${PGIS1_ARROW_SOVERSION} \
       libarrow-dataset${PGIS1_ARROW_SOVERSION} \
+      \
+      # Install GDAL extra dependencies
+      libblosc1 \
+      libfreexl1 \
+      libfyba0 \
+      libhdf5-103-1 \
+      libheif1 \
+      libkmlbase1 \
+      libkmldom1 \
+      libkmlengine1 \
+      libnetcdf19 \
+      libopenjp2-7 \
+      libqhull-r8.0 \
+      libspatialite7 \
+      netcdf-bin \
+      libcfitsio10 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN set -eux \
+    && apt-get update \
+    && apt-get install -y -V --no-install-recommends \
       \
       curl \
       libboost-atomic${PGIS1_BOOST_VERSION} \
@@ -480,21 +495,6 @@ RUN set -eux \
       libtiff6 \
       libxml2 \
       sqlite3 \
-      # gdal+
-      libblosc1 \
-      libcfitsio10 \
-      libfreexl1 \
-      libfyba0 \
-      libhdf5-103-1 \
-      libheif1 \
-      libkmlbase1 \
-      libkmldom1 \
-      libkmlengine1 \
-      libnetcdf19 \
-      libopenjp2-7 \
-      libqhull-r8.0 \
-      libspatialite7 \
-      netcdf-bin \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -691,6 +691,8 @@ RUN set -eux \
     && ogr2ogr --version \
     && proj \
     && sfcgal-config --version \
+    # check any missing dependencies
+    && ldd /usr/lib/postgresql/$PG_MAJOR/lib/*.so | grep 'not found' && exit 1 || true \
     \
     # Is the "ca-certificates" package installed? (for accessing remote raster files)
     #   https://github.com/postgis/docker-postgis/issues/307

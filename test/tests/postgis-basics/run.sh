@@ -53,3 +53,15 @@ else
     echo "address_standardizer extension test failed, returned response is $response"
     exit 1
 fi
+
+echo "CREATE EXTENSION IF NOT EXISTS postgis;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS postgis_raster;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS address_standardizer;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;" | psql
+echo "CREATE EXTENSION IF NOT EXISTS postgis_topology;" | psql
+echo "SELECT version();" | psql
+echo "SELECT PostGIS_Full_Version();" | psql
+echo "\dx" | psql
