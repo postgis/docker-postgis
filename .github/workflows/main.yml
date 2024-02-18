@@ -25,12 +25,6 @@ jobs:
           - postgres: 16
             postgis: master
             variant: default
-          - postgres: 11
-            postgis: 3.3
-            variant: default
-          - postgres: 11
-            postgis: 3.3
-            variant: alpine
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
     runs-on: ubuntu-20.04
@@ -41,13 +35,13 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
       run: make test
 
     - name: Login to dockerhub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
