@@ -568,8 +568,10 @@ RUN set -eux \
     && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
-# Specify GDAL config path for PostGIS build
+# Specify GDAL_CONFIG and LD_LIBRARY_PATH for PostGIS build;
+# The arm64 build is very senitive.
 ENV GDAL_CONFIG /usr/local/bin/gdal-config
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # temporary workaround for : nitdb: invalid locale settings; check LANG and LC_* environment variables
 #   https://github.com/docker-library/postgres/issues/1112#issuecomment-1746076388
@@ -629,10 +631,10 @@ RUN set -eux \
          fi; \
        fi \
     && git log -1 > /_pgis_last_commit.txt \
+    && ldconfig \
     && ./autogen.sh \
 # configure options taken from:
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
-    && ldconfig \
     && ./configure \
         --enable-lto \
     && make -j$(nproc) \
