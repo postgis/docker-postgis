@@ -388,9 +388,6 @@ ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
     PGIS1_BASE_IMAGE=${PGIS1_BASE_IMAGE} \
     PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
-# minimal GDAL build; so no need extra dependencies
-
-
 RUN set -eux \
     && apt-get update \
     && apt-get install -y -V --no-install-recommends \
@@ -422,6 +419,9 @@ RUN set -eux \
 
 COPY --from=stage0-builder /_pgis*.* /
 COPY --from=stage0-builder /usr/local /usr/local
+
+# minimal GDAL build; so no need extra dependencies
+
 
 ARG PGIS1_GDAL_CHECKOUT
 ARG PGIS1_GDAL_REPOSITORY

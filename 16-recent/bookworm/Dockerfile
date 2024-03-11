@@ -285,8 +285,7 @@ ENV PGIS1_GDAL_CHECKOUT ${PGIS1_GDAL_CHECKOUT}
 ARG PGIS1_GDAL_CHECKOUT_SHA1
 
 
-ARG PGIS1_ARROW_VERSION
-ARG PGIS1_ARROW_SOVERSION
+
 # Install Arrow C++
 #  also check the "Build final image" section too, for the final installation
 RUN set -eux \
@@ -296,9 +295,18 @@ RUN set -eux \
     && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
     && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
     && apt-get update \
+    # Automatically determine the latest PGIS1 Arrow version and SOVERSION
     && apt-cache showpkg libarrow-dev \
+    && PGIS1_ARROW_VERSION=$(apt-cache showpkg libarrow-dev | grep -m1 'Versions:' -A1 | tail -n1 | grep -oP '^\S+') \
+    && apt-cache depends libarrow-dev=${PGIS1_ARROW_VERSION} | tee /_pgis1_libarrow-dev-dependencies.txt \
+    && PGIS1_ARROW_SOVERSION=$(grep 'Depends: libarrow' /_pgis1_libarrow-dev-dependencies.txt | grep -oP 'libarrow\K[0-9]+') \
+    && echo "Detected PGIS1_ARROW_VERSION=$PGIS1_ARROW_VERSION" \
+    && echo "Detected PGIS1_ARROW_SOVERSION=$PGIS1_ARROW_SOVERSION" \
+    # Backup the version variables - reusing in a later stage
+    && echo "PGIS1_ARROW_VERSION=$PGIS1_ARROW_VERSION" > /_pgis1_arrow_environment.env \
+    && echo "PGIS1_ARROW_SOVERSION=$PGIS1_ARROW_SOVERSION" >> /_pgis1_arrow_environment.env \
+    # Install Arrow C++
     && apt-get install -y --no-install-recommends \
-      # Install Arrow C++ \
       libarrow${PGIS1_ARROW_SOVERSION} \
       libparquet${PGIS1_ARROW_SOVERSION} \
       libarrow-dataset${PGIS1_ARROW_SOVERSION} \
@@ -436,39 +444,6 @@ ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
     PGIS1_BASE_IMAGE=${PGIS1_BASE_IMAGE} \
     PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
-# Install Arrow + Parquet + other GDAL extra dependencies
-ARG PGIS1_ARROW_SOVERSION
-RUN set -eux \
-    # Install Arrow + Parquet
-    && apt-get update \
-    && apt-get install -y -V ca-certificates wget \
-    && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
-    && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
-    && apt-get update \
-    && apt-get install -y -V --no-install-recommends \
-      libarrow${PGIS1_ARROW_SOVERSION} \
-      libparquet${PGIS1_ARROW_SOVERSION} \
-      libarrow-dataset${PGIS1_ARROW_SOVERSION} \
-      \
-      # Install GDAL extra dependencies
-      libblosc1 \
-      libfreexl1 \
-      libfyba0 \
-      libhdf5-103-1 \
-      libheif1 \
-      libkmlbase1 \
-      libkmldom1 \
-      libkmlengine1 \
-      libnetcdf19 \
-      libopenjp2-7 \
-      libqhull-r8.0 \
-      libspatialite7 \
-      netcdf-bin \
-      libcfitsio10 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-
 RUN set -eux \
     && apt-get update \
     && apt-get install -y -V --no-install-recommends \
@@ -500,6 +475,43 @@ RUN set -eux \
 
 COPY --from=stage0-builder /_pgis*.* /
 COPY --from=stage0-builder /usr/local /usr/local
+
+# Install Arrow + Parquet + other GDAL extra dependencies
+
+RUN set -eux \
+    # Install Arrow + Parquet
+    && apt-get update \
+    && apt-get install -y -V ca-certificates wget \
+    && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
+    && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
+    && apt-get update \
+    # Load the PGIS1_ARROW version variables
+    && . /_pgis1_arrow_environment.env \
+    # Use the PGIS1_ARROW_SOVERSION as needed
+    && echo "Using PGIS1_ARROW_SOVERSION=$PGIS1_ARROW_SOVERSION" \
+    && apt-get install -y -V --no-install-recommends \
+      libarrow${PGIS1_ARROW_SOVERSION} \
+      libparquet${PGIS1_ARROW_SOVERSION} \
+      libarrow-dataset${PGIS1_ARROW_SOVERSION} \
+      \
+      # Install GDAL extra dependencies
+      libblosc1 \
+      libfreexl1 \
+      libfyba0 \
+      libhdf5-103-1 \
+      libheif1 \
+      libkmlbase1 \
+      libkmldom1 \
+      libkmlengine1 \
+      libnetcdf19 \
+      libopenjp2-7 \
+      libqhull-r8.0 \
+      libspatialite7 \
+      netcdf-bin \
+      libcfitsio10 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 
 ARG PGIS1_GDAL_CHECKOUT
 ARG PGIS1_GDAL_REPOSITORY
