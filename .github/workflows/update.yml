@@ -2,7 +2,7 @@ name: "update_dockerfiles"
 # updating the image code and pushing to the local registry
 on:
   schedule:
-      - cron: '17 19 * * *'
+      - cron: '57 19 * * *'
 
 jobs:
   update_dockerfiles:
@@ -45,7 +45,7 @@ jobs:
         if: env.versions_changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.POSTGIS_PR_REPO_TOKEN }}
+#          token: ${{ secrets.POSTGIS_PR_REPO_TOKEN }}
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           commit-message: Update versions.json and related Dockerfiles
