@@ -2,7 +2,7 @@ name: "update_dockerfiles"
 # updating the image code and pushing to the local registry
 on:
   schedule:
-      - cron: '57 17 * * *'
+      - cron: '57 18 * * *'
 
 jobs:
   update_dockerfiles:
@@ -27,14 +27,16 @@ jobs:
       - name: Check if version.json changed
         id: version_check
         run: |
-          if git diff --name-only | grep -q 'version.json'; then
+          if git diff --name-only | grep 'versions.json'; then
             echo "version.json changed"
-            # echo "versions_changed=true" >> $GITHUB_ENV
+            echo "versions_changed=true" >> $GITHUB_ENV
             # Generate changed versions list
             echo "versions_changed_list=$(./tools/get_versions_changes.sh)" >> $GITHUB_ENV
             echo "versions_changed_list=$(./tools/get_versions_changes.sh)"
             # Generate branch name with date and time
             echo "BRANCH_NAME=updates/$(date +'%Y%m%d_%H%M')" >> $GITHUB_ENV
+          else
+            echo "version.json not changed"
           fi
 
       # https://github.com/peter-evans/create-pull-request
