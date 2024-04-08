@@ -15,6 +15,7 @@ ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
 ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
+# Should valid git checkout ( SHA1, tags, branches )
 ARG PGIS1_POSTGIS_CHECKOUT=master
 ARG PGIS1_GEOS_CHECKOUT=main
 ARG PGIS1_GDAL_CHECKOUT=master
@@ -22,6 +23,8 @@ ARG PGIS1_PROJ_CHECKOUT=master
 ARG PGIS1_SFCGAL_CHECKOUT=master
 ARG PGIS1_CGAL_CHECKOUT=5.6.x-branch
 
+# Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
+# Otherwise, verify that the commit hash matches
 ARG PGIS1_POSTGIS_CHECKOUT_SHA1=nocheck
 ARG PGIS1_GEOS_CHECKOUT_SHA1=nocheck
 ARG PGIS1_GDAL_CHECKOUT_SHA1=nocheck
@@ -29,16 +32,11 @@ ARG PGIS1_PROJ_CHECKOUT_SHA1=nocheck
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1=nocheck
 ARG PGIS1_CGAL_CHECKOUT_SHA1=nocheck
 
-ARG PGIS1_GDAL_BUILD=with_extra
-
 ARG PGIS1_BOOST_VERSION=1.74.0
-
 ARG PGIS1_CMAKE_BUILD_TYPE=Release
 
-# gdal_build:
-ARG PGIS1_ARROW_VERSION=15.0.0-1
-ARG PGIS1_ARROW_SOVERSION=1500
-# --
+ARG PGIS1_GDAL_BUILD=with_extra
+# Full GDAL build ; with arrow, parquet and extra dependencies
 
 FROM ${PGIS1_BASE_IMAGE} as builder
 

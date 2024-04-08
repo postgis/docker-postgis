@@ -15,6 +15,7 @@ ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
 ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
+# Should valid git checkout ( SHA1, tags, branches )
 ARG PGIS1_POSTGIS_CHECKOUT=tags/3.1.9
 ARG PGIS1_GEOS_CHECKOUT=tags/3.6.6
 ARG PGIS1_GDAL_CHECKOUT=tags/v3.6.4
@@ -22,6 +23,8 @@ ARG PGIS1_PROJ_CHECKOUT=tags/6.3.1
 ARG PGIS1_SFCGAL_CHECKOUT=tags/v1.5.1
 ARG PGIS1_CGAL_CHECKOUT=tags/v5.6
 
+# Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
+# Otherwise, verify that the commit hash matches
 ARG PGIS1_POSTGIS_CHECKOUT_SHA1=95a641b1747721d7004c5f0133b918d034035319
 ARG PGIS1_GEOS_CHECKOUT_SHA1=36ea3034fb8719a639a7e7727e54ec8ab2e8a196
 ARG PGIS1_GDAL_CHECKOUT_SHA1=7ca88116f5a46d429251361634eb24629f315076
@@ -29,15 +32,11 @@ ARG PGIS1_PROJ_CHECKOUT_SHA1=0e993d9744ecaa2f146bf62c43aecc61809a43ef
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1=61f3b08ade49493b56c6bafa98c7c1f84addbc10
 ARG PGIS1_CGAL_CHECKOUT_SHA1=de4fa0d7d57b5a997012f2804161386ff4bc0d0f
 
-ARG PGIS1_GDAL_BUILD=minimal
-
 ARG PGIS1_BOOST_VERSION=1.74.0
-
 ARG PGIS1_CMAKE_BUILD_TYPE=Release
 
-# gdal_build:
-# - minimal ; no arrow, no parquet, no extra dependencies
-# --
+ARG PGIS1_GDAL_BUILD=minimal
+# Minimal GDAL build ; no arrow, no parquet, no extra dependencies
 
 FROM ${PGIS1_BASE_IMAGE} as builder
 

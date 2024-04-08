@@ -10,6 +10,7 @@ ARG PGIS1_PROJ_REPOSITORY=https://github.com/OSGeo/PROJ.git
 ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
+# Should valid git checkout ( SHA1, tags, branches )
 ARG PGIS1_POSTGIS_CHECKOUT={{ .[env.variant].POSTGIS_CHECKOUT }}
 ARG PGIS1_GEOS_CHECKOUT={{ .[env.variant].GEOS_CHECKOUT }}
 ARG PGIS1_GDAL_CHECKOUT={{ .[env.variant].GDAL_CHECKOUT }}
@@ -17,6 +18,8 @@ ARG PGIS1_PROJ_CHECKOUT={{ .[env.variant].PROJ_CHECKOUT }}
 ARG PGIS1_SFCGAL_CHECKOUT={{ .[env.variant].SFCGAL_CHECKOUT }}
 ARG PGIS1_CGAL_CHECKOUT={{ .[env.variant].CGAL_CHECKOUT }}
 
+# Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
+# Otherwise, verify that the commit hash matches
 ARG PGIS1_POSTGIS_CHECKOUT_SHA1={{ .[env.variant].POSTGIS_CHECKOUT_SHA1 }}
 ARG PGIS1_GEOS_CHECKOUT_SHA1={{ .[env.variant].GEOS_CHECKOUT_SHA1 }}
 ARG PGIS1_GDAL_CHECKOUT_SHA1={{ .[env.variant].GDAL_CHECKOUT_SHA1 }}
@@ -24,20 +27,15 @@ ARG PGIS1_PROJ_CHECKOUT_SHA1={{ .[env.variant].PROJ_CHECKOUT_SHA1 }}
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1={{ .[env.variant].SFCGAL_CHECKOUT_SHA1 }}
 ARG PGIS1_CGAL_CHECKOUT_SHA1={{ .[env.variant].CGAL_CHECKOUT_SHA1 }}
 
-ARG PGIS1_GDAL_BUILD={{ .[env.variant].GDAL_BUILD }}
-
 ARG PGIS1_BOOST_VERSION={{ .[env.variant].BOOST_VERSION }}
-
 ARG PGIS1_CMAKE_BUILD_TYPE=Release
 
-# gdal_build:
+ARG PGIS1_GDAL_BUILD={{ .[env.variant].GDAL_BUILD }}
 {{ if .[env.variant].GDAL_BUILD != "minimal" then ( -}}
-ARG PGIS1_ARROW_VERSION=15.0.0-1
-ARG PGIS1_ARROW_SOVERSION=1500
+# Full GDAL build ; with arrow, parquet and extra dependencies
 {{ ) else ( -}}
-# - minimal ; no arrow, no parquet, no extra dependencies
+# Minimal GDAL build ; no arrow, no parquet, no extra dependencies
 {{ ) end -}}
-# --
 
 FROM ${PGIS1_BASE_IMAGE} as builder
 
