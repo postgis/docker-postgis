@@ -51,15 +51,11 @@ for version in $versions; do
 
         # Remove quotes around variant
         variant=$(echo "$variant" | tr -d '"')
-        pg_docker=$(jq -r ".\"$version\".\"$variant\".PG_DOCKER" "$input_file")
-        postgis=$(jq -r ".\"$version\".\"$variant\".postgis" "$input_file")
-        tags=$(jq -r ".\"$version\".\"$variant\".tags" "$input_file")
         arch=$(jq -r ".\"$version\".\"$variant\".arch" "$input_file")
-        readme_group=$(jq -r ".\"$version\".\"$variant\".readme_group" "$input_file")
 
         if [[ $arch == *"amd64"* ]]; then
             if [[ $versions_bundle_base =~ ${version}-${variant} ]]; then
-                echo "# --skip-- - { version: \"$version\", variant: \"$variant\" }" >>_matrix.yml
+                echo "# --skip-- - { version: \"$version\", variant: \"$variant\" } -->  generated with the related bundle job!" >>_matrix.yml
             else
                 echo "           - { version: \"$version\", variant: \"$variant\" }" >>_matrix.yml
             fi
