@@ -48,9 +48,9 @@
     }
   },
   "12-3.3": {
-    "alpine3.18": {
-      "tags": "12-3.3-alpine3.18 12-3.3.6-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.20": {
+      "tags": "12-3.3-alpine3.20 12-3.3.6-alpine3.20 12-3.3-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.3",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -88,9 +88,9 @@
       "POSTGIS_MAJOR": "3",
       "POSTGIS_VERSION": "3.4.2+dfsg-1.pgdg120+1"
     },
-    "alpine3.18": {
-      "tags": "12-3.4-alpine3.18 12-3.4.2-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.19": {
+      "tags": "12-3.4-alpine3.19 12-3.4.2-alpine3.19",
+      "readme_group": "alpine3.19",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -102,9 +102,9 @@
       "POSTGIS_CHECKOUT": "tags/3.4.2",
       "POSTGIS_CHECKOUT_SHA1": "c19ce56ca8982635026ba605f5b2fdce3622bb4a"
     },
-    "alpine3.19": {
-      "tags": "12-3.4-alpine3.19 12-3.4.2-alpine3.19 12-3.4-alpine",
-      "readme_group": "alpine3.19",
+    "alpine3.20": {
+      "tags": "12-3.4-alpine3.20 12-3.4.2-alpine3.20 12-3.4-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -166,9 +166,9 @@
     }
   },
   "13-3.3": {
-    "alpine3.18": {
-      "tags": "13-3.3-alpine3.18 13-3.3.6-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.20": {
+      "tags": "13-3.3-alpine3.20 13-3.3.6-alpine3.20 13-3.3-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.3",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -206,9 +206,9 @@
       "POSTGIS_MAJOR": "3",
       "POSTGIS_VERSION": "3.4.2+dfsg-1.pgdg120+1"
     },
-    "alpine3.18": {
-      "tags": "13-3.4-alpine3.18 13-3.4.2-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.19": {
+      "tags": "13-3.4-alpine3.19 13-3.4.2-alpine3.19",
+      "readme_group": "alpine3.19",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -220,9 +220,9 @@
       "POSTGIS_CHECKOUT": "tags/3.4.2",
       "POSTGIS_CHECKOUT_SHA1": "c19ce56ca8982635026ba605f5b2fdce3622bb4a"
     },
-    "alpine3.19": {
-      "tags": "13-3.4-alpine3.19 13-3.4.2-alpine3.19 13-3.4-alpine",
-      "readme_group": "alpine3.19",
+    "alpine3.20": {
+      "tags": "13-3.4-alpine3.20 13-3.4.2-alpine3.20 13-3.4-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -268,9 +268,9 @@
     }
   },
   "14-3.3": {
-    "alpine3.18": {
-      "tags": "14-3.3-alpine3.18 14-3.3.6-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.20": {
+      "tags": "14-3.3-alpine3.20 14-3.3.6-alpine3.20 14-3.3-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.3",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -308,9 +308,9 @@
       "POSTGIS_MAJOR": "3",
       "POSTGIS_VERSION": "3.4.2+dfsg-1.pgdg120+1"
     },
-    "alpine3.18": {
-      "tags": "14-3.4-alpine3.18 14-3.4.2-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.19": {
+      "tags": "14-3.4-alpine3.19 14-3.4.2-alpine3.19",
+      "readme_group": "alpine3.19",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -322,9 +322,9 @@
       "POSTGIS_CHECKOUT": "tags/3.4.2",
       "POSTGIS_CHECKOUT_SHA1": "c19ce56ca8982635026ba605f5b2fdce3622bb4a"
     },
-    "alpine3.19": {
-      "tags": "14-3.4-alpine3.19 14-3.4.2-alpine3.19 14-3.4-alpine",
-      "readme_group": "alpine3.19",
+    "alpine3.20": {
+      "tags": "14-3.4-alpine3.20 14-3.4.2-alpine3.20 14-3.4-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -354,9 +354,9 @@
     }
   },
   "15-3.3": {
-    "alpine3.18": {
-      "tags": "15-3.3-alpine3.18 15-3.3.6-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.20": {
+      "tags": "15-3.3-alpine3.20 15-3.3.6-alpine3.20 15-3.3-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.3",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -394,9 +394,9 @@
       "POSTGIS_MAJOR": "3",
       "POSTGIS_VERSION": "3.4.2+dfsg-1.pgdg120+1"
     },
-    "alpine3.18": {
-      "tags": "15-3.4-alpine3.18 15-3.4.2-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.19": {
+      "tags": "15-3.4-alpine3.19 15-3.4.2-alpine3.19",
+      "readme_group": "alpine3.19",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -408,9 +408,9 @@
       "POSTGIS_CHECKOUT": "tags/3.4.2",
       "POSTGIS_CHECKOUT_SHA1": "c19ce56ca8982635026ba605f5b2fdce3622bb4a"
     },
-    "alpine3.19": {
-      "tags": "15-3.4-alpine3.19 15-3.4.2-alpine3.19 15-3.4-alpine",
-      "readme_group": "alpine3.19",
+    "alpine3.20": {
+      "tags": "15-3.4-alpine3.20 15-3.4.2-alpine3.20 15-3.4-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -441,8 +441,8 @@
       "PGSQL_GZIP_CHECKOUT_SHA1": "7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49",
       "TIMESCALEDB_CHECKOUT": "tags/2.15.0",
       "TIMESCALEDB_CHECKOUT_SHA1": "19f731d174820dfc0f33e073235c99368b3ad98c",
-      "DUCKDB_CHECKOUT": "tags/v0.10.2",
-      "DUCKDB_CHECKOUT_SHA1": "1601d94f94a7e0d2eb805a94803eb1e3afbbe4ed",
+      "DUCKDB_CHECKOUT": "tags/v0.10.3",
+      "DUCKDB_CHECKOUT_SHA1": "70fd6a8a2450c1e2a7d0547d4c0666a649dc378e",
       "PG_HINT_PLAN_CHECKOUT": "tags/REL15_1_5_1",
       "PG_HINT_PLAN_CHECKOUT_SHA1": "7a41e7ba94c8769895fefbb282f6943067adac2e",
       "POSTGIS_MAJOR": "3",
@@ -502,9 +502,9 @@
     }
   },
   "16-3.3": {
-    "alpine3.18": {
-      "tags": "16-3.3-alpine3.18 16-3.3.6-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.20": {
+      "tags": "16-3.3-alpine3.20 16-3.3.6-alpine3.20 16-3.3-alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.3",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -542,9 +542,9 @@
       "POSTGIS_MAJOR": "3",
       "POSTGIS_VERSION": "3.4.2+dfsg-1.pgdg120+1"
     },
-    "alpine3.18": {
-      "tags": "16-3.4-alpine3.18 16-3.4.2-alpine3.18",
-      "readme_group": "alpine3.18",
+    "alpine3.19": {
+      "tags": "16-3.4-alpine3.19 16-3.4.2-alpine3.19",
+      "readme_group": "alpine3.19",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -556,9 +556,9 @@
       "POSTGIS_CHECKOUT": "tags/3.4.2",
       "POSTGIS_CHECKOUT_SHA1": "c19ce56ca8982635026ba605f5b2fdce3622bb4a"
     },
-    "alpine3.19": {
-      "tags": "16-3.4-alpine3.19 16-3.4.2-alpine3.19 16-3.4-alpine alpine",
-      "readme_group": "alpine3.19",
+    "alpine3.20": {
+      "tags": "16-3.4-alpine3.20 16-3.4.2-alpine3.20 16-3.4-alpine alpine",
+      "readme_group": "alpine3.20",
       "postgis": "3.4",
       "arch": "amd64 arm64",
       "template": "Dockerfile.alpine.template",
@@ -589,8 +589,8 @@
       "PGSQL_GZIP_CHECKOUT_SHA1": "7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49",
       "TIMESCALEDB_CHECKOUT": "tags/2.15.0",
       "TIMESCALEDB_CHECKOUT_SHA1": "19f731d174820dfc0f33e073235c99368b3ad98c",
-      "DUCKDB_CHECKOUT": "tags/v0.10.2",
-      "DUCKDB_CHECKOUT_SHA1": "1601d94f94a7e0d2eb805a94803eb1e3afbbe4ed",
+      "DUCKDB_CHECKOUT": "tags/v0.10.3",
+      "DUCKDB_CHECKOUT_SHA1": "70fd6a8a2450c1e2a7d0547d4c0666a649dc378e",
       "PG_HINT_PLAN_CHECKOUT": "tags/REL16_1_6_0",
       "PG_HINT_PLAN_CHECKOUT_SHA1": "fa0a461af929c06f7c96956369458456c26e7ad9",
       "POSTGIS_MAJOR": "3",
