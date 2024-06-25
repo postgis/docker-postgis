@@ -6,7 +6,7 @@
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
-ARG PGIS1_BASE_IMAGE=postgres:15-bookworm
+ARG PGIS1_BASE_IMAGE=postgres:17beta1-bookworm
 
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
@@ -434,7 +434,7 @@ RUN set -eux \
 FROM ${PGIS1_BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - 15-recent spatial database extension with PostgreSQL 15 bookworm" \
+      org.opencontainers.image.description="PostGIS - 17beta1-recent spatial database extension with PostgreSQL 17beta1 bookworm" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ARG PGIS1_CMAKE_BUILD_TYPE

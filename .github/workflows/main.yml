@@ -24,31 +24,22 @@ jobs:
 #       hence they must be generated within the bundle JOB.
 #
 #matrix-include-start
-           - { version: "12-3.0", variant: "alpine3.18" }
-           - { version: "12-3.1", variant: "alpine3.18" }
-           - { version: "12-3.2", variant: "alpine3.18" }
            - { version: "12-3.3", variant: "alpine3.20" }
            - { version: "12-3.4", variant: "alpine3.19" }
            - { version: "12-3.4", variant: "alpine3.20" }
            - { version: "12-3.4", variant: "bookworm" }
            - { version: "12-3.4", variant: "bullseye" }
-           - { version: "13-3.0", variant: "alpine3.18" }
-           - { version: "13-3.1", variant: "alpine3.18" }
-           - { version: "13-3.2", variant: "alpine3.18" }
            - { version: "13-3.3", variant: "alpine3.20" }
            - { version: "13-3.4", variant: "alpine3.19" }
            - { version: "13-3.4", variant: "alpine3.20" }
            - { version: "13-3.4", variant: "bookworm" }
            - { version: "13-3.4", variant: "bullseye" }
-           - { version: "14-3.1", variant: "alpine3.18" }
-           - { version: "14-3.2", variant: "alpine3.18" }
            - { version: "14-3.3", variant: "alpine3.20" }
            - { version: "14-3.4", variant: "alpine3.19" }
            - { version: "14-3.4", variant: "alpine3.20" }
            - { version: "14-3.4", variant: "bookworm" }
            - { version: "14-3.4", variant: "bullseye" }
            - { version: "14-l3.1.9gcp", variant: "bookworm" }
-           - { version: "15-3.2", variant: "alpine3.18" }
            - { version: "15-3.3", variant: "alpine3.20" }
            - { version: "15-3.4", variant: "alpine3.19" }
            - { version: "15-3.4", variant: "alpine3.20" }
@@ -65,6 +56,9 @@ jobs:
            - { version: "16-3.4-bundle0", variant: "bookworm" }
            - { version: "16-master", variant: "bookworm" }
            - { version: "16-recent", variant: "bookworm" }
+           - { version: "17beta1-3.4", variant: "alpine3.20" }
+           - { version: "17beta1-master", variant: "bookworm" }
+           - { version: "17beta1-recent", variant: "bookworm" }
 #matrix-include-end
 
     name: "${{ matrix.version }}-${{ matrix.variant }} docker image"

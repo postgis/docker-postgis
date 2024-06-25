@@ -342,6 +342,7 @@ RUN set -eux \
             -DGDAL_USE_GEOS=ON \
             -DGDAL_USE_JSONC=ON \
             -DGDAL_USE_LIBLZMA=ON \
+            -DGDAL_USE_LIBXML2=ON \
             -DGDAL_USE_LZ4=ON \
             -DGDAL_USE_POSTGRESQL=ON \
             -DGDAL_USE_SQLITE3=ON \

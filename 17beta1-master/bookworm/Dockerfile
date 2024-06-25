@@ -6,7 +6,7 @@
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
-ARG PGIS1_BASE_IMAGE=postgres:15-bookworm
+ARG PGIS1_BASE_IMAGE=postgres:17beta1-bookworm
 
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
@@ -16,21 +16,21 @@ ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 # Should valid git checkout ( SHA1, tags, branches )
-ARG PGIS1_POSTGIS_CHECKOUT=tags/3.4.2
-ARG PGIS1_GEOS_CHECKOUT=tags/3.12.2
-ARG PGIS1_GDAL_CHECKOUT=tags/v3.9.0
-ARG PGIS1_PROJ_CHECKOUT=tags/9.4.1
-ARG PGIS1_SFCGAL_CHECKOUT=tags/v1.5.1
-ARG PGIS1_CGAL_CHECKOUT=tags/v5.6.1
+ARG PGIS1_POSTGIS_CHECKOUT=master
+ARG PGIS1_GEOS_CHECKOUT=main
+ARG PGIS1_GDAL_CHECKOUT=master
+ARG PGIS1_PROJ_CHECKOUT=master
+ARG PGIS1_SFCGAL_CHECKOUT=master
+ARG PGIS1_CGAL_CHECKOUT=5.6.x-branch
 
 # Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
 # Otherwise, verify that the commit hash matches
-ARG PGIS1_POSTGIS_CHECKOUT_SHA1=c19ce56ca8982635026ba605f5b2fdce3622bb4a
-ARG PGIS1_GEOS_CHECKOUT_SHA1=b74fefb7be4ba6c833760106f95f0f495b832c43
-ARG PGIS1_GDAL_CHECKOUT_SHA1=bb5ea618e23e498e79e8b8e6bd7215ad94bb2103
-ARG PGIS1_PROJ_CHECKOUT_SHA1=875a485fa5ef435c57f7682f904dd31ca92253ab
-ARG PGIS1_SFCGAL_CHECKOUT_SHA1=61f3b08ade49493b56c6bafa98c7c1f84addbc10
-ARG PGIS1_CGAL_CHECKOUT_SHA1=188e51bad36ffc30e49dbabda29620b71a84664c
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=nocheck
+ARG PGIS1_GEOS_CHECKOUT_SHA1=nocheck
+ARG PGIS1_GDAL_CHECKOUT_SHA1=nocheck
+ARG PGIS1_PROJ_CHECKOUT_SHA1=nocheck
+ARG PGIS1_SFCGAL_CHECKOUT_SHA1=nocheck
+ARG PGIS1_CGAL_CHECKOUT_SHA1=nocheck
 
 ARG PGIS1_BOOST_VERSION=1.74.0
 ARG PGIS1_CMAKE_BUILD_TYPE=Release
@@ -434,7 +434,7 @@ RUN set -eux \
 FROM ${PGIS1_BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - 15-recent spatial database extension with PostgreSQL 15 bookworm" \
+      org.opencontainers.image.description="PostGIS - 17beta1-master spatial database extension with PostgreSQL 17beta1 bookworm" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ARG PGIS1_CMAKE_BUILD_TYPE

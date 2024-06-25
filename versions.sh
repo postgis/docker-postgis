@@ -17,7 +17,7 @@ source tools/environment_init.sh
 api_preference="github"
 #api_preference="osgeo"  -- not working yet
 
-alpine_variants=" alpine3.18 alpine3.19 alpine3.20 "
+alpine_variants=" alpine3.19 alpine3.20 "
 debian_variants=" bullseye bookworm "
 
 debian_latest="bookworm"
@@ -25,7 +25,7 @@ alpine_latest="alpine3.20"
 postgis_latest="3.4"
 postgres_latest="16"
 postgis_versions="3.0 3.1 3.2 3.3 3.4"
-postgres_versions="11 12 13 14 15 16"
+postgres_versions="11 12 13 14 15 16 17beta1"
 
 # MASTER_BRANCH_MODE='flexible'=if you want to use the latest version of the dependencies - automatically
 #   if not set, it will use the locked version, and the checkout hash will be used
@@ -171,6 +171,11 @@ if [ "$api_preference" == "github" ]; then
         echo " You can check your remaining requests with :"
         echo "    curl -sI https://api.github.com/users/postgis | grep x-ratelimit "
         echo
+        echo " ------------------------ "
+        curl -sI https://api.github.com/users/postgis | grep x-ratelimit
+        echo
+        echo " The limit will be reset at :"
+        curl -sI https://api.github.com/users/postgis | grep x-ratelimit-reset | cut -d' ' -f2 | xargs -I {} date -d @{}
         exit 1
     fi
 fi

@@ -17,7 +17,7 @@ ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 # Should valid git checkout ( SHA1, tags, branches )
 ARG PGIS1_POSTGIS_CHECKOUT=tags/3.4.2
-ARG PGIS1_GEOS_CHECKOUT=tags/3.12.1
+ARG PGIS1_GEOS_CHECKOUT=tags/3.12.2
 ARG PGIS1_GDAL_CHECKOUT=tags/v3.9.0
 ARG PGIS1_PROJ_CHECKOUT=tags/9.4.1
 ARG PGIS1_SFCGAL_CHECKOUT=tags/v1.5.1
@@ -26,7 +26,7 @@ ARG PGIS1_CGAL_CHECKOUT=tags/v5.6.1
 # Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
 # Otherwise, verify that the commit hash matches
 ARG PGIS1_POSTGIS_CHECKOUT_SHA1=c19ce56ca8982635026ba605f5b2fdce3622bb4a
-ARG PGIS1_GEOS_CHECKOUT_SHA1=9a5d0587fe62b1551dbee678e2cf6360d292e95b
+ARG PGIS1_GEOS_CHECKOUT_SHA1=b74fefb7be4ba6c833760106f95f0f495b832c43
 ARG PGIS1_GDAL_CHECKOUT_SHA1=bb5ea618e23e498e79e8b8e6bd7215ad94bb2103
 ARG PGIS1_PROJ_CHECKOUT_SHA1=875a485fa5ef435c57f7682f904dd31ca92253ab
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1=61f3b08ade49493b56c6bafa98c7c1f84addbc10
@@ -322,6 +322,7 @@ RUN set -eux \
       libkml-dev \
       libnetcdf-dev \
       libopenjp2-7-dev \
+      libpng-dev \
       libqhull-dev \
       libspatialite-dev
 
@@ -382,6 +383,7 @@ RUN set -eux \
             -DGDAL_USE_GEOS=ON \
             -DGDAL_USE_JSONC=ON \
             -DGDAL_USE_LIBLZMA=ON \
+            -DGDAL_USE_LIBXML2=ON \
             -DGDAL_USE_LZ4=ON \
             -DGDAL_USE_POSTGRESQL=ON \
             -DGDAL_USE_SQLITE3=ON \
@@ -403,6 +405,7 @@ RUN set -eux \
             -DGDAL_USE_NETCDF=ON \
             -DGDAL_USE_OPENJPEG=ON \
             -DGDAL_USE_PARQUET=ON \
+            -DGDAL_USE_PNG=ON \
             -DGDAL_USE_QHULL=ON \
             -DGDAL_USE_SPATIALITE=ON \
         ; \
@@ -494,6 +497,7 @@ RUN set -eux \
       \
       # Install GDAL extra dependencies
       libblosc1 \
+      libcrypto++8 \
       libfreexl1 \
       libfyba0 \
       libhdf5-103-1 \
@@ -503,7 +507,9 @@ RUN set -eux \
       libkmlengine1 \
       libnetcdf19 \
       libopenjp2-7 \
+      libpng16-16 \
       libqhull-r8.0 \
+      librasterlite2-1 \
       libspatialite7 \
       netcdf-bin \
       libcfitsio10 \

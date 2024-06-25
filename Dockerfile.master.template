@@ -326,6 +326,7 @@ RUN set -eux \
       libkml-dev \
       libnetcdf-dev \
       libopenjp2-7-dev \
+      libpng-dev \
       libqhull-dev \
       libspatialite-dev
 {{ ) else ( -}}
@@ -389,6 +390,7 @@ RUN set -eux \
             -DGDAL_USE_GEOS=ON \
             -DGDAL_USE_JSONC=ON \
             -DGDAL_USE_LIBLZMA=ON \
+            -DGDAL_USE_LIBXML2=ON \
             -DGDAL_USE_LZ4=ON \
             -DGDAL_USE_POSTGRESQL=ON \
             -DGDAL_USE_SQLITE3=ON \
@@ -411,6 +413,7 @@ RUN set -eux \
             -DGDAL_USE_NETCDF=ON \
             -DGDAL_USE_OPENJPEG=ON \
             -DGDAL_USE_PARQUET=ON \
+            -DGDAL_USE_PNG=ON \
             -DGDAL_USE_QHULL=ON \
             -DGDAL_USE_SPATIALITE=ON \
 {{ ) else ( -}}
@@ -510,6 +513,7 @@ RUN set -eux \
       \
       # Install GDAL extra dependencies
       libblosc1 \
+      libcrypto++8 \
       libfreexl1 \
       libfyba0 \
       libhdf5-103-1 \
@@ -519,7 +523,9 @@ RUN set -eux \
       libkmlengine1 \
       libnetcdf19 \
       libopenjp2-7 \
+      libpng16-16 \
       libqhull-r8.0 \
+      librasterlite2-1 \
       libspatialite7 \
       netcdf-bin \
 {{ if env.variant != "bullseye" then ( -}}
