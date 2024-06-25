@@ -221,9 +221,9 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install
 
-# pg_quack is not available for PG16
-# - https://github.com/hydradatabase/pg_quack/issues/3
-
+#  #  # pg_quack is not available for PG16
+#  # - https://github.com/hydradatabase/pg_quack/issues/3
+#  
 # install pg_hint_plan
 RUN set -eux \
     && mkdir pg_hint_plan \

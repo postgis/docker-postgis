@@ -221,14 +221,14 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install
 
-# add pg_quack: PG 14 and PG 15 only (PG 16 is not yet supported)
-# TODO: add pg_quack version!
-RUN set -eux \
-    && git clone --depth 1  https://github.com/hydradatabase/pg_quack  \
-    && cd pg_quack \
-    && make -j$(nproc) \
-    && make install
-
+#  #  # add pg_quack: PG 14 and PG 15 only (PG 16 is not yet supported)
+#  # TODO: add pg_quack version!
+#  RUN set -eux \
+#      && git clone --depth 1  https://github.com/hydradatabase/pg_quack  \
+#      && cd pg_quack \
+#      && make -j$(nproc) \
+#      && make install
+#  
 # install pg_hint_plan
 RUN set -eux \
     && mkdir pg_hint_plan \
