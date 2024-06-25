@@ -216,18 +216,18 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install
 
-{{ if env.version | startswith("16") then ( -}}
-# pg_quack is not available for PG16
-# - https://github.com/hydradatabase/pg_quack/issues/3
-{{ ) else ( -}}
-# add pg_quack: PG 14 and PG 15 only (PG 16 is not yet supported)
-# TODO: add pg_quack version!
-RUN set -eux \
-    && git clone --depth 1  https://github.com/hydradatabase/pg_quack  \
-    && cd pg_quack \
-    && make -j$(nproc) \
-    && make install
-{{ ) end -}}
+#  {{ if env.version | startswith("16") then ( -}}
+#  # pg_quack is not available for PG16
+#  # - https://github.com/hydradatabase/pg_quack/issues/3
+#  {{ ) else ( -}}
+#  # add pg_quack: PG 14 and PG 15 only (PG 16 is not yet supported)
+#  # TODO: add pg_quack version!
+#  RUN set -eux \
+#      && git clone --depth 1  https://github.com/hydradatabase/pg_quack  \
+#      && cd pg_quack \
+#      && make -j$(nproc) \
+#      && make install
+#  {{ ) end -}}
 
 # install pg_hint_plan
 RUN set -eux \
