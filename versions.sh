@@ -529,7 +529,7 @@ for version in "${versions[@]}"; do
                 if [ -n "$bundleType" ]; then
                     readme_group="$bundleType"
                     bundleTypeTags="-${bundleType}"
-                elif [[ "recent" == "$postgisVersion" ]]; then
+                elif [[ ${postgresLastMainTags[$postgresVersion]} =~ ^[0-9]+$ ]] && [[ "$postgisVersion" == "recent" ]]; then
                     readme_group="recent"
                 elif [[ ${mainTags} =~ [a-zA-Z] ]]; then
                     readme_group="test"
