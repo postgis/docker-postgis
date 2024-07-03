@@ -24,8 +24,8 @@ debian_latest="bookworm"
 alpine_latest="alpine3.20"
 postgis_latest="3.4"
 postgres_latest="16"
-postgis_versions="3.0 3.1 3.2 3.3 3.4"
-postgres_versions="11 12 13 14 15 16 17beta1"
+postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5"
+postgres_versions="11 12 13 14 15 16 17beta2"
 
 # MASTER_BRANCH_MODE='flexible'=if you want to use the latest version of the dependencies - automatically
 #   if not set, it will use the locked version, and the checkout hash will be used

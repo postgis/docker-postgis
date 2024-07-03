@@ -155,8 +155,8 @@ workflows:
                 "16-3.4-bundle0-bookworm",
                 "16-master-bookworm",
                 "16-recent-bookworm",
-                "17beta1-3.4-alpine3.20",
-                "17beta1-master-bookworm",
-                "17beta1-recent-bookworm",
+                "17beta2-3.4-alpine3.20",
+                "17beta2-master-bookworm",
+                "17beta2-recent-bookworm",
 #circleci-targets-end
               ]
