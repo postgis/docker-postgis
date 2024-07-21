@@ -25,7 +25,7 @@ githubrepolink="https://github.com/postgis/docker-postgis/blob/master"
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
-defaultAlpinenSuite='3.18'
+defaultAlpinenSuite='3.20'
 defaultDebianSuite='bullseye-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
@@ -35,6 +35,7 @@ declare -A debianSuite=(
     [14]='bullseye-slim'
     [15]='bullseye-slim'
     [16]='bullseye-slim'
+    [17]='bullseye-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
@@ -44,6 +45,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
     [3.2]='3'
     [3.3]='3'
     [3.4]='3'
+    [3.5]='3'
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
