@@ -333,7 +333,7 @@
   },
   "15-recent": {
     "bookworm": {
-      "tags": "15-recent-bookworm 15-recent-postgis3.4.2-geos3.12.2-proj9.4.1-gdal3.9.1-cgal5.6.1-sfcgal1.5.1-bookworm 15-recent-postgis3.4-geos3.12-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm 15-recent",
+      "tags": "15-recent-bookworm 15-recent-postgis3.4.2-geos3.12.2-proj9.4.1-gdal3.9.1-cgal5.6.1-sfcgal1.5.2-bookworm 15-recent-postgis3.4-geos3.12-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm 15-recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "15",
@@ -350,8 +350,8 @@
       "GDAL_CHECKOUT_SHA1": "01ac70772b997ab87d2312e2036eb66faf6b0508",
       "GEOS_CHECKOUT": "tags/3.12.2",
       "GEOS_CHECKOUT_SHA1": "b74fefb7be4ba6c833760106f95f0f495b832c43",
-      "SFCGAL_CHECKOUT": "tags/v1.5.1",
-      "SFCGAL_CHECKOUT_SHA1": "61f3b08ade49493b56c6bafa98c7c1f84addbc10",
+      "SFCGAL_CHECKOUT": "tags/v1.5.2",
+      "SFCGAL_CHECKOUT_SHA1": "5584600ad7ed512f158b297476f57ed5fcf9c8dc",
       "CGAL_CHECKOUT": "tags/v5.6.1",
       "CGAL_CHECKOUT_SHA1": "188e51bad36ffc30e49dbabda29620b71a84664c",
       "BOOST_VERSION": "1.74.0"
@@ -481,7 +481,7 @@
   },
   "16-recent": {
     "bookworm": {
-      "tags": "16-recent-bookworm 16-recent-postgis3.4.2-geos3.12.2-proj9.4.1-gdal3.9.1-cgal5.6.1-sfcgal1.5.1-bookworm 16-recent-postgis3.4-geos3.12-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm 16-recent recent",
+      "tags": "16-recent-bookworm 16-recent-postgis3.4.2-geos3.12.2-proj9.4.1-gdal3.9.1-cgal5.6.1-sfcgal1.5.2-bookworm 16-recent-postgis3.4-geos3.12-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm 16-recent recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "16",
@@ -498,8 +498,8 @@
       "GDAL_CHECKOUT_SHA1": "01ac70772b997ab87d2312e2036eb66faf6b0508",
       "GEOS_CHECKOUT": "tags/3.12.2",
       "GEOS_CHECKOUT_SHA1": "b74fefb7be4ba6c833760106f95f0f495b832c43",
-      "SFCGAL_CHECKOUT": "tags/v1.5.1",
-      "SFCGAL_CHECKOUT_SHA1": "61f3b08ade49493b56c6bafa98c7c1f84addbc10",
+      "SFCGAL_CHECKOUT": "tags/v1.5.2",
+      "SFCGAL_CHECKOUT_SHA1": "5584600ad7ed512f158b297476f57ed5fcf9c8dc",
       "CGAL_CHECKOUT": "tags/v5.6.1",
       "CGAL_CHECKOUT_SHA1": "188e51bad36ffc30e49dbabda29620b71a84664c",
       "BOOST_VERSION": "1.74.0"
@@ -549,7 +549,7 @@
   },
   "17beta2-recent": {
     "bookworm": {
-      "tags": "17beta2-recent-bookworm 17beta2-recent-postgis3.4.2-geos3.12.2-proj9.4.1-gdal3.9.1-cgal5.6.1-sfcgal1.5.1-bookworm 17beta2-recent-postgis3.4-geos3.12-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm 17beta2-recent",
+      "tags": "17beta2-recent-bookworm 17beta2-recent-postgis3.4.2-geos3.12.2-proj9.4.1-gdal3.9.1-cgal5.6.1-sfcgal1.5.2-bookworm 17beta2-recent-postgis3.4-geos3.12-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm 17beta2-recent",
       "postgis": "recent",
       "readme_group": "test",
       "PG_MAJOR": "17beta2",
@@ -566,8 +566,8 @@
       "GDAL_CHECKOUT_SHA1": "01ac70772b997ab87d2312e2036eb66faf6b0508",
       "GEOS_CHECKOUT": "tags/3.12.2",
       "GEOS_CHECKOUT_SHA1": "b74fefb7be4ba6c833760106f95f0f495b832c43",
-      "SFCGAL_CHECKOUT": "tags/v1.5.1",
-      "SFCGAL_CHECKOUT_SHA1": "61f3b08ade49493b56c6bafa98c7c1f84addbc10",
+      "SFCGAL_CHECKOUT": "tags/v1.5.2",
+      "SFCGAL_CHECKOUT_SHA1": "5584600ad7ed512f158b297476f57ed5fcf9c8dc",
       "CGAL_CHECKOUT": "tags/v5.6.1",
       "CGAL_CHECKOUT_SHA1": "188e51bad36ffc30e49dbabda29620b71a84664c",
       "BOOST_VERSION": "1.74.0"
