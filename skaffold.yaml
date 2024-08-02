@@ -1,0 +1,36 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+build:
+  platforms: ["linux/amd64", "linux/arm64"]
+  tagPolicy:
+    dateTime:
+      format: "2006-01-02_15-04-05"
+      timezone: "UTC"
+  artifacts:
+  - image: 280296955917.dkr.ecr.us-east-2.amazonaws.com/postgis
+    kaniko:
+      cache: {}
+      dockerfile: 15-3.4/Dockerfile
+      useNewRun: false
+      reproducible: true
+      snapshotMode: redo
+  cluster:
+    concurrency: 0
+    serviceAccount: ci-pipeline
+    namespace: ci
+    annotations:
+      karpenter.sh/do-not-evict: "true"
+    resources:
+      requests:
+        cpu: "4"
+        memory: 32Gi
+        ephemeral-storage: 50Gi
+    tolerations:
+    - key: "arch"
+      value: "arm64"
+      operator: "Equal"
+      effect: "NoExecute"
+    - key: "role"
+      value: "iops"
+      operator: "Equal"
+      effect: "NoExecute"
