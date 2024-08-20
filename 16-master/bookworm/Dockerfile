@@ -17,11 +17,11 @@ ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 # Should valid git checkout ( SHA1, tags, branches )
 ARG PGIS1_POSTGIS_CHECKOUT=master
-ARG PGIS1_GEOS_CHECKOUT=main
+ARG PGIS1_GEOS_CHECKOUT=3.12
 ARG PGIS1_GDAL_CHECKOUT=master
 ARG PGIS1_PROJ_CHECKOUT=master
 ARG PGIS1_SFCGAL_CHECKOUT=master
-ARG PGIS1_CGAL_CHECKOUT=5.6.x-branch
+ARG PGIS1_CGAL_CHECKOUT=master
 
 # Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
 # Otherwise, verify that the commit hash matches
