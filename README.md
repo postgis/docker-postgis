@@ -18,7 +18,7 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions (2024-07-19)
+# Versions (2024-08-20)
 
 Supported architecture: `amd64` (also known as X86-64)"
 
@@ -65,9 +65,9 @@ Recommended version for new users: `postgis/postgis:16-3.4`
 | [postgis/postgis:15-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-master/Dockerfile) | debian:bullseye | 15 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:16-3.5.0alpha2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.5.0alpha2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.5.0alpha2/alpine/Dockerfile) | alpine:3.20 | 16 | 3.5.0alpha2 |
 | [postgis/postgis:16-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-master/Dockerfile) | debian:bullseye | 16 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:17beta2-3.5.0alpha2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17beta2-3.5.0alpha2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17beta2-3.5.0alpha2/alpine/Dockerfile) | alpine:3.20 | 17beta2 | 3.5.0alpha2 |
-| [postgis/postgis:17beta2-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17beta2-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17beta2-master/Dockerfile) | debian:bullseye | 17beta2 | development: postgis, geos, proj, gdal |
- 
+| [postgis/postgis:17beta3-3.5.0alpha2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17beta3-3.5.0alpha2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17beta3-3.5.0alpha2/alpine/Dockerfile) | alpine:3.20 | 17beta3 | 3.5.0alpha2 |
+| [postgis/postgis:17beta3-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17beta3-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17beta3-master/Dockerfile) | debian:bullseye | 17beta3 | development: postgis, geos, proj, gdal |
+  
 ## Usage
 
 In order to run a basic container capable of serving a PostGIS-enabled database, start a container as follows:
