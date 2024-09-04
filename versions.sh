@@ -346,7 +346,14 @@ declare -A postgisSrcSha256=()
 declare -A postgisSrcSha1=()
 for variant in ${postgis_versions}; do
     _postgisMinor=$(echo "$variant" | cut -d. -f2)
-    postgisLastTags[$variant]=$(echo "$postgis_all_v3_versions" | grep "^3\.${_postgisMinor}\." | version_reverse_sort | head -n 1 || true)
+
+    # check the latest released 3.x version (so not alpha/beta/rc)
+    postgisLastTags[$variant]=$(echo "$postgis_all_v3_versions" | grep "^3\.${_postgisMinor}\." | grep -v '[a-zA-Z]' | version_reverse_sort | head -n 1 || true)
+    # Check if the result is empty
+    if [[ -z "${postgisLastTags[$variant]}" ]]; then
+        # If empty, run the command again without excluding pre-releases (alpha/beta/rc)
+        postgisLastTags[$variant]=$(echo "$postgis_all_v3_versions" | grep "^3\.${_postgisMinor}\." | version_reverse_sort | head -n 1 || true)
+    fi
 
     if [[ ${postgisLastTags[$variant]} =~ [a-zA-Z] ]]; then
         postgisLastDockerTags[$variant]=${postgisLastTags[$variant]}
