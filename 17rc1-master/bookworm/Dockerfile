@@ -6,7 +6,7 @@
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
-ARG PGIS1_BASE_IMAGE=postgres:17beta3-bookworm
+ARG PGIS1_BASE_IMAGE=postgres:17rc1-bookworm
 
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
@@ -17,7 +17,7 @@ ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 # Should valid git checkout ( SHA1, tags, branches )
 ARG PGIS1_POSTGIS_CHECKOUT=master
-ARG PGIS1_GEOS_CHECKOUT=3.12
+ARG PGIS1_GEOS_CHECKOUT=main
 ARG PGIS1_GDAL_CHECKOUT=master
 ARG PGIS1_PROJ_CHECKOUT=master
 ARG PGIS1_SFCGAL_CHECKOUT=master
@@ -434,7 +434,7 @@ RUN set -eux \
 FROM ${PGIS1_BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - 17beta3-master spatial database extension with PostgreSQL 17beta3 bookworm" \
+      org.opencontainers.image.description="PostGIS - 17rc1-master spatial database extension with PostgreSQL 17rc1 bookworm" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ARG PGIS1_CMAKE_BUILD_TYPE

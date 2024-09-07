@@ -56,9 +56,9 @@ jobs:
            - { version: "16-3.4-bundle0", variant: "bookworm" }
            - { version: "16-master", variant: "bookworm" }
            - { version: "16-recent", variant: "bookworm" }
-           - { version: "17beta3-3.4", variant: "alpine3.20" }
-           - { version: "17beta3-master", variant: "bookworm" }
-           - { version: "17beta3-recent", variant: "bookworm" }
+           - { version: "17rc1-3.4", variant: "alpine3.20" }
+           - { version: "17rc1-master", variant: "bookworm" }
+           - { version: "17rc1-recent", variant: "bookworm" }
 #matrix-include-end
 
     name: "${{ matrix.version }}-${{ matrix.variant }} docker image"
