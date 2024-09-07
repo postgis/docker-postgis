@@ -610,62 +610,62 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:recent \
     --target ${dockername}:recent || true
 
-# ----- 17beta3-3.4-alpine3.20 -----
+# ----- 17rc1-3.4-alpine3.20 -----
 
-echo "manifest: ${dockername}:17beta3-3.4-alpine3.20"
+echo "manifest: ${dockername}:17rc1-3.4-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-3.4-alpine3.20 \
-    --target ${dockername}:17beta3-3.4-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:17rc1-3.4-alpine3.20 \
+    --target ${dockername}:17rc1-3.4-alpine3.20 || true
 
-echo "manifest: ${dockername}:17beta3-3.4.3-alpine3.20"
+echo "manifest: ${dockername}:17rc1-3.4.3-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-3.4.3-alpine3.20 \
-    --target ${dockername}:17beta3-3.4.3-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:17rc1-3.4.3-alpine3.20 \
+    --target ${dockername}:17rc1-3.4.3-alpine3.20 || true
 
-echo "manifest: ${dockername}:17beta3-3.4-alpine"
+echo "manifest: ${dockername}:17rc1-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-3.4-alpine \
-    --target ${dockername}:17beta3-3.4-alpine || true
+    --template ${dockername}-ARCHVARIANT:17rc1-3.4-alpine \
+    --target ${dockername}:17rc1-3.4-alpine || true
 
-# ----- 17beta3-master-bookworm -----
+# ----- 17rc1-master-bookworm -----
 
-echo "manifest: ${dockername}:17beta3-master-bookworm"
+echo "manifest: ${dockername}:17rc1-master-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-master-bookworm \
-    --target ${dockername}:17beta3-master-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17rc1-master-bookworm \
+    --target ${dockername}:17rc1-master-bookworm || true
 
-echo "manifest: ${dockername}:17beta3-master"
+echo "manifest: ${dockername}:17rc1-master"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-master \
-    --target ${dockername}:17beta3-master || true
+    --template ${dockername}-ARCHVARIANT:17rc1-master \
+    --target ${dockername}:17rc1-master || true
 
-# ----- 17beta3-recent-bookworm -----
+# ----- 17rc1-recent-bookworm -----
 
-echo "manifest: ${dockername}:17beta3-recent-bookworm"
+echo "manifest: ${dockername}:17rc1-recent-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-recent-bookworm \
-    --target ${dockername}:17beta3-recent-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17rc1-recent-bookworm \
+    --target ${dockername}:17rc1-recent-bookworm || true
 
-echo "manifest: ${dockername}:17beta3-recent-postgis3.4.3-geos3.13.0-proj9.4.1-gdal3.9.2-cgal5.6.1-sfcgal1.5.2-bookworm"
+echo "manifest: ${dockername}:17rc1-recent-postgis3.4.3-geos3.13.0-proj9.4.1-gdal3.9.2-cgal5.6.1-sfcgal1.5.2-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-recent-postgis3.4.3-geos3.13.0-proj9.4.1-gdal3.9.2-cgal5.6.1-sfcgal1.5.2-bookworm \
-    --target ${dockername}:17beta3-recent-postgis3.4.3-geos3.13.0-proj9.4.1-gdal3.9.2-cgal5.6.1-sfcgal1.5.2-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17rc1-recent-postgis3.4.3-geos3.13.0-proj9.4.1-gdal3.9.2-cgal5.6.1-sfcgal1.5.2-bookworm \
+    --target ${dockername}:17rc1-recent-postgis3.4.3-geos3.13.0-proj9.4.1-gdal3.9.2-cgal5.6.1-sfcgal1.5.2-bookworm || true
 
-echo "manifest: ${dockername}:17beta3-recent-postgis3.4-geos3.13-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm"
+echo "manifest: ${dockername}:17rc1-recent-postgis3.4-geos3.13-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-recent-postgis3.4-geos3.13-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm \
-    --target ${dockername}:17beta3-recent-postgis3.4-geos3.13-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17rc1-recent-postgis3.4-geos3.13-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm \
+    --target ${dockername}:17rc1-recent-postgis3.4-geos3.13-proj9.4-gdal3.9-cgal5.6-sfcgal1.5-bookworm || true
 
-echo "manifest: ${dockername}:17beta3-recent"
+echo "manifest: ${dockername}:17rc1-recent"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17beta3-recent \
-    --target ${dockername}:17beta3-recent || true
+    --template ${dockername}-ARCHVARIANT:17rc1-recent \
+    --target ${dockername}:17rc1-recent || true
