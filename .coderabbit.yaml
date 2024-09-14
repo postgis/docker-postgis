@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# see - https://docs.coderabbit.ai/configure-coderabbit/
+
+language: "en-US"
+
+early_access: true
+
+# we(docker-postgis) always need a human to approve (and merge), we don't use this,
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: false
+  poem: false
+  review_status: false
+  collapse_walkthrough: true
+  auto_review:
+    enabled: false
+    drafts: false
+
+# chat is allowed
+chat:
+  auto_reply: true
+
+
+# https://docs.coderabbit.ai/guides/commands
+#
+# The following commands are available (invoked as PR comments):
+# @coderabbitai pause         :  to pause the reviews on a PR.
+# @coderabbitai resume        : to resume the paused reviews.
+# @coderabbitai review        : to trigger an incremental review. This is useful when automatic reviews are disabled for the repository.
+# @coderabbitai full review   : to do a full review from scratch and review all the files again.
+# @coderabbitai summary       : to regenerate the summary of the PR.
+# @coderabbitai resolve       : resolve all the CodeRabbit review comments.
+# @coderabbitai configuration : to show the current CodeRabbit configuration for the repository.
+# @coderabbitai help          : to get help.
+
