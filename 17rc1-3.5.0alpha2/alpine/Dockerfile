@@ -1,11 +1,11 @@
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG BASE_IMAGE=postgres:17beta3-alpine3.20
+ARG BASE_IMAGE=postgres:17rc1-alpine3.20
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.5.0alpha2 spatial database extension with PostgreSQL 17beta3 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.5.0alpha2 spatial database extension with PostgreSQL 17rc1 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_VERSION 3.5.0alpha2
