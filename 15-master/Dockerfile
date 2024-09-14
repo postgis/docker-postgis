@@ -88,8 +88,8 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # one can benefit from the latest CGAL patches while avoiding compatibility issues.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH 8730ff5d5592d883a091ac5eb13ee8f58c3344d5
-ENV SFCGAL_GIT_HASH c03c1bdfe1c8effcde2be4879417dabb82cae615
+ENV CGAL5X_GIT_HASH f1af52edeb741a05f86d959984ed943f25f5fcd4
+ENV SFCGAL_GIT_HASH 3a493846b779ded5ac87b8a7b37e8c119d4208c2
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -122,7 +122,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 2ce6c7a9b1ca44b8a7cfb1acca7ff10c8c616774
+ENV PROJ_GIT_HASH 0a407325fbb5bf42407a7dc5d4f948be9707e302
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -151,8 +151,8 @@ RUN set -ex \
     \
     && rm -fr /usr/src/PROJ
 
-# geos - lock 3.12 branch
-ENV GEOS_GIT_HASH 8fa289cf0146780a0be01e97501589b5a29224c4
+# geos
+ENV GEOS_GIT_HASH 701c868fa9ad8e82a3aa43f0bd19ec2003722f45
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -168,7 +168,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 27a73be049c244ff3483d05a1a2a5b9779f30d2e
+ENV GDAL_GIT_HASH 6a5ab0e588d17b8cc9ee16c212407c0bd3f05a9b
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -301,11 +301,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH 8730ff5d5592d883a091ac5eb13ee8f58c3344d5
-ENV SFCGAL_GIT_HASH c03c1bdfe1c8effcde2be4879417dabb82cae615
-ENV PROJ_GIT_HASH 2ce6c7a9b1ca44b8a7cfb1acca7ff10c8c616774
-ENV GEOS_GIT_HASH d9422f5ef776c87c78dabd705e486ee08ca39be7
-ENV GDAL_GIT_HASH 27a73be049c244ff3483d05a1a2a5b9779f30d2e
+ENV CGAL5X_GIT_HASH f1af52edeb741a05f86d959984ed943f25f5fcd4
+ENV SFCGAL_GIT_HASH 3a493846b779ded5ac87b8a7b37e8c119d4208c2
+ENV PROJ_GIT_HASH 0a407325fbb5bf42407a7dc5d4f948be9707e302
+ENV GEOS_GIT_HASH 701c868fa9ad8e82a3aa43f0bd19ec2003722f45
+ENV GDAL_GIT_HASH 6a5ab0e588d17b8cc9ee16c212407c0bd3f05a9b
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -324,7 +324,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 0a8072199200a8323b5ddcfdcb89ed01dbd5f6b1
+ENV POSTGIS_GIT_HASH 8349e1670aa4f273dd68813813a1a37b59c12a8c
 
 RUN set -ex \
     && apt-get update \
