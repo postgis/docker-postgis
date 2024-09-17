@@ -1,7 +1,11 @@
 
+
 # unique locked versions we want to build
 # initialize directory with : touch 14-l3.1.9gcp/bookworm/Dockerfile
 # this file will be append to 'version.json'
+
+# - edited by manually, for locking/creating special versions.
+# - this can be used for testing new debian based posgis versions - created from recent(master) template
 
 '14-l3.1.9gcp':
   'bookworm':
@@ -28,3 +32,55 @@
     CGAL_CHECKOUT: 'tags/v5.6'
     CGAL_CHECKOUT_SHA1: 'de4fa0d7d57b5a997012f2804161386ff4bc0d0f'
     BOOST_VERSION: '1.74.0'
+
+'16-l3.5.0beta1':
+  'bookworm':
+    _comment: "source: ./locked.yml"  
+    arch: 'amd64 arm64'
+    BOOST_VERSION: '1.74.0'
+    CGAL_CHECKOUT_SHA1: '188e51bad36ffc30e49dbabda29620b71a84664c'
+    CGAL_CHECKOUT: 'tags/v5.6.1'
+    GDAL_BUILD: 'with_extra'
+    GDAL_CHECKOUT_SHA1: '3aae5b4cf30c958ab339157b4f8115922e2f2562'
+    GDAL_CHECKOUT: 'tags/v3.9.2'
+    GEOS_CHECKOUT_SHA1: 'd7957246c588aa9c690efe67924fd70e741a06ab'
+    GEOS_CHECKOUT: 'tags/3.13.0'
+    initfile: 'initdb-postgis.sh'
+    PG_DOCKER: '16'
+    PG_MAJOR: '16'
+    POSTGIS_CHECKOUT_SHA1: '880fca31f541369d246400f9d9268a793c7466dd'
+    POSTGIS_CHECKOUT: 'tags/3.5.0beta1'
+    postgis: 'l3.5.0beta1'
+    PROJ_CHECKOUT_SHA1: '0a407325fbb5bf42407a7dc5d4f948be9707e302'
+    PROJ_CHECKOUT: 'tags/9.5.0'
+    readme_group: 'test'
+    SFCGAL_CHECKOUT_SHA1: '5584600ad7ed512f158b297476f57ed5fcf9c8dc'
+    SFCGAL_CHECKOUT: 'tags/v1.5.2'
+    tags: '16-l3.5.0beta1-bookworm 16-l3.5.0beta1'
+    template: 'Dockerfile.master.template'
+
+'17rc1-l3.5.0beta1':
+  'bookworm':
+    _comment: "source: ./locked.yml"  
+    arch: 'amd64 arm64'
+    BOOST_VERSION: '1.74.0'
+    CGAL_CHECKOUT_SHA1: '188e51bad36ffc30e49dbabda29620b71a84664c'
+    CGAL_CHECKOUT: 'tags/v5.6.1'
+    GDAL_BUILD: 'with_extra'
+    GDAL_CHECKOUT_SHA1: '3aae5b4cf30c958ab339157b4f8115922e2f2562'
+    GDAL_CHECKOUT: 'tags/v3.9.2'
+    GEOS_CHECKOUT_SHA1: 'd7957246c588aa9c690efe67924fd70e741a06ab'
+    GEOS_CHECKOUT: 'tags/3.13.0'
+    initfile: 'initdb-postgis.sh'
+    PG_DOCKER: '17rc1'
+    PG_MAJOR: '17rc1'
+    POSTGIS_CHECKOUT_SHA1: '880fca31f541369d246400f9d9268a793c7466dd'
+    POSTGIS_CHECKOUT: 'tags/3.5.0beta1'
+    postgis: 'l3.5.0beta1'
+    PROJ_CHECKOUT_SHA1: '0a407325fbb5bf42407a7dc5d4f948be9707e302'
+    PROJ_CHECKOUT: 'tags/9.5.0'
+    readme_group: 'test'
+    SFCGAL_CHECKOUT_SHA1: '5584600ad7ed512f158b297476f57ed5fcf9c8dc'
+    SFCGAL_CHECKOUT: 'tags/v1.5.2'
+    tags: '17rc1-l3.5.0beta1-bookworm 17rc1-l3.5.0beta1'
+    template: 'Dockerfile.master.template'
