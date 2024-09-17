@@ -5,7 +5,7 @@ version: 2.1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/docker
-  docker: circleci/docker@2.5.0
+  docker: circleci/docker@2.7.1
   # https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@2.1.1
   # https://circleci.com/developer/orbs/orb/circleci/shellcheck
@@ -13,6 +13,9 @@ orbs:
 
 jobs:
   build-arm64:
+    # We limit this to prevent overloading external servers (e.g., OSGeo, PROJ).
+    # Note: Include parallel GitHub CI jobs when calculating the total load, as they run simultaneously!
+    parallelism: 6
     machine:
       image: ubuntu-2204:current
     resource_class: arm.medium

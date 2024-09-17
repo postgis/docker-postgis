@@ -15,6 +15,9 @@ defaults:
 jobs:
   make-docker-images:
     strategy:
+      # We limit this to prevent overloading external servers (e.g., OSGeo, PROJ).
+      # Note: Include parallel Circle CI jobs when calculating the total load, as they run simultaneously!
+      max-parallel: 6
       matrix:
         include:
 #
