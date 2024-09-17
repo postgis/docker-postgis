@@ -56,8 +56,8 @@ Notes:
 
 For those new to PostGIS, we recommend the following image versions:
 
-- `imresamu/postgis:16-3.4`: This image includes a minimal setup of PostgreSQL with the PostGIS extension.
-- `imresamu/postgis:16-recent-bookworm`: (experimental) Latest postgis with the latest geos,proj,gdal,sfcgal
+- `imresamu/postgis:16-3.4-bookworm`: This image includes a minimal setup of PostgreSQL with the PostGIS extension. ( debian bookworm based, easy to extend with debian packages )
+- `imresamu/postgis:16-recent-bookworm`: (experimental) Latest postgis with the latest geos,proj,gdal,sfcgal. ( debian based, extending is complex ! )
 - `imresamu/postgis:16-3.4-bundle0-bookworm`: (experimental) This image includes additional geospatial-related extras along with PostgreSQL and PostGIS.
 
 ### 🥇Debian - bookworm  (recommended)
@@ -65,7 +65,7 @@ For those new to PostGIS, we recommend the following image versions:
 - This Docker-PostGIS version has a cautious release cycle to guarantee high stability.
   - By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
 - We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
-  - In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
+  - In the Debian Bullseye repository, the versions are: geos=3.11, gdal=3.6, proj=9.1, and sfcgal=1.4.
 - This version is easy to extend and has matured over time.
 
 <!-- bookworm_begin  -->
