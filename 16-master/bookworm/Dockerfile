@@ -100,7 +100,9 @@ RUN set -eux \
       liblz4-dev \
       liblzma-dev \
       libwebp-dev \
-      libzstd-dev
+      libzstd-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ARG PGIS1_CMAKE_BUILD_TYPE
 ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE}
@@ -324,7 +326,9 @@ RUN set -eux \
       libopenjp2-7-dev \
       libpng-dev \
       libqhull-dev \
-      libspatialite-dev
+      libspatialite-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ## GDAL_build-end
 

@@ -67,7 +67,12 @@ RUN set -eux \
     && ./autogen.sh \
     && ./configure \
         --enable-lto \
+{{ if .[env.variant].POSTGIS_CHECKOUT == "tags/3.5.0beta1" then ( -}}
+    # postgis=3.5.0beta1 -j1 workaround activated; https://trac.osgeo.org/postgis/ticket/5779
+    && make -j1 \
+{{ ) else ( -}}
     && make -j$(nproc) \
+{{ ) end -}}
     && make install \
     \
 # This section is for refreshing the proj data for the regression tests.

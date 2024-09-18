@@ -100,7 +100,9 @@ RUN set -eux \
       liblz4-dev \
       liblzma-dev \
       libwebp-dev \
-      libzstd-dev
+      libzstd-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ARG PGIS1_CMAKE_BUILD_TYPE
 ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE}
@@ -324,7 +326,9 @@ RUN set -eux \
       libopenjp2-7-dev \
       libpng-dev \
       libqhull-dev \
-      libspatialite-dev
+      libspatialite-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ## GDAL_build-end
 
@@ -630,7 +634,8 @@ RUN set -eux \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
         --enable-lto \
-    && make -j$(nproc) \
+    # postgis=3.5.0beta1 -j1 workaround activated; https://trac.osgeo.org/postgis/ticket/5779
+    && make -j1 \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
     && if command -v projsync >/dev/null 2>&1; then \
