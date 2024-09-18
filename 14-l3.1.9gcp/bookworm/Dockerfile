@@ -629,6 +629,6 @@ RUN set -eux \
     && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
     # list last commits.
-    && find /_pgis_*_last_commit.txt -type f -print -exec cat {} \;  \
+    && find /_pgis*_commit.txt -type f -print -exec cat {} \;  \
     # list postgresql, postgis version
     && cat _pgis_full_version.txt

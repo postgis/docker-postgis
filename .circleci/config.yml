@@ -15,10 +15,10 @@ jobs:
   build-arm64:
     # We limit this to prevent overloading external servers (e.g., OSGeo, PROJ).
     # Note: Include parallel GitHub CI jobs when calculating the total load, as they run simultaneously!
-    parallelism: 6
+    parallelism: 8
     machine:
       image: ubuntu-2204:current
-    resource_class: arm.medium
+    resource_class: arm.xlarge
     environment:
       BUILDX_PLATFORMS: linux/arm64v8
       DOCKER_BUILDKIT: '1'

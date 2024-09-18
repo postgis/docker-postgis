@@ -72,8 +72,7 @@ RUN set -eux \
     && ./autogen.sh \
     && ./configure \
         --enable-lto \
-    # postgis=3.5.0beta1 -j1 workaround activated; https://trac.osgeo.org/postgis/ticket/5779
-    && make -j1 \
+    && make -j$(nproc) \
     && make install \
     \
 # This section is for refreshing the proj data for the regression tests.

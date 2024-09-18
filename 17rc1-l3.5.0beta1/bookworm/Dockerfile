@@ -634,8 +634,7 @@ RUN set -eux \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
         --enable-lto \
-    # postgis=3.5.0beta1 -j1 workaround activated; https://trac.osgeo.org/postgis/ticket/5779
-    && make -j1 \
+    && make -j$(nproc) \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
     && if command -v projsync >/dev/null 2>&1; then \
@@ -726,6 +725,6 @@ RUN set -eux \
     && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed" \
     \
     # list last commits.
-    && find /_pgis_*_last_commit.txt -type f -print -exec cat {} \;  \
+    && find /_pgis*_commit.txt -type f -print -exec cat {} \;  \
     # list postgresql, postgis version
     && cat _pgis_full_version.txt
