@@ -102,25 +102,25 @@ manifest-tool push from-args \
 
 # ----- 12-3.5-alpine3.19 -----
 
-echo "manifest: ${dockername}:12-3.5.0beta1-alpine3.19"
+echo "manifest: ${dockername}:12-3.5.0rc1-alpine3.19"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:12-3.5.0beta1-alpine3.19 \
-    --target ${dockername}:12-3.5.0beta1-alpine3.19 || true
+    --template ${dockername}-ARCHVARIANT:12-3.5.0rc1-alpine3.19 \
+    --target ${dockername}:12-3.5.0rc1-alpine3.19 || true
 
 # ----- 12-3.5-alpine3.20 -----
 
-echo "manifest: ${dockername}:12-3.5.0beta1-alpine3.20"
+echo "manifest: ${dockername}:12-3.5.0rc1-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:12-3.5.0beta1-alpine3.20 \
-    --target ${dockername}:12-3.5.0beta1-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:12-3.5.0rc1-alpine3.20 \
+    --target ${dockername}:12-3.5.0rc1-alpine3.20 || true
 
-echo "manifest: ${dockername}:12-3.5.0beta1-alpine"
+echo "manifest: ${dockername}:12-3.5.0rc1-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:12-3.5.0beta1-alpine \
-    --target ${dockername}:12-3.5.0beta1-alpine || true
+    --template ${dockername}-ARCHVARIANT:12-3.5.0rc1-alpine \
+    --target ${dockername}:12-3.5.0rc1-alpine || true
 
 # ----- 13-3.3-alpine3.20 -----
 
@@ -212,25 +212,25 @@ manifest-tool push from-args \
 
 # ----- 13-3.5-alpine3.19 -----
 
-echo "manifest: ${dockername}:13-3.5.0beta1-alpine3.19"
+echo "manifest: ${dockername}:13-3.5.0rc1-alpine3.19"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.0beta1-alpine3.19 \
-    --target ${dockername}:13-3.5.0beta1-alpine3.19 || true
+    --template ${dockername}-ARCHVARIANT:13-3.5.0rc1-alpine3.19 \
+    --target ${dockername}:13-3.5.0rc1-alpine3.19 || true
 
 # ----- 13-3.5-alpine3.20 -----
 
-echo "manifest: ${dockername}:13-3.5.0beta1-alpine3.20"
+echo "manifest: ${dockername}:13-3.5.0rc1-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.0beta1-alpine3.20 \
-    --target ${dockername}:13-3.5.0beta1-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:13-3.5.0rc1-alpine3.20 \
+    --target ${dockername}:13-3.5.0rc1-alpine3.20 || true
 
-echo "manifest: ${dockername}:13-3.5.0beta1-alpine"
+echo "manifest: ${dockername}:13-3.5.0rc1-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.0beta1-alpine \
-    --target ${dockername}:13-3.5.0beta1-alpine || true
+    --template ${dockername}-ARCHVARIANT:13-3.5.0rc1-alpine \
+    --target ${dockername}:13-3.5.0rc1-alpine || true
 
 # ----- 14-3.3-alpine3.20 -----
 
@@ -322,25 +322,25 @@ manifest-tool push from-args \
 
 # ----- 14-3.5-alpine3.19 -----
 
-echo "manifest: ${dockername}:14-3.5.0beta1-alpine3.19"
+echo "manifest: ${dockername}:14-3.5.0rc1-alpine3.19"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.0beta1-alpine3.19 \
-    --target ${dockername}:14-3.5.0beta1-alpine3.19 || true
+    --template ${dockername}-ARCHVARIANT:14-3.5.0rc1-alpine3.19 \
+    --target ${dockername}:14-3.5.0rc1-alpine3.19 || true
 
 # ----- 14-3.5-alpine3.20 -----
 
-echo "manifest: ${dockername}:14-3.5.0beta1-alpine3.20"
+echo "manifest: ${dockername}:14-3.5.0rc1-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.0beta1-alpine3.20 \
-    --target ${dockername}:14-3.5.0beta1-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:14-3.5.0rc1-alpine3.20 \
+    --target ${dockername}:14-3.5.0rc1-alpine3.20 || true
 
-echo "manifest: ${dockername}:14-3.5.0beta1-alpine"
+echo "manifest: ${dockername}:14-3.5.0rc1-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.0beta1-alpine \
-    --target ${dockername}:14-3.5.0beta1-alpine || true
+    --template ${dockername}-ARCHVARIANT:14-3.5.0rc1-alpine \
+    --target ${dockername}:14-3.5.0rc1-alpine || true
 
 # ----- 14-l3.1.9gcp-bookworm -----
 
@@ -466,25 +466,25 @@ manifest-tool push from-args \
 
 # ----- 15-3.5-alpine3.19 -----
 
-echo "manifest: ${dockername}:15-3.5.0beta1-alpine3.19"
+echo "manifest: ${dockername}:15-3.5.0rc1-alpine3.19"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.0beta1-alpine3.19 \
-    --target ${dockername}:15-3.5.0beta1-alpine3.19 || true
+    --template ${dockername}-ARCHVARIANT:15-3.5.0rc1-alpine3.19 \
+    --target ${dockername}:15-3.5.0rc1-alpine3.19 || true
 
 # ----- 15-3.5-alpine3.20 -----
 
-echo "manifest: ${dockername}:15-3.5.0beta1-alpine3.20"
+echo "manifest: ${dockername}:15-3.5.0rc1-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.0beta1-alpine3.20 \
-    --target ${dockername}:15-3.5.0beta1-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:15-3.5.0rc1-alpine3.20 \
+    --target ${dockername}:15-3.5.0rc1-alpine3.20 || true
 
-echo "manifest: ${dockername}:15-3.5.0beta1-alpine"
+echo "manifest: ${dockername}:15-3.5.0rc1-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.0beta1-alpine \
-    --target ${dockername}:15-3.5.0beta1-alpine || true
+    --template ${dockername}-ARCHVARIANT:15-3.5.0rc1-alpine \
+    --target ${dockername}:15-3.5.0rc1-alpine || true
 
 # ----- 15-master-bookworm -----
 
@@ -654,39 +654,39 @@ manifest-tool push from-args \
 
 # ----- 16-3.5-alpine3.19 -----
 
-echo "manifest: ${dockername}:16-3.5.0beta1-alpine3.19"
+echo "manifest: ${dockername}:16-3.5.0rc1-alpine3.19"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.0beta1-alpine3.19 \
-    --target ${dockername}:16-3.5.0beta1-alpine3.19 || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.0rc1-alpine3.19 \
+    --target ${dockername}:16-3.5.0rc1-alpine3.19 || true
 
 # ----- 16-3.5-alpine3.20 -----
 
-echo "manifest: ${dockername}:16-3.5.0beta1-alpine3.20"
+echo "manifest: ${dockername}:16-3.5.0rc1-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.0beta1-alpine3.20 \
-    --target ${dockername}:16-3.5.0beta1-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.0rc1-alpine3.20 \
+    --target ${dockername}:16-3.5.0rc1-alpine3.20 || true
 
-echo "manifest: ${dockername}:16-3.5.0beta1-alpine"
+echo "manifest: ${dockername}:16-3.5.0rc1-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.0beta1-alpine \
-    --target ${dockername}:16-3.5.0beta1-alpine || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.0rc1-alpine \
+    --target ${dockername}:16-3.5.0rc1-alpine || true
 
-# ----- 16-l3.5.0beta1-bookworm -----
+# ----- 16-l3.5.0rc1-bookworm -----
 
-echo "manifest: ${dockername}:16-l3.5.0beta1-bookworm"
+echo "manifest: ${dockername}:16-l3.5.0rc1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-l3.5.0beta1-bookworm \
-    --target ${dockername}:16-l3.5.0beta1-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-l3.5.0rc1-bookworm \
+    --target ${dockername}:16-l3.5.0rc1-bookworm || true
 
-echo "manifest: ${dockername}:16-l3.5.0beta1"
+echo "manifest: ${dockername}:16-l3.5.0rc1"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-l3.5.0beta1 \
-    --target ${dockername}:16-l3.5.0beta1 || true
+    --template ${dockername}-ARCHVARIANT:16-l3.5.0rc1 \
+    --target ${dockername}:16-l3.5.0rc1 || true
 
 # ----- 16-master-bookworm -----
 
@@ -756,39 +756,39 @@ manifest-tool push from-args \
 
 # ----- 17rc1-3.5-alpine3.19 -----
 
-echo "manifest: ${dockername}:17rc1-3.5.0beta1-alpine3.19"
+echo "manifest: ${dockername}:17rc1-3.5.0rc1-alpine3.19"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17rc1-3.5.0beta1-alpine3.19 \
-    --target ${dockername}:17rc1-3.5.0beta1-alpine3.19 || true
+    --template ${dockername}-ARCHVARIANT:17rc1-3.5.0rc1-alpine3.19 \
+    --target ${dockername}:17rc1-3.5.0rc1-alpine3.19 || true
 
 # ----- 17rc1-3.5-alpine3.20 -----
 
-echo "manifest: ${dockername}:17rc1-3.5.0beta1-alpine3.20"
+echo "manifest: ${dockername}:17rc1-3.5.0rc1-alpine3.20"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17rc1-3.5.0beta1-alpine3.20 \
-    --target ${dockername}:17rc1-3.5.0beta1-alpine3.20 || true
+    --template ${dockername}-ARCHVARIANT:17rc1-3.5.0rc1-alpine3.20 \
+    --target ${dockername}:17rc1-3.5.0rc1-alpine3.20 || true
 
-echo "manifest: ${dockername}:17rc1-3.5.0beta1-alpine"
+echo "manifest: ${dockername}:17rc1-3.5.0rc1-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17rc1-3.5.0beta1-alpine \
-    --target ${dockername}:17rc1-3.5.0beta1-alpine || true
+    --template ${dockername}-ARCHVARIANT:17rc1-3.5.0rc1-alpine \
+    --target ${dockername}:17rc1-3.5.0rc1-alpine || true
 
-# ----- 17rc1-l3.5.0beta1-bookworm -----
+# ----- 17rc1-l3.5.0rc1-bookworm -----
 
-echo "manifest: ${dockername}:17rc1-l3.5.0beta1-bookworm"
+echo "manifest: ${dockername}:17rc1-l3.5.0rc1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17rc1-l3.5.0beta1-bookworm \
-    --target ${dockername}:17rc1-l3.5.0beta1-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17rc1-l3.5.0rc1-bookworm \
+    --target ${dockername}:17rc1-l3.5.0rc1-bookworm || true
 
-echo "manifest: ${dockername}:17rc1-l3.5.0beta1"
+echo "manifest: ${dockername}:17rc1-l3.5.0rc1"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17rc1-l3.5.0beta1 \
-    --target ${dockername}:17rc1-l3.5.0beta1 || true
+    --template ${dockername}-ARCHVARIANT:17rc1-l3.5.0rc1 \
+    --target ${dockername}:17rc1-l3.5.0rc1 || true
 
 # ----- 17rc1-master-bookworm -----
 
