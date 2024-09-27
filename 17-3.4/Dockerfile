@@ -2,10 +2,10 @@
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM postgres:12-bullseye
+FROM postgres:17-bullseye
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.4.3+dfsg-2.pgdg110+1 spatial database extension with PostgreSQL 12 bullseye" \
+      org.opencontainers.image.description="PostGIS 3.4.3+dfsg-2.pgdg110+1 spatial database extension with PostgreSQL 17 bullseye" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
