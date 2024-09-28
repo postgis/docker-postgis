@@ -6,11 +6,11 @@
 FROM postgres:15-bullseye
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.4.2+dfsg-1.pgdg110+1 spatial database extension with PostgreSQL 15 bullseye" \
+      org.opencontainers.image.description="PostGIS 3.4.3+dfsg-2.pgdg110+1 spatial database extension with PostgreSQL 15 bullseye" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
-ENV POSTGIS_VERSION 3.4.2+dfsg-1.pgdg110+1
+ENV POSTGIS_VERSION 3.4.3+dfsg-2.pgdg110+1
 
 RUN set -eux \
       && apt-get update \
