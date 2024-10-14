@@ -22,7 +22,7 @@ debian_variants=" bullseye bookworm "
 
 debian_latest="bookworm"
 alpine_latest="alpine3.20"
-postgis_latest="3.4"
+postgis_latest="3.5"
 postgres_latest="17"
 postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5"
 postgres_versions="11 12 13 14 15 16 17"
@@ -271,6 +271,7 @@ get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal" releases nore
 get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj" releases norepo "${PROJ_CHECKOUT_LOCK}"
 get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal" releases norepo "${SFCGAL_CHECKOUT_LOCK}"
 
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL17 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL16 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL15 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL14 ""

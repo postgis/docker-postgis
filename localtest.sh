@@ -28,7 +28,7 @@ fi
 # check update code
 ./update.sh
 
-test_tag=16-3.4-bookworm
+test_tag=17-3.5-bookworm
 
 # check commands
 make -n test-${test_tag}
@@ -74,10 +74,3 @@ echo "WARNING:  Be carefull and not push the .localtest.sh script generated Dock
 echo "          because contains reference to the test REGISTRY, REPO_NAME and IMAGE_NAME!"
 echo " "
 echo "done."
-
-#  manual tests cheetsheets:
-#  ----------------------------
-#  REGISTRY=localhost:5000  make push-15-3.4-bundle0
-#  REGISTRY=localhost:5000  make push-15-3.4-bundle0-bookworm
-#  TEST=true                make push-15-3.4-bundle0-bookworm
-#
