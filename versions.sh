@@ -271,6 +271,7 @@ get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal" releases nore
 get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj" releases norepo "${PROJ_CHECKOUT_LOCK}"
 get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal" releases norepo "${SFCGAL_CHECKOUT_LOCK}"
 
+get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL17 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL16 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL15 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL14 ""

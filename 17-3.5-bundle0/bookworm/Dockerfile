@@ -16,7 +16,7 @@ ARG REGISTRY=docker.io
 ARG REPO_NAME=imresamu
 ARG IMAGE_NAME=postgis-amd64
 
-ARG PGIS1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:15-3.4-bookworm
+ARG PGIS1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:17-3.5-bookworm
 
 ARG PGIS1_MOBILITYDB_REPOSITORY=https://github.com/MobilityDB/MobilityDB.git
 ARG PGIS1_MOBILITYDB_CHECKOUT=tags/v1.1.2
@@ -36,8 +36,8 @@ ARG PGIS1_TIMESCALEDB_CHECKOUT=tags/2.17.0
 ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1=43ef9b7bda813c10f845fe55f7fc6113bbd47b07
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
-ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL15_1_5_2
-ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1=fabd97bd76361051b91c0e772eb819a45f3fd095
+ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL17_1_7_0
+ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1=85e07af6ca4675a26fa2281370c37371b883b2a9
 
 ARG PGIS1_DUCKDB_CHECKOUT=tags/v1.1.2
 
@@ -253,10 +253,10 @@ RUN set -eux \
     && rm -rf .git
     #install:  psql < /pg_svg/pg-svg-lib.sql
 
-FROM ${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:15-3.4-bookworm
+FROM ${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:17-3.5-bookworm
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS Bundle - 15-3.4-bookworm " \
+      org.opencontainers.image.description="PostGIS Bundle - 17-3.5-bookworm " \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 # install all utf8 locales;

@@ -120,6 +120,8 @@ Please note that the included package list is subject to change as we continue t
 <!-- bundle0_begin  -->
 | `docker.io/imresamu/postgis:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
+| [`16-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0-bookworm), [`16-3.5.0-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.0-bundle0-bookworm), [`16-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.0 |
+| [`17-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bundle0-bookworm), [`17-3.5.0-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5.0-bundle0-bookworm), [`17-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bundle0), [`bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 17 | 3.5.0 |
 <!-- bundle0_end  -->
 
 
