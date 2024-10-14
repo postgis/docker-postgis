@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/postgis/docker-postgis/workflows/Docker%20PostGIS%20CI/badge.svg)](https://github.com/postgis/docker-postgis/actions) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.4.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, 16 and 17. Additionally, an image version is provided which is built from the latest two versions of Postgres (16, 17) with versions of PostGIS and its dependencies built from their respective master branches.
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.5.x, which is compatible with PostgreSQL versions 12, 13, 14, 15, 16 and 17. Additionally, an image version is provided which is built from the latest two versions of Postgres (16, 17) with versions of PostGIS and its dependencies built from their respective master branches.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -22,7 +22,7 @@ Unless `-e POSTGRES_DB` is passed to the container at startup time, this databas
 
 Supported architecture: `amd64` (also known as X86-64)"
 
-Recommended versions for new users are: `postgis/postgis:17-3.4`, `postgis/postgis:16-3.4`
+Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postgis:16-3.5`
 
 ### Debian based (recommended)
 
@@ -32,14 +32,14 @@ Recommended versions for new users are: `postgis/postgis:17-3.4`, `postgis/postg
   * In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
 * This version is easy to extend and has matured over time.
 
- DockerHub image | Dockerfile | OS | Postgres | PostGIS |
+| DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
-| [postgis/postgis:12-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=12-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/12-3.4/Dockerfile) | debian:bullseye | 12 | 3.4.3 |
-| [postgis/postgis:13-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.4/Dockerfile) | debian:bullseye | 13 | 3.4.3 |
-| [postgis/postgis:14-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.4/Dockerfile) | debian:bullseye | 14 | 3.4.3 |
-| [postgis/postgis:15-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.4/Dockerfile) | debian:bullseye | 15 | 3.4.3 |
-| [postgis/postgis:16-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.4/Dockerfile) | debian:bullseye | 16 | 3.4.3 |
-| [postgis/postgis:17-3.4](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.4) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.4/Dockerfile) | debian:bullseye | 17 | 3.4.3 |
+| [postgis/postgis:12-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=12-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/12-3.5/Dockerfile) | debian:bullseye | 12 | 3.5.0 |
+| [postgis/postgis:13-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.5/Dockerfile) | debian:bullseye | 13 | 3.5.0 |
+| [postgis/postgis:14-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.5/Dockerfile) | debian:bullseye | 14 | 3.5.0 |
+| [postgis/postgis:15-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.5/Dockerfile) | debian:bullseye | 15 | 3.5.0 |
+| [postgis/postgis:16-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.5/Dockerfile) | debian:bullseye | 16 | 3.5.0 |
+| [postgis/postgis:17-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.5/Dockerfile) | debian:bullseye | 17 | 3.5.0 |
 
 ### Alpine based
 
@@ -49,25 +49,23 @@ Recommended versions for new users are: `postgis/postgis:17-3.4`, `postgis/postg
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
-| [postgis/postgis:12-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=12-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/12-3.4/alpine/Dockerfile) | alpine:3.20 | 12 | 3.4.3 |
-| [postgis/postgis:13-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.4/alpine/Dockerfile) | alpine:3.20 | 13 | 3.4.3 |
-| [postgis/postgis:14-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.4/alpine/Dockerfile) | alpine:3.20 | 14 | 3.4.3 |
-| [postgis/postgis:15-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.4/alpine/Dockerfile) | alpine:3.20 | 15 | 3.4.3 |
-| [postgis/postgis:16-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.4/alpine/Dockerfile) | alpine:3.20 | 16 | 3.4.3 |
+| [postgis/postgis:12-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=12-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/12-3.5/alpine/Dockerfile) | alpine:3.20 | 12 | 3.5.0 |
+| [postgis/postgis:13-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.5/alpine/Dockerfile) | alpine:3.20 | 13 | 3.5.0 |
+| [postgis/postgis:14-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.5/alpine/Dockerfile) | alpine:3.20 | 14 | 3.5.0 |
+| [postgis/postgis:15-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.5/alpine/Dockerfile) | alpine:3.20 | 15 | 3.5.0 |
 | [postgis/postgis:16-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.5/alpine/Dockerfile) | alpine:3.20 | 16 | 3.5.0 |
-| [postgis/postgis:17-3.4-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.4-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.4/alpine/Dockerfile) | alpine:3.20 | 17 | 3.4.3 |
 | [postgis/postgis:17-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.5/alpine/Dockerfile) | alpine:3.20 | 17 | 3.5.0 |
 
 ### Test images
 
 * We provide alpha, beta, release candidate (rc), and development (identified as ~master) versions.
 * The template for the `*-master` images is updated manually, which might lead to a delay of a few weeks sometimes.
-* The ~master SFCGAL version is 1.5.1 or higher. The cgal version is locked on the [5.6.x-branch](https://github.com/CGAL/cgal/tree/5.6.x-branch).
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:16-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-master/Dockerfile) | debian:bullseye | 16 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:17-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-master/Dockerfile) | debian:bullseye | 17 | development: postgis, geos, proj, gdal |
+
 
 ## Usage
 
@@ -154,7 +152,7 @@ For more specific issues related to the postgres docker image, you can search us
 - Optimizing Security Scans:
 It's advisable to focus on scanning and fixing issues that can be resolved.
 Use this command to scan for fixable issues only:
-  * `trivy image --ignore-unfixed postgis/postgis:16-3.4-alpine`
+  * `trivy image --ignore-unfixed postgis/postgis:16-3.5-alpine`
   * `trivy image --ignore-unfixed postgres:16-alpine`
 For more details, you can read this article: https://pythonspeed.com/articles/docker-security-scanner/
 

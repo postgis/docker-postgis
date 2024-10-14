@@ -6,7 +6,7 @@
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-ARG CGAL_GIT_BRANCH=5.6.x-branch
+ARG CGAL_GIT_BRANCH=master
 FROM postgres:17-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
@@ -84,18 +84,16 @@ ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
 # cgal & sfcgal
-# By utilizing the latest commit of the CGAL 5.x.x-branch and implementing a header-only build for SFCGAL,
-# one can benefit from the latest CGAL patches while avoiding compatibility issues.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH f1af52edeb741a05f86d959984ed943f25f5fcd4
-ENV SFCGAL_GIT_HASH 88ec10481fc51efb4d232fd2f45bb556120a6f4c
+ENV CGAL_GIT_HASH a98031649b4d9bd61ea2934204b523d0d8a9e633
+ENV SFCGAL_GIT_HASH c92aa736e1f22422b8fd4ac6eba2e041b74d3a29
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
     && git clone --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
     && cd cgal \
-    && git checkout ${CGAL5X_GIT_HASH} \
+    && git checkout ${CGAL_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && git clone https://gitlab.com/SFCGAL/SFCGAL.git \
@@ -122,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH d19ab643b9825bf4de5ff336e228b9abc06e2991
+ENV PROJ_GIT_HASH 54a7662dbc52963da70303ac8c9124966f4cf6b4
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -152,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH e142764b77f4b8d0c36ec88406300c5f876743fb
+ENV GEOS_GIT_HASH d7c51c401213d11f5dafd56596295274433379b6
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -168,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 91bfec36a4dc03cfba554e6197a83099d9ec122a
+ENV GDAL_GIT_HASH 014581eece0d174ac283691e855c5f370a73d990
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -301,11 +299,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH f1af52edeb741a05f86d959984ed943f25f5fcd4
-ENV SFCGAL_GIT_HASH 88ec10481fc51efb4d232fd2f45bb556120a6f4c
-ENV PROJ_GIT_HASH d19ab643b9825bf4de5ff336e228b9abc06e2991
-ENV GEOS_GIT_HASH e142764b77f4b8d0c36ec88406300c5f876743fb
-ENV GDAL_GIT_HASH 91bfec36a4dc03cfba554e6197a83099d9ec122a
+ENV CGAL_GIT_HASH a98031649b4d9bd61ea2934204b523d0d8a9e633
+ENV SFCGAL_GIT_HASH c92aa736e1f22422b8fd4ac6eba2e041b74d3a29
+ENV PROJ_GIT_HASH 54a7662dbc52963da70303ac8c9124966f4cf6b4
+ENV GEOS_GIT_HASH d7c51c401213d11f5dafd56596295274433379b6
+ENV GDAL_GIT_HASH 014581eece0d174ac283691e855c5f370a73d990
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -324,7 +322,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH b28f00c3efd772460714cb9db30b0dc9a0ff27fd
+ENV POSTGIS_GIT_HASH 77bcee79332a82a5b5fc7ae6ae47470939a855fa
 
 RUN set -ex \
     && apt-get update \
