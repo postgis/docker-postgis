@@ -796,32 +796,6 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:17-3.5.0-bullseye \
     --target ${dockername}:17-3.5.0-bullseye || true
 
-# ----- 17-3.5-bundle0-bookworm -----
-
-echo "manifest: ${dockername}:17-3.5-bundle0-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5-bundle0-bookworm \
-    --target ${dockername}:17-3.5-bundle0-bookworm || true
-
-echo "manifest: ${dockername}:17-3.5.0-bundle0-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5.0-bundle0-bookworm \
-    --target ${dockername}:17-3.5.0-bundle0-bookworm || true
-
-echo "manifest: ${dockername}:17-3.5-bundle0"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5-bundle0 \
-    --target ${dockername}:17-3.5-bundle0 || true
-
-echo "manifest: ${dockername}:bundle0"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:bundle0 \
-    --target ${dockername}:bundle0 || true
-
 # ----- 17-master-bookworm -----
 
 echo "manifest: ${dockername}:17-master-bookworm"

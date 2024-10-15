@@ -30,7 +30,7 @@ This image ensures that the default database created by the parent `postgres` im
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
 
-## Versions (2024-10-14)
+## Versions (2024-10-15)
 
 
 We provide multi-platform image support for the following architectures:
@@ -121,7 +121,6 @@ Please note that the included package list is subject to change as we continue t
 | `docker.io/imresamu/postgis:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
 | [`16-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0-bookworm), [`16-3.5.0-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.0-bundle0-bookworm), [`16-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.0 |
-| [`17-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bundle0-bookworm), [`17-3.5.0-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5.0-bundle0-bookworm), [`17-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bundle0), [`bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 17 | 3.5.0 |
 <!-- bundle0_end  -->
 
 

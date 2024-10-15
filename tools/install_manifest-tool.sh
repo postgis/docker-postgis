@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 # https://github.com/estesp/manifest-tool
-version="2.1.6"
+version="2.1.8"
 
 # Determine IMAGE_ARCH based on the machine architecture
 if [[ "$(uname -m)" == "x86_64" ]]; then
