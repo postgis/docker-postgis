@@ -50,6 +50,7 @@ RUN set -eux \
       build-essential \
       cmake \
       curl \
+      flex \
       g++ \
       git \
       make \
@@ -197,7 +198,13 @@ RUN pgxn install --verbose pg_xenophile
 RUN pgxn install --verbose pg_xxhash
 RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
+
+{{ if env.version | startswith("17") then ( -}}
+# sqlite_fdw is not available for PG17
+{{ ) else ( -}}
 RUN USE_PGXS=1 pgxn install sqlite_fdw
+{{ ) end -}}
+
 
 FROM builder as builder-other
 
@@ -205,8 +212,11 @@ ARG PGIS1_PG_HINT_PLAN_REPOSITORY
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
 
+
+{{ if env.version | startswith("17") then ( -}}
+#  hydradatabase/hydra is not available for PG17
+{{ ) else ( -}}
 # Add hydradatabase
-# TODO hydradatabase version!
 RUN set -eux \
     && git clone --depth 1 https://github.com/hydradatabase/hydra  \
     && cd hydra/columnar \
@@ -215,6 +225,7 @@ RUN set -eux \
     && ./configure \
     && make -j$(nproc) \
     && make install
+{{ ) end -}}
 
 #  {{ if env.version | startswith("16") then ( -}}
 #  # pg_quack is not available for PG16
@@ -306,10 +317,16 @@ RUN set -eux \
         pspg \
         vip-manager \
         \
+{{ if env.version | startswith("17") then ( -}}
+        #postgresql-$PG_MAJOR-age \             #  not available for PG17
+        #postgresql-$PG_MAJOR-decoderbufs \     #  not available for PG17
+{{ ) else ( -}}
         postgresql-$PG_MAJOR-age \
+        postgresql-$PG_MAJOR-decoderbufs \
+{{ ) end -}}
+        \
         postgresql-$PG_MAJOR-asn1oid \
         postgresql-$PG_MAJOR-cron \
-        postgresql-$PG_MAJOR-decoderbufs \
         postgresql-$PG_MAJOR-extra-window-functions \
         postgresql-$PG_MAJOR-first-last-agg \
         postgresql-$PG_MAJOR-h3 \

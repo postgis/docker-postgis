@@ -55,6 +55,7 @@ RUN set -eux \
       build-essential \
       cmake \
       curl \
+      flex \
       g++ \
       git \
       make \
@@ -202,7 +203,9 @@ RUN pgxn install --verbose pg_xenophile
 RUN pgxn install --verbose pg_xxhash
 RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
+
 RUN USE_PGXS=1 pgxn install sqlite_fdw
+
 
 FROM builder as builder-other
 
@@ -210,8 +213,8 @@ ARG PGIS1_PG_HINT_PLAN_REPOSITORY
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
 
+
 # Add hydradatabase
-# TODO hydradatabase version!
 RUN set -eux \
     && git clone --depth 1 https://github.com/hydradatabase/hydra  \
     && cd hydra/columnar \
@@ -302,9 +305,10 @@ RUN set -eux \
         vip-manager \
         \
         postgresql-$PG_MAJOR-age \
+        postgresql-$PG_MAJOR-decoderbufs \
+        \
         postgresql-$PG_MAJOR-asn1oid \
         postgresql-$PG_MAJOR-cron \
-        postgresql-$PG_MAJOR-decoderbufs \
         postgresql-$PG_MAJOR-extra-window-functions \
         postgresql-$PG_MAJOR-first-last-agg \
         postgresql-$PG_MAJOR-h3 \
