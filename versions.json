@@ -510,7 +510,7 @@
       "template": "Dockerfile.bundle0.template",
       "initfile": "initdb-bundle0.sh",
       "MOBILITYDB_CHECKOUT": "tags/v1.2.0",
-      "MOBILITYDB_CHECKOUT_SHA1": "f457e35de8202a6e8f1b8bb72603b2fcb3dc0321",
+      "MOBILITYDB_CHECKOUT_SHA1": "60048b5b4b7ce2f7560c024d1af024db73b3bd5b",
       "PGSQL_HTTP_CHECKOUT": "tags/v1.6.1",
       "PGSQL_HTTP_CHECKOUT_SHA1": "5e2bd270a9ce2b0e8e1fdf8e46b85396bd4125cd",
       "PGSQL_GZIP_CHECKOUT": "tags/v1.0.0",
