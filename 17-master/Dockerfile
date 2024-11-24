@@ -150,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 1ab10dd64bcb0032adbd76b91fa699bacba8d4e2
+ENV GEOS_GIT_HASH 930487a20b6b5860eba91f9719ce0881973defc2
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 17f6835f621cb785f39aff7eb6ee215255f7ed93
+ENV GDAL_GIT_HASH f6945319679af19f2487cd76b1f62550fdb862ba
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -302,8 +302,8 @@ ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL_GIT_HASH da588c9f95ba1040801afb7e9304259d9359835b
 ENV SFCGAL_GIT_HASH 8660a26173895e6d298a024a9f10fd6e27d43d8b
 ENV PROJ_GIT_HASH 2d430667ce01f845a8fd9768891d45c489c77094
-ENV GEOS_GIT_HASH 1ab10dd64bcb0032adbd76b91fa699bacba8d4e2
-ENV GDAL_GIT_HASH 17f6835f621cb785f39aff7eb6ee215255f7ed93
+ENV GEOS_GIT_HASH 930487a20b6b5860eba91f9719ce0881973defc2
+ENV GDAL_GIT_HASH f6945319679af19f2487cd76b1f62550fdb862ba
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
