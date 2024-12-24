@@ -18,7 +18,7 @@ This image ensures that the default database created by the parent `postgres` im
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-# Versions (2024-11-24)
+# Versions (2024-12-24)
 
 Supported architecture: `amd64` (also known as X86-64)"
 
@@ -44,17 +44,17 @@ Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postg
 ### Alpine based
 
 * The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
-* In the Alpine 3.20 version, the package versions are: geos=3.12.2, gdal=3.9.2, proj=9.4, and sfcgal=1.5.1
+* In the Alpine 3.21 version, the package versions are: geos=3.13, gdal=3.10, proj=9.5, and sfcgal=2.0
 * PostGIS is compiled from source, making it a bit more challenging to extend.
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
-| [postgis/postgis:12-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=12-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/12-3.5/alpine/Dockerfile) | alpine:3.20 | 12 | 3.5.0 |
-| [postgis/postgis:13-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.5/alpine/Dockerfile) | alpine:3.20 | 13 | 3.5.0 |
-| [postgis/postgis:14-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.5/alpine/Dockerfile) | alpine:3.20 | 14 | 3.5.0 |
-| [postgis/postgis:15-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.5/alpine/Dockerfile) | alpine:3.20 | 15 | 3.5.0 |
-| [postgis/postgis:16-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.5/alpine/Dockerfile) | alpine:3.20 | 16 | 3.5.0 |
-| [postgis/postgis:17-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.5/alpine/Dockerfile) | alpine:3.20 | 17 | 3.5.0 |
+| [postgis/postgis:12-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=12-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/12-3.5/alpine/Dockerfile) | alpine:3.21 | 12 | 3.5.1 |
+| [postgis/postgis:13-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=13-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/13-3.5/alpine/Dockerfile) | alpine:3.21 | 13 | 3.5.1 |
+| [postgis/postgis:14-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.5/alpine/Dockerfile) | alpine:3.21 | 14 | 3.5.1 |
+| [postgis/postgis:15-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.5/alpine/Dockerfile) | alpine:3.21 | 15 | 3.5.1 |
+| [postgis/postgis:16-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.5/alpine/Dockerfile) | alpine:3.21 | 16 | 3.5.1 |
+| [postgis/postgis:17-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.5/alpine/Dockerfile) | alpine:3.21 | 17 | 3.5.1 |
 
 ### Test images
 

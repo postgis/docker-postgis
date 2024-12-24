@@ -86,8 +86,8 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH da588c9f95ba1040801afb7e9304259d9359835b
-ENV SFCGAL_GIT_HASH 8660a26173895e6d298a024a9f10fd6e27d43d8b
+ENV CGAL_GIT_HASH f5f5dc72441cd89d5e54ba7026f0524bb07571f3
+ENV SFCGAL_GIT_HASH 38d5c0f5af3eaf38998e53d959994a346deb1c64
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -120,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 2d430667ce01f845a8fd9768891d45c489c77094
+ENV PROJ_GIT_HASH 3421b04700627e2f83ebc3e2cb413eefe0fdb923
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -150,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 930487a20b6b5860eba91f9719ce0881973defc2
+ENV GEOS_GIT_HASH e1c9a7c5c6819383bb57fb15a000cdb06dd47600
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH f6945319679af19f2487cd76b1f62550fdb862ba
+ENV GDAL_GIT_HASH f314d4b6bc0b70582fd1cb07f8ae95d01e9c8a86
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -299,11 +299,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH da588c9f95ba1040801afb7e9304259d9359835b
-ENV SFCGAL_GIT_HASH 8660a26173895e6d298a024a9f10fd6e27d43d8b
-ENV PROJ_GIT_HASH 2d430667ce01f845a8fd9768891d45c489c77094
-ENV GEOS_GIT_HASH 930487a20b6b5860eba91f9719ce0881973defc2
-ENV GDAL_GIT_HASH f6945319679af19f2487cd76b1f62550fdb862ba
+ENV CGAL_GIT_HASH f5f5dc72441cd89d5e54ba7026f0524bb07571f3
+ENV SFCGAL_GIT_HASH 38d5c0f5af3eaf38998e53d959994a346deb1c64
+ENV PROJ_GIT_HASH 3421b04700627e2f83ebc3e2cb413eefe0fdb923
+ENV GEOS_GIT_HASH e1c9a7c5c6819383bb57fb15a000cdb06dd47600
+ENV GDAL_GIT_HASH f314d4b6bc0b70582fd1cb07f8ae95d01e9c8a86
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -322,7 +322,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 78f1646214ca915fd34580a63989afd772736521
+ENV POSTGIS_GIT_HASH 04ef40af32ceeb671bce399b73814e8630c54a6d
 
 RUN set -ex \
     && apt-get update \
