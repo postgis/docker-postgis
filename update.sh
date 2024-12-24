@@ -25,7 +25,7 @@ githubrepolink="https://github.com/postgis/docker-postgis/blob/master"
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
-defaultAlpinenSuite='3.20'
+defaultAlpinenSuite='3.21'
 defaultDebianSuite='bullseye-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
@@ -243,10 +243,28 @@ for version in "${versions[@]}"; do
     if [ "master" == "$postgisVersion" ]; then
         srcVersion=""
         srcSha256=""
+    elif [ -d "$version/alpine" ]; then
+        # For Alpine, get the latest release in the same minor version series
+        _postgisMajor=$(echo "$postgisMajMin" | cut -d. -f1)
+        _postgisMinor=$(echo "$postgisMajMin" | cut -d. -f2)
+
+        # Find the latest non-preview release for this minor version
+        srcVersion=$(echo "$postgis_all_v3_versions_array_string" | tr ' ' '\n' | grep "^${_postgisMajor}\.${_postgisMinor}\." | grep -v '[a-zA-Z]' | head -n 1)
+
+        # If no stable release found, fall back to the debian version
+        if [ -z "$srcVersion" ]; then
+            srcVersion="${postgisFullVersion%%+*}"
+        fi
+
+        srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
+        echo "Selected PostGIS version for Alpine: ${srcVersion}"
+        postgisDocSrc=$srcVersion
     else
         srcVersion="${postgisFullVersion%%+*}"
         srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"
+        postgisDocSrc=$srcVersion
     fi
+
     for variant in alpine; do
         if [ ! -d "$version/$variant" ]; then
             continue
