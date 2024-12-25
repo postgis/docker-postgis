@@ -17,15 +17,15 @@ source tools/environment_init.sh
 api_preference="github"
 #api_preference="osgeo"  -- not working yet
 
-alpine_variants=" alpine3.19 alpine3.20 "
+alpine_variants=" alpine3.20 alpine3.21 "
 debian_variants=" bullseye bookworm "
 
 debian_latest="bookworm"
-alpine_latest="alpine3.20"
+alpine_latest="alpine3.21"
 postgis_latest="3.5"
 postgres_latest="17"
 postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5"
-postgres_versions="11 12 13 14 15 16 17"
+postgres_versions="12 13 14 15 16 17"
 
 # MASTER_BRANCH_MODE='flexible'=if you want to use the latest version of the dependencies - automatically
 #   if not set, it will use the locked version, and the checkout hash will be used
