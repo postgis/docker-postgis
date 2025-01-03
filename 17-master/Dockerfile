@@ -86,7 +86,7 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH f5f5dc72441cd89d5e54ba7026f0524bb07571f3
+ENV CGAL_GIT_HASH 1c04f5768caddb5598c37dee342e72ff6c0c83c5
 ENV SFCGAL_GIT_HASH 38d5c0f5af3eaf38998e53d959994a346deb1c64
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -120,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 3421b04700627e2f83ebc3e2cb413eefe0fdb923
+ENV PROJ_GIT_HASH 5500ba73a99c8b64778628ac50e03c51a984a5c6
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH f314d4b6bc0b70582fd1cb07f8ae95d01e9c8a86
+ENV GDAL_GIT_HASH 0fbf2b8a968178bc808997df1ebd127155d701c2
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -299,11 +299,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH f5f5dc72441cd89d5e54ba7026f0524bb07571f3
+ENV CGAL_GIT_HASH 1c04f5768caddb5598c37dee342e72ff6c0c83c5
 ENV SFCGAL_GIT_HASH 38d5c0f5af3eaf38998e53d959994a346deb1c64
-ENV PROJ_GIT_HASH 3421b04700627e2f83ebc3e2cb413eefe0fdb923
+ENV PROJ_GIT_HASH 5500ba73a99c8b64778628ac50e03c51a984a5c6
 ENV GEOS_GIT_HASH e1c9a7c5c6819383bb57fb15a000cdb06dd47600
-ENV GDAL_GIT_HASH f314d4b6bc0b70582fd1cb07f8ae95d01e9c8a86
+ENV GDAL_GIT_HASH 0fbf2b8a968178bc808997df1ebd127155d701c2
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
