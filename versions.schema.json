@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "definitions": {
+    "git_checkout_ref": {
+      "type": "string",      
+      "pattern": "^(master|main|develop|tags/(((v|V)?[0-9]+(\\.[0-9]+)*([-_]?[a-zA-Z0-9]+)*)|((REL|rel)_?[0-9]+(_[0-9]+)*(_[a-zA-Z0-9]+)*)))$"
+    },
+    "sha1_value": {
+      "type": "string",
+      "pattern": "^(nocheck|[0-9a-f]{40})$"
+    },
+    "pg_version": {
+      "type": "string",
+      "pattern": "^[0-9]{2}$"
+    },
+    "gdal_build_type": {
+      "type": "string",
+      "enum": ["with_extra", "minimal"]
+    },
+    "shell_script": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]*\\.sh$"
+    },
+    "docker_tags": {
+      "type": "string",
+      "pattern": "^(([0-9]{2}-[a-zA-Z0-9.-]+|recent|latest|alpine)\\s*)+$"
+    },
+    "readme_group_type": {
+      "type": "string",
+      "pattern": "^(alpine[0-9.]+|bullseye|bookworm|bundle0|locked|recent|test)$"
+    },
+    "distribution": {
+      "type": "object",
+      "required": [
+        "tags", 
+        "postgis", 
+        "arch", 
+        "template", 
+        "initfile",
+        "PG_MAJOR",
+        "PG_DOCKER",
+        "readme_group"
+      ],
+      "properties": {
+        "tags": {"$ref": "#/definitions/docker_tags"},
+        "postgis": {"type": "string"},
+        "readme_group": {"$ref": "#/definitions/readme_group_type"},
+        "arch": {"type": "string", "pattern": "^(amd64|arm64|amd64 arm64)$"},
+        "template": {
+          "type": "string", 
+          "enum": [
+            "Dockerfile.alpine.template",
+            "Dockerfile.debian.template",
+            "Dockerfile.master.template",
+            "Dockerfile.bundle0.template"
+          ]
+        },
+        "initfile": {"$ref": "#/definitions/shell_script"},
+        "PG_MAJOR": {"$ref": "#/definitions/pg_version"},
+        "PG_DOCKER": {"$ref": "#/definitions/pg_version"},
+        "GDAL_BUILD": {"$ref": "#/definitions/gdal_build_type"},
+        "POSTGIS_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "PROJ_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "GDAL_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "GEOS_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "SFCGAL_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "CGAL_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "MOBILITYDB_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "PGSQL_HTTP_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "PGSQL_GZIP_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "TIMESCALEDB_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "DUCKDB_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "PG_HINT_PLAN_CHECKOUT": {"$ref": "#/definitions/git_checkout_ref"},
+        "POSTGIS_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "PROJ_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "GDAL_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "GEOS_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "SFCGAL_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "CGAL_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "MOBILITYDB_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "PGSQL_HTTP_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "PGSQL_GZIP_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "TIMESCALEDB_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "DUCKDB_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"},
+        "PG_HINT_PLAN_CHECKOUT_SHA1": {"$ref": "#/definitions/sha1_value"}
+      },
+      "patternProperties": {
+        ".*_CHECKOUT_SHA1$": {"$ref": "#/definitions/sha1_value"}
+      }
+    }
+  },
+  "patternProperties": {
+    "^[0-9]+-[0-9.]+(?:-[a-zA-Z0-9]+)?$": {
+      "type": "object",
+      "patternProperties": {
+        "^(alpine[0-9.]+|bullseye|bookworm)$": {
+          "$ref": "#/definitions/distribution"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

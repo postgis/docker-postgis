@@ -108,11 +108,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:12-3.5-bookworm \
     --target ${dockername}:12-3.5-bookworm || true
 
-echo "manifest: ${dockername}:12-3.5.0-bookworm"
+echo "manifest: ${dockername}:12-3.5.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:12-3.5.0-bookworm \
-    --target ${dockername}:12-3.5.0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:12-3.5.1-bookworm \
+    --target ${dockername}:12-3.5.1-bookworm || true
 
 echo "manifest: ${dockername}:12-3.5"
 manifest-tool push from-args \
@@ -128,11 +128,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:12-3.5-bullseye \
     --target ${dockername}:12-3.5-bullseye || true
 
-echo "manifest: ${dockername}:12-3.5.0-bullseye"
+echo "manifest: ${dockername}:12-3.5.1-bullseye"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:12-3.5.0-bullseye \
-    --target ${dockername}:12-3.5.0-bullseye || true
+    --template ${dockername}-ARCHVARIANT:12-3.5.1-bullseye \
+    --target ${dockername}:12-3.5.1-bullseye || true
 
 # ----- 13-3.3-alpine3.21 -----
 
@@ -230,11 +230,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:13-3.5-bookworm \
     --target ${dockername}:13-3.5-bookworm || true
 
-echo "manifest: ${dockername}:13-3.5.0-bookworm"
+echo "manifest: ${dockername}:13-3.5.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.0-bookworm \
-    --target ${dockername}:13-3.5.0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:13-3.5.1-bookworm \
+    --target ${dockername}:13-3.5.1-bookworm || true
 
 echo "manifest: ${dockername}:13-3.5"
 manifest-tool push from-args \
@@ -250,11 +250,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:13-3.5-bullseye \
     --target ${dockername}:13-3.5-bullseye || true
 
-echo "manifest: ${dockername}:13-3.5.0-bullseye"
+echo "manifest: ${dockername}:13-3.5.1-bullseye"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.0-bullseye \
-    --target ${dockername}:13-3.5.0-bullseye || true
+    --template ${dockername}-ARCHVARIANT:13-3.5.1-bullseye \
+    --target ${dockername}:13-3.5.1-bullseye || true
 
 # ----- 14-3.3-alpine3.21 -----
 
@@ -352,11 +352,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.5-bookworm \
     --target ${dockername}:14-3.5-bookworm || true
 
-echo "manifest: ${dockername}:14-3.5.0-bookworm"
+echo "manifest: ${dockername}:14-3.5.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.0-bookworm \
-    --target ${dockername}:14-3.5.0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:14-3.5.1-bookworm \
+    --target ${dockername}:14-3.5.1-bookworm || true
 
 echo "manifest: ${dockername}:14-3.5"
 manifest-tool push from-args \
@@ -372,11 +372,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.5-bullseye \
     --target ${dockername}:14-3.5-bullseye || true
 
-echo "manifest: ${dockername}:14-3.5.0-bullseye"
+echo "manifest: ${dockername}:14-3.5.1-bullseye"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.0-bullseye \
-    --target ${dockername}:14-3.5.0-bullseye || true
+    --template ${dockername}-ARCHVARIANT:14-3.5.1-bullseye \
+    --target ${dockername}:14-3.5.1-bullseye || true
 
 # ----- 14-l3.1.9gcp-bookworm -----
 
@@ -488,11 +488,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.5-bookworm \
     --target ${dockername}:15-3.5-bookworm || true
 
-echo "manifest: ${dockername}:15-3.5.0-bookworm"
+echo "manifest: ${dockername}:15-3.5.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.0-bookworm \
-    --target ${dockername}:15-3.5.0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:15-3.5.1-bookworm \
+    --target ${dockername}:15-3.5.1-bookworm || true
 
 echo "manifest: ${dockername}:15-3.5"
 manifest-tool push from-args \
@@ -508,11 +508,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.5-bullseye \
     --target ${dockername}:15-3.5-bullseye || true
 
-echo "manifest: ${dockername}:15-3.5.0-bullseye"
+echo "manifest: ${dockername}:15-3.5.1-bullseye"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.0-bullseye \
-    --target ${dockername}:15-3.5.0-bullseye || true
+    --template ${dockername}-ARCHVARIANT:15-3.5.1-bullseye \
+    --target ${dockername}:15-3.5.1-bullseye || true
 
 # ----- 16-3.3-alpine3.21 -----
 
@@ -610,11 +610,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.5-bookworm \
     --target ${dockername}:16-3.5-bookworm || true
 
-echo "manifest: ${dockername}:16-3.5.0-bookworm"
+echo "manifest: ${dockername}:16-3.5.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.0-bookworm \
-    --target ${dockername}:16-3.5.0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.1-bookworm \
+    --target ${dockername}:16-3.5.1-bookworm || true
 
 echo "manifest: ${dockername}:16-3.5"
 manifest-tool push from-args \
@@ -630,11 +630,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.5-bullseye \
     --target ${dockername}:16-3.5-bullseye || true
 
-echo "manifest: ${dockername}:16-3.5.0-bullseye"
+echo "manifest: ${dockername}:16-3.5.1-bullseye"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.0-bullseye \
-    --target ${dockername}:16-3.5.0-bullseye || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.1-bullseye \
+    --target ${dockername}:16-3.5.1-bullseye || true
 
 # ----- 16-3.5-bundle0-bookworm -----
 
@@ -644,11 +644,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.5-bundle0-bookworm \
     --target ${dockername}:16-3.5-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:16-3.5.0-bundle0-bookworm"
+echo "manifest: ${dockername}:16-3.5.1-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.0-bundle0-bookworm \
-    --target ${dockername}:16-3.5.0-bundle0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.1-bundle0-bookworm \
+    --target ${dockername}:16-3.5.1-bundle0-bookworm || true
 
 echo "manifest: ${dockername}:16-3.5-bundle0"
 manifest-tool push from-args \
@@ -764,11 +764,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:17-3.5-bookworm \
     --target ${dockername}:17-3.5-bookworm || true
 
-echo "manifest: ${dockername}:17-3.5.0-bookworm"
+echo "manifest: ${dockername}:17-3.5.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5.0-bookworm \
-    --target ${dockername}:17-3.5.0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17-3.5.1-bookworm \
+    --target ${dockername}:17-3.5.1-bookworm || true
 
 echo "manifest: ${dockername}:17-3.5"
 manifest-tool push from-args \
@@ -790,11 +790,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:17-3.5-bullseye \
     --target ${dockername}:17-3.5-bullseye || true
 
-echo "manifest: ${dockername}:17-3.5.0-bullseye"
+echo "manifest: ${dockername}:17-3.5.1-bullseye"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5.0-bullseye \
-    --target ${dockername}:17-3.5.0-bullseye || true
+    --template ${dockername}-ARCHVARIANT:17-3.5.1-bullseye \
+    --target ${dockername}:17-3.5.1-bullseye || true
 
 # ----- 17-master-bookworm -----
 

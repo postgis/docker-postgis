@@ -28,6 +28,8 @@ fi
 # check update code
 ./update.sh
 
+check-jsonschema --schemafile versions.schema.json versions.json
+
 test_tag=17-3.5-bookworm
 
 # check commands

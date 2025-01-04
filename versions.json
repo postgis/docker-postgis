@@ -47,7 +47,7 @@
   },
   "12-3.5": {
     "bullseye": {
-      "tags": "12-3.5-bullseye 12-3.5.0-bullseye",
+      "tags": "12-3.5-bullseye 12-3.5.1-bullseye",
       "postgis": "3.5",
       "readme_group": "bullseye",
       "PG_MAJOR": "12",
@@ -56,10 +56,10 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg110+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg110+1"
     },
     "bookworm": {
-      "tags": "12-3.5-bookworm 12-3.5.0-bookworm 12-3.5",
+      "tags": "12-3.5-bookworm 12-3.5.1-bookworm 12-3.5",
       "postgis": "3.5",
       "readme_group": "bookworm",
       "PG_MAJOR": "12",
@@ -68,7 +68,7 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
       "tags": "12-3.5-alpine3.20 12-3.5.1-alpine3.20",
@@ -147,7 +147,7 @@
   },
   "13-3.5": {
     "bullseye": {
-      "tags": "13-3.5-bullseye 13-3.5.0-bullseye",
+      "tags": "13-3.5-bullseye 13-3.5.1-bullseye",
       "postgis": "3.5",
       "readme_group": "bullseye",
       "PG_MAJOR": "13",
@@ -156,10 +156,10 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg110+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg110+1"
     },
     "bookworm": {
-      "tags": "13-3.5-bookworm 13-3.5.0-bookworm 13-3.5",
+      "tags": "13-3.5-bookworm 13-3.5.1-bookworm 13-3.5",
       "postgis": "3.5",
       "readme_group": "bookworm",
       "PG_MAJOR": "13",
@@ -168,7 +168,7 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
       "tags": "13-3.5-alpine3.20 13-3.5.1-alpine3.20",
@@ -247,7 +247,7 @@
   },
   "14-3.5": {
     "bullseye": {
-      "tags": "14-3.5-bullseye 14-3.5.0-bullseye",
+      "tags": "14-3.5-bullseye 14-3.5.1-bullseye",
       "postgis": "3.5",
       "readme_group": "bullseye",
       "PG_MAJOR": "14",
@@ -256,10 +256,10 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg110+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg110+1"
     },
     "bookworm": {
-      "tags": "14-3.5-bookworm 14-3.5.0-bookworm 14-3.5",
+      "tags": "14-3.5-bookworm 14-3.5.1-bookworm 14-3.5",
       "postgis": "3.5",
       "readme_group": "bookworm",
       "PG_MAJOR": "14",
@@ -268,7 +268,7 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
       "tags": "14-3.5-alpine3.20 14-3.5.1-alpine3.20",
@@ -347,7 +347,7 @@
   },
   "15-3.5": {
     "bullseye": {
-      "tags": "15-3.5-bullseye 15-3.5.0-bullseye",
+      "tags": "15-3.5-bullseye 15-3.5.1-bullseye",
       "postgis": "3.5",
       "readme_group": "bullseye",
       "PG_MAJOR": "15",
@@ -356,10 +356,10 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg110+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg110+1"
     },
     "bookworm": {
-      "tags": "15-3.5-bookworm 15-3.5.0-bookworm 15-3.5",
+      "tags": "15-3.5-bookworm 15-3.5.1-bookworm 15-3.5",
       "postgis": "3.5",
       "readme_group": "bookworm",
       "PG_MAJOR": "15",
@@ -368,7 +368,7 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
       "tags": "15-3.5-alpine3.20 15-3.5.1-alpine3.20",
@@ -447,7 +447,7 @@
   },
   "16-3.5": {
     "bullseye": {
-      "tags": "16-3.5-bullseye 16-3.5.0-bullseye",
+      "tags": "16-3.5-bullseye 16-3.5.1-bullseye",
       "postgis": "3.5",
       "readme_group": "bullseye",
       "PG_MAJOR": "16",
@@ -456,10 +456,10 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg110+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg110+1"
     },
     "bookworm": {
-      "tags": "16-3.5-bookworm 16-3.5.0-bookworm 16-3.5",
+      "tags": "16-3.5-bookworm 16-3.5.1-bookworm 16-3.5",
       "postgis": "3.5",
       "readme_group": "bookworm",
       "PG_MAJOR": "16",
@@ -468,7 +468,7 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
       "tags": "16-3.5-alpine3.20 16-3.5.1-alpine3.20",
@@ -501,7 +501,7 @@
   },
   "16-3.5-bundle0": {
     "bookworm": {
-      "tags": "16-3.5-bundle0-bookworm 16-3.5.0-bundle0-bookworm 16-3.5-bundle0",
+      "tags": "16-3.5-bundle0-bookworm 16-3.5.1-bundle0-bookworm 16-3.5-bundle0",
       "postgis": "3.5",
       "readme_group": "bundle0",
       "PG_MAJOR": "16",
@@ -522,7 +522,7 @@
       "PG_HINT_PLAN_CHECKOUT": "tags/REL16_1_6_1",
       "PG_HINT_PLAN_CHECKOUT_SHA1": "54b4b0358a6c96dc80b2b836bba50937415753b6",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     }
   },
   "16-master": {
@@ -595,7 +595,7 @@
   },
   "17-3.5": {
     "bullseye": {
-      "tags": "17-3.5-bullseye 17-3.5.0-bullseye",
+      "tags": "17-3.5-bullseye 17-3.5.1-bullseye",
       "postgis": "3.5",
       "readme_group": "bullseye",
       "PG_MAJOR": "17",
@@ -604,10 +604,10 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg110+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg110+1"
     },
     "bookworm": {
-      "tags": "17-3.5-bookworm 17-3.5.0-bookworm 17-3.5 latest",
+      "tags": "17-3.5-bookworm 17-3.5.1-bookworm 17-3.5 latest",
       "postgis": "3.5",
       "readme_group": "bookworm",
       "PG_MAJOR": "17",
@@ -616,7 +616,7 @@
       "template": "Dockerfile.debian.template",
       "initfile": "initdb-postgis.sh",
       "POSTGIS_MAJOR": "3",
-      "POSTGIS_VERSION": "3.5.0+dfsg-1.pgdg120+1"
+      "POSTGIS_VERSION": "3.5.1+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
       "tags": "17-3.5-alpine3.20 17-3.5.1-alpine3.20",

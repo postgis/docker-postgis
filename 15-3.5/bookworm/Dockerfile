@@ -6,11 +6,11 @@
 FROM postgres:15-bookworm
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.5.0+dfsg-1.pgdg120+1 spatial database extension with PostgreSQL 15 bookworm" \
+      org.opencontainers.image.description="PostGIS 3.5.1+dfsg-1.pgdg120+1 spatial database extension with PostgreSQL 15 bookworm" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
-ENV POSTGIS_VERSION 3.5.0+dfsg-1.pgdg120+1
+ENV POSTGIS_VERSION 3.5.1+dfsg-1.pgdg120+1
 
 RUN set -eux \
       && apt-get update \

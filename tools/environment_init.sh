@@ -78,7 +78,7 @@ echo " "
 
 # Verify that the required command-line tools (jq, gawk, python3, .. ) are available in the system's PATH.
 # Exit with an error message if any of them are missing.
-for cmd in docker jq gawk curl python3 manifest-tool lastversion; do
+for cmd in docker jq check-jsonschema gawk curl python3 manifest-tool lastversion; do
     if ! command -v "$cmd" &>/dev/null; then
         echo "Error: $cmd is not installed."
         exit 1

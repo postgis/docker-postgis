@@ -11,7 +11,7 @@ env:
 jobs:
   update_dockerfiles:
     name: "update_dockerfiles"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,12 +24,13 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
       - run: pip3 install --upgrade pip
-      - run: pip3 install --upgrade lastversion
+      - run: pip3 install --upgrade lastversion check-jsonschema
       - run: tools/install_manifest-tool.sh
       - run: tools/environment_init.sh
       - run: ./update.sh
       - run: git status
       - run: git diff versions.json
+      - run: check-jsonschema --schemafile versions.schema.json versions.json
 
       - name: Check if versions.json changed
         id: version_check
@@ -64,7 +65,7 @@ jobs:
       # https://github.com/peter-evans/create-pull-request
       - name: Create Pull Request
         if: env.versions_changed == 'true' && steps.check_prs.outputs.create_pr == 'true'
-        id: create-pr        
+        id: create-pr
         uses: peter-evans/create-pull-request@v6
         with:
           committer: GitHub <noreply@github.com>
@@ -97,10 +98,9 @@ jobs:
             gh pr close $PR_NUMBER --comment "Closing to trigger full CI/CD pipeline"
             sleep 5  # Wait for 5 seconds to ensure the PR is fully closed
             gh pr reopen $PR_NUMBER --comment "Reopening to trigger full CI/CD pipeline"
-  
+
       - name: Comment PR
         if: steps.create-pr.outputs.pull-request-number
         run: |
             PR_NUMBER=${{ steps.create-pr.outputs.pull-request-number }}
             gh pr comment $PR_NUMBER --body "This PR was automatically created and reopened by the update_dockerfiles workflow to trigger the full CI/CD pipeline. Please review the changes carefully."
-  

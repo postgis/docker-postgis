@@ -5,9 +5,9 @@ version: 2.1
 
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/docker
-  docker: circleci/docker@2.7.1
+  docker: circleci/docker@2.8.1
   # https://circleci.com/developer/orbs/orb/circleci/python
-  python: circleci/python@2.1.1
+  python: circleci/python@3.0.0
   # https://circleci.com/developer/orbs/orb/circleci/shellcheck
   shellcheck: circleci/shellcheck@3.2.0
 
@@ -17,7 +17,7 @@ jobs:
     # Note: Include parallel GitHub CI jobs when calculating the total load, as they run simultaneously!
     parallelism: 8
     machine:
-      image: ubuntu-2204:current
+      image: ubuntu-2404:current
     resource_class: arm.large
     environment:
       BUILDX_PLATFORMS: linux/arm64v8
@@ -58,7 +58,7 @@ jobs:
       - run: docker --version
       - run: docker info
       - run: pip3 install --upgrade pip
-      - run: pip3 install --upgrade lastversion
+      - run: pip3 install --upgrade lastversion check-jsonschema
       - run: tools/install_manifest-tool.sh
       - run: tools/install_dive.sh
       - run: tools/environment_init.sh

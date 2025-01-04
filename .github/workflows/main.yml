@@ -76,7 +76,7 @@ jobs:
 #matrix-include-end
 
     name: "${{ matrix.version }}-${{ matrix.variant }} docker image"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     continue-on-error: ${{ endsWith(matrix.version, '-master') }}
     env:
       PLATFORM: linux/amd64
@@ -88,7 +88,7 @@ jobs:
       uses: actions/checkout@v4
 
     - run: pip3 install --upgrade pip
-    - run: pip3 install --upgrade lastversion
+    - run: pip3 install --upgrade lastversion check-jsonschema
     - run: tools/install_manifest-tool.sh
     - run: tools/install_dive.sh
     - run: tools/environment_init.sh
@@ -174,7 +174,7 @@ jobs:
   make-readme:
     name: update readme
     needs: make-docker-images
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       PLATFORM: linux/amd64
       DOCKER_BUILDKIT: '1'
@@ -185,7 +185,7 @@ jobs:
       uses: actions/checkout@v4
 
     - run: pip3 install --upgrade pip
-    - run: pip3 install --upgrade lastversion
+    - run: pip3 install --upgrade lastversion check-jsonschema
     - run: tools/install_manifest-tool.sh
     - run: tools/environment_init.sh
     - run: make check_version
