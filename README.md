@@ -20,7 +20,7 @@ Unless `-e POSTGRES_DB` is passed to the container at startup time, this databas
 
 # Versions (2025-01-23)
 
-Supported architecture: `amd64` (also known as X86-64)"
+Supported architectures: `amd64` (also known as X86-64)", `arm64`
 
 Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postgis:16-3.5`
 

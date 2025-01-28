@@ -1,23 +1,24 @@
+---
 name: Docker PostGIS CI
 
 on:
   push:
   pull_request:
   schedule:
-    - cron: '15 5 * * 1'
+    - cron: "15 5 * * 1"
 
 defaults:
   run:
     shell: bash
 
 jobs:
-
   make-docker-images:
     strategy:
       matrix:
         postgres: [12, 13, 14, 15, 16, 17]
-        postgis: ['3.5']
+        postgis: ["3.5"]
         variant: [default, alpine]
+        arch: ["linux/amd64", "linux/arm64"]
         include:
           - postgres: 16
             postgis: master
@@ -26,31 +27,52 @@ jobs:
             postgis: master
             variant: default
 
-    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
+    name: >-
+      Build docker image for
+      ${{ matrix.arch }}-${{ matrix.postgres }}-${{ matrix.postgis }}
+      variant ${{ matrix.variant }}
     runs-on: ubuntu-20.04
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
+      ARCH: ${{ matrix.arch }}
       VARIANT: ${{ matrix.variant }}
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-    - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
-      run: make test
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Login to dockerhub
-      uses: docker/login-action@v3
-      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Push docker image to dockerhub
-      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
-      env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      run: make push
+      - name: >-
+          Build docker image for
+          ${{ env.ARCH }}
+          ${{ env.VERSION }}
+          ${{ env.VARIANT }}
+        run: make test
 
+      - name: Login to dockerhub
+        uses: docker/login-action@v3
+        if: >-
+          ${{
+            (github.ref == 'refs/heads/master') &&
+            (github.event_name != 'pull_request')
+          }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Push docker image to dockerhub
+        if: >-
+          ${{
+            (github.ref == 'refs/heads/master') &&
+            (github.event_name != 'pull_request')
+          }}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: make push
