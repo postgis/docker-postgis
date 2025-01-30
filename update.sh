@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 # Source environment variables and necessary configurations
 source tools/environment_init.sh
+[ -f ./versions.json ]
 
 # This code derived from:
 #   - URL: https://github.com/docker-library/postgres/blob/master/versions.sh
@@ -13,16 +14,16 @@ cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 echo " "
 
 # Generate versions.json metadata file
-./versions.sh "$@"
+./tools/versions.sh "$@"
 
 # apply version.json - generate Dockerfiles
-./apply-templates.sh "$@"
+./tools/apply-templates.sh "$@"
 
 # apply version.json - generate .github/workflows/main.yml and .circleci/config.yml
-./apply-ci.sh "$@"
+./tools/apply-ci.sh "$@"
 
 # apply version.json - generate manifest.sh
-./apply-manifest.sh "$@"
+./tools/apply-manifest.sh "$@"
 
 # apply version.json - generate README.md
-./apply-readme.sh "$@"
+./tools/apply-readme.sh "$@"

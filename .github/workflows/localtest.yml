@@ -17,5 +17,5 @@ jobs:
       - run: pip3 install --upgrade lastversion check-jsonschema
       - run: tools/install_manifest-tool.sh
       - run: tools/environment_init.sh
-      - run: ./localtest.sh
+      - run: tools/localtest.sh
       - run: docker images

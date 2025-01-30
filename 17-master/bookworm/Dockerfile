@@ -1,6 +1,6 @@
 #
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#       source: "Dockerfile.master.template"
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "./tools/apply-templates.sh"
+#       source: "./templates/Dockerfile.master.template"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!

@@ -11,7 +11,6 @@ source tools/environment_init.sh
 # Check dependencies
 [ -f ./versions.json ]
 
-cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 jqt='.jq-template.awk'
 if [ -n "${BASHBREW_SCRIPTS:-}" ]; then
     jqt="$BASHBREW_SCRIPTS/jq-template.awk"
@@ -37,7 +36,7 @@ echo "versions = $versions"
 generated_warning() {
     cat <<-EOH
 		#
-		# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+		# NOTE: THIS DOCKERFILE IS GENERATED VIA "./tools/apply-templates.sh"
 		#       source: "$1"
 		# PLEASE DO NOT EDIT IT DIRECTLY.
 		#
@@ -57,10 +56,10 @@ for version; do
         dir="$version/$variant"
         echo "processing $dir ..."
 
-        template="$(jq -r '.[env.version][env.variant].template' versions.json)"
+        template=./templates/"$(jq -r '.[env.version][env.variant].template' versions.json)"
         echo "  template=$template"
 
-        initfile="$(jq -r '.[env.version][env.variant].initfile' versions.json)"
+        initfile=./templates/"$(jq -r '.[env.version][env.variant].initfile' versions.json)"
         echo "  initfile=$initfile"
 
         tags="$(jq -r '.[env.version][env.variant].tags' versions.json)"
@@ -68,7 +67,7 @@ for version; do
 
         cp -a "$initfile" "$dir/"
         if [ -z "$bundleType" ]; then
-            cp -a update-postgis.sh "$dir/"
+            cp -a ./templates/update-postgis.sh "$dir/"
         fi
 
         echo "$tags" >"$dir/tags"
@@ -82,5 +81,5 @@ for version; do
 done
 
 echo " "
-echo " apply-template : done"
+echo " ./tools/apply-template : done"
 echo " "

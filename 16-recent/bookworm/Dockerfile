@@ -1,6 +1,6 @@
 #
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#       source: "Dockerfile.master.template"
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "./tools/apply-templates.sh"
+#       source: "./templates/Dockerfile.master.template"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!
@@ -16,18 +16,18 @@ ARG PGIS1_SFCGAL_REPOSITORY=https://gitlab.com/sfcgal/SFCGAL.git
 ARG PGIS1_CGAL_REPOSITORY=https://github.com/CGAL/cgal.git
 
 # Should valid git checkout ( SHA1, tags, branches )
-ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.1
+ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.2
 ARG PGIS1_GEOS_CHECKOUT=tags/3.13.0
-ARG PGIS1_GDAL_CHECKOUT=tags/v3.10.0
+ARG PGIS1_GDAL_CHECKOUT=tags/v3.10.1
 ARG PGIS1_PROJ_CHECKOUT=tags/9.5.1
 ARG PGIS1_SFCGAL_CHECKOUT=tags/v2.0.0
 ARG PGIS1_CGAL_CHECKOUT=tags/v6.0.1
 
 # Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
 # Otherwise, verify that the commit hash matches
-ARG PGIS1_POSTGIS_CHECKOUT_SHA1=48ab069ef1482412fda915105b546f9866c76a79
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45
 ARG PGIS1_GEOS_CHECKOUT_SHA1=d7957246c588aa9c690efe67924fd70e741a06ab
-ARG PGIS1_GDAL_CHECKOUT_SHA1=35a44cc570cdf4dbd55611e4bd61da76e56bc221
+ARG PGIS1_GDAL_CHECKOUT_SHA1=9b7a7c8ffa7b7aff696974c432d4254a809b3efe
 ARG PGIS1_PROJ_CHECKOUT_SHA1=41f79ccfe107d3951dac6826f289b55d17cc3b81
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1=5d4eb5e896c41e592534ba1e79ccc721c66d66e3
 ARG PGIS1_CGAL_CHECKOUT_SHA1=50cfbde3b84dbeae8338268db2d78fe4fcb522de

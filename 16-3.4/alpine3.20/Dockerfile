@@ -1,6 +1,6 @@
 #
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#       source: "Dockerfile.alpine.template"
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "./tools/apply-templates.sh"
+#       source: "./templates/Dockerfile.alpine.template"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 

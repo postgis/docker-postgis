@@ -4,6 +4,7 @@ set -Eeuo pipefail
 
 # Source environment variables and necessary configurations
 source tools/environment_init.sh
+[ -f ./versions.json ]
 
 # This code derived from:
 #   - URL: https://github.com/docker-library/postgres/blob/master/versions.sh
@@ -377,7 +378,7 @@ for variant in ${postgis_versions}; do
     echo "postgisSrcSha1[$variant]=${postgisSrcSha1[$variant]}"
 done
 
-cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+#cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 versions=("$@")
 if [ ${#versions[@]} -eq 0 ]; then
     versions=()
@@ -410,7 +411,7 @@ for version in "${versions[@]}"; do
     IFS=- read -r postgresVersion postgisVersion bundleType <<<"$version"
 
     echo " "
-    echo "---- generate Dockerfile for $version ----"
+    echo "---- generate metadata for $version ----"
     echo "postgresVersion=$postgresVersion"
     echo "postgisVersion=$postgisVersion"
     echo "bundleType=$bundleType"

@@ -5,6 +5,7 @@ set -Eeuo pipefail
 export TEST=true
 # Source environment variables and necessary configurations
 source tools/environment_init.sh
+[ -f ./versions.json ]
 
 # Check if the container with name "registry" is already running
 # https://docs.docker.com/registry/deploying/

@@ -5,20 +5,21 @@ source tools/environment_init.sh
 
 [ -f ./versions.json ]
 input_file="versions.json"
-rm -f manifest.sh
+rm -f ./tools/manifest.sh
 
-cat <<'EOF' >manifest.sh
+cat <<'EOF' > ./tools/manifest.sh
 #!/usr/bin/env bash
 set -Eeuo pipefail
 # Source environment variables and necessary configurations
 source tools/environment_init.sh
+[ -f ./versions.json ]
 
 #
 # Updating the docker manifest for the postgis image.
 # This script uses the version.json metadata file as input to create the updated manifest.
 #   manifest-tool doc : https://github.com/estesp/manifest-tool
 #
-# NOTE: THIS FILE IS GENERATED VIA "./apply-manifest.sh"
+# NOTE: THIS FILE IS GENERATED VIA "./tools/apply-manifest.sh"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 EOF
@@ -74,11 +75,11 @@ for version in $versions; do
             echo ""
             echo "# ----- ${version}-${variant} -----"
             create_manifest "$tags" "$arch"
-        ) >>manifest.sh
+        ) >> ./tools/manifest.sh
 
     done
 done
 
-echo "Done! a new ./manifest.sh has been created!"
-chmod +x ./manifest.sh
-head -n 50 <./manifest.sh
+echo "Done! a new ./tools/manifest.sh has been created!"
+chmod +x ./tools/manifest.sh
+head -n 50 <./tools/manifest.sh

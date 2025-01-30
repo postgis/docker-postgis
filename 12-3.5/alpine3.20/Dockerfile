@@ -1,13 +1,13 @@
 #
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#       source: "Dockerfile.alpine.template"
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "./tools/apply-templates.sh"
+#       source: "./templates/Dockerfile.alpine.template"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
 ARG PGIS1_BASE_IMAGE=postgres:12-alpine3.20
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
-ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.1
-ARG PGIS1_POSTGIS_CHECKOUT_SHA1=48ab069ef1482412fda915105b546f9866c76a79
+ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.2
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45
 
 FROM ${PGIS1_BASE_IMAGE}
 

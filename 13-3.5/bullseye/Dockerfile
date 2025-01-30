@@ -1,16 +1,16 @@
 #
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#       source: "Dockerfile.debian.template"
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "./tools/apply-templates.sh"
+#       source: "./templates/Dockerfile.debian.template"
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 FROM postgres:13-bullseye
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.5.1+dfsg-1.pgdg110+1 spatial database extension with PostgreSQL 13 bullseye" \
+      org.opencontainers.image.description="PostGIS 3.5.2+dfsg-1.pgdg110+1 spatial database extension with PostgreSQL 13 bullseye" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
-ENV POSTGIS_VERSION 3.5.1+dfsg-1.pgdg110+1
+ENV POSTGIS_VERSION 3.5.2+dfsg-1.pgdg110+1
 
 RUN set -eux \
       && apt-get update \
