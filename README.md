@@ -193,6 +193,21 @@ This Docker-PostGIS project [is part of the PostGIS group](https://postgis.net/d
 * If you have a major change in mind, we kindly ask you to start a discussion about it first.
 * After making changes to the templates, please run the `./update.sh` script.
 
+## Building Docker Images
+
+To build the all Docker images on your local machine, run:
+
+```sh
+make build
+```
+
+To build for a different platform, install `docker buildx` and run:
+
+```sh
+export PLATFORMS="linux/arm64,linux/amd64"
+make build
+```
+
 ## Code of Conduct
 
 see: https://postgis.net/community/conduct/

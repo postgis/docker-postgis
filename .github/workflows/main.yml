@@ -32,6 +32,7 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
+      PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7,linux/386
 
     steps:
     - name: Checkout source
