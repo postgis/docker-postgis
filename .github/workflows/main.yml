@@ -15,7 +15,7 @@ jobs:
   make-docker-images:
     strategy:
       matrix:
-        platform: ["ubuntu-24.04-arm", "ubuntu-24.04"]
+        os: ["ubuntu-24.04-arm", "ubuntu-24.04"]
         postgres: [13, 14, 15, 16, 17]
         postgis: ['3.5']
         variant: [default, alpine]
@@ -27,8 +27,8 @@ jobs:
             postgis: master
             variant: default
 
-    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
-    runs-on: ${{ matrix.platform }}
+    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
