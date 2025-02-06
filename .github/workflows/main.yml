@@ -37,7 +37,7 @@ jobs:
             variant: default
             os: "ubuntu-24.04-arm"
 
-    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.platform }}
+    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
