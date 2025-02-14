@@ -86,7 +86,7 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH b19515e1f82660c9709a2bd152991b8f85d3f411
+ENV CGAL_GIT_HASH 06b511cc65b2a55db7b10b8904618d68efb95245
 ENV SFCGAL_GIT_HASH a88742fe3c794e859c2b98e1f1daf030643ebdbf
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -120,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 8268efca12986e8d33c13cd42aa16ccbf14d86c1
+ENV PROJ_GIT_HASH 2bd03d9a26fec948e0cf07c3113eeed812c81839
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -150,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH b77f7fa6fb4161f3587eba1b6e7f00197ce46bc5
+ENV GEOS_GIT_HASH 0989e2dbbfef206928bd1849be5118022febc2f7
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 28c687a4bbf94522fd2424b007746763819c0ff4
+ENV GDAL_GIT_HASH b9526c1ac59c7f44ec935fb75d429f41e512d092
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -299,11 +299,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH b19515e1f82660c9709a2bd152991b8f85d3f411
+ENV CGAL_GIT_HASH 06b511cc65b2a55db7b10b8904618d68efb95245
 ENV SFCGAL_GIT_HASH a88742fe3c794e859c2b98e1f1daf030643ebdbf
-ENV PROJ_GIT_HASH 8268efca12986e8d33c13cd42aa16ccbf14d86c1
-ENV GEOS_GIT_HASH b77f7fa6fb4161f3587eba1b6e7f00197ce46bc5
-ENV GDAL_GIT_HASH 28c687a4bbf94522fd2424b007746763819c0ff4
+ENV PROJ_GIT_HASH 2bd03d9a26fec948e0cf07c3113eeed812c81839
+ENV GEOS_GIT_HASH 0989e2dbbfef206928bd1849be5118022febc2f7
+ENV GDAL_GIT_HASH b9526c1ac59c7f44ec935fb75d429f41e512d092
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -322,7 +322,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH b98401af48b5372bf73ba27e4c4cfcc78ebd49d1
+ENV POSTGIS_GIT_HASH c30f3237b30c19278b534f654bf211144868df39
 
 RUN set -ex \
     && apt-get update \
