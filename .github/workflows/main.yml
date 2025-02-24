@@ -15,6 +15,7 @@ jobs:
   make-docker-images:
     strategy:
       matrix:
+        runner-platform: ['ubuntu-24.04', 'ubuntu-24.04-arm']
         postgres: [13, 14, 15, 16, 17]
         postgis: ['3.5']
         variant: [default, alpine]
@@ -22,18 +23,60 @@ jobs:
           - postgres: 16
             postgis: master
             variant: default
+            runner-platform: 'ubuntu-24.04'
           - postgres: 17
             postgis: master
             variant: default
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 16
+            postgis: master
+            variant: default
+            runner-platform: 'ubuntu-24.04-arm'
+          - postgres: 17
+            postgis: master
+            variant: default
+            runner-platform: 'ubuntu-24.04-arm'
 
-    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
-    runs-on: ubuntu-24.04
+    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.runner-platform }}
+    runs-on: ${{ matrix.runner-platform }}
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
+      DOCKER_APT_PKG_VER: '5:28.0.0-1~ubuntu.24.04~noble'
 
     steps:
+    - name: Install/config specific version of Docker packages
+      run: |
+        echo "***** Removing any currently installed conflicting packages..."
+        for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+        echo "***** Setting up Docker's APT repo..."
+        sudo apt-get update
+        sudo apt-get install ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+        echo "***** Installing Docker packages..."
+        sudo apt-get install docker-ce=${{ env.DOCKER_APT_PKG_VER }} docker-ce-cli=${{ env.DOCKER_APT_PKG_VER }} containerd.io docker-buildx-plugin docker-compose-plugin
+        echo "***** Verifying initial Docker installation..."
+        docker run hello-world
+        echo "***** Displaying Docker information..."
+        docker info
+        echo "***** Configuring Docker for containerd image store..."
+        echo "{ \"features\": { \"containerd-snapshotter\": true }}" | sudo tee /etc/docker/daemon.json
+        sudo systemctl restart docker
+        docker info -f '{{ .DriverStatus }}'
+
+    - name: Load binfmt platforms for QEMU
+      run: |
+        docker run --privileged --rm tonistiigi/binfmt --install all
+        docker images --tree
+
     - name: Checkout source
       uses: actions/checkout@v4
 
@@ -48,7 +91,8 @@ jobs:
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
     - name: Push docker image to dockerhub
-      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      # !!!! ONLY push the images when built on ubuntu-24.04 x86 runner for now, NOT for ubuntu-24.04-arm runners
+      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request') && ( matrix.runner-platform == 'ubuntu-24.04' ) }}
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
