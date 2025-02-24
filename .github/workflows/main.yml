@@ -27,7 +27,7 @@ jobs:
             variant: default
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
