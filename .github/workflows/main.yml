@@ -27,13 +27,6 @@ jobs:
 #       hence they must be generated within the bundle JOB.
 #
 #matrix-include-start
-           - { version: "12-3.3", variant: "alpine3.21" }
-           - { version: "12-3.4", variant: "alpine3.20" }
-           - { version: "12-3.4", variant: "alpine3.21" }
-           - { version: "12-3.5", variant: "alpine3.20" }
-           - { version: "12-3.5", variant: "alpine3.21" }
-           - { version: "12-3.5", variant: "bookworm" }
-           - { version: "12-3.5", variant: "bullseye" }
            - { version: "13-3.3", variant: "alpine3.21" }
            - { version: "13-3.4", variant: "alpine3.20" }
            - { version: "13-3.4", variant: "alpine3.21" }
