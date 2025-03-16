@@ -1,4 +1,3 @@
-
 # When processing the rules for tagging and pushing container images with the
 # "latest" tag, the following variable will be the version that is considered
 # to be the latest.
@@ -76,13 +75,13 @@ update:
 define build-version
 build-$1:
 ifeq ($(do_default),true)
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
-	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
+	$(DOCKER) buildx build --platform linux/amd64,linux/arm64 --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) || true
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
-	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
+	$(DOCKER) buildx build --platform linux/amd64,linux/arm64 --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine || true
 endif
 endif
 endef
