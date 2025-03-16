@@ -29,14 +29,6 @@ jobs:
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04'
-          - postgres: 16
-            postgis: master
-            variant: default
-            runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 17
-            postgis: master
-            variant: default
-            runner-platform: 'ubuntu-24.04-arm'
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.runner-platform }}
     runs-on: ${{ matrix.runner-platform }}
