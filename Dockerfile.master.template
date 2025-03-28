@@ -6,7 +6,7 @@
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-ARG CGAL_GIT_BRANCH=5.6.x-branch
+ARG CGAL_GIT_BRANCH=master
 FROM postgres:%%PG_MAJOR%%-%%DEBIAN_VERSION%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
@@ -84,18 +84,16 @@ ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
 # cgal & sfcgal
-# By utilizing the latest commit of the CGAL 5.x.x-branch and implementing a header-only build for SFCGAL,
-# one can benefit from the latest CGAL patches while avoiding compatibility issues.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH %%CGAL5X_GIT_HASH%%
+ENV CGAL_GIT_HASH %%CGAL_GIT_HASH%%
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
     && git clone --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
     && cd cgal \
-    && git checkout ${CGAL5X_GIT_HASH} \
+    && git checkout ${CGAL_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
     && git clone https://gitlab.com/SFCGAL/SFCGAL.git \
@@ -301,7 +299,7 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL5X_GIT_HASH %%CGAL5X_GIT_HASH%%
+ENV CGAL_GIT_HASH %%CGAL_GIT_HASH%%
 ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
 ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
 ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
