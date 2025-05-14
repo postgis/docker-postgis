@@ -453,7 +453,7 @@
   },
   "16-recent": {
     "bookworm": {
-      "tags": "16-recent-bookworm 16-recent-postgis3.5.2-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.0.0-bookworm 16-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.0-bookworm 16-recent",
+      "tags": "16-recent-bookworm 16-recent-postgis3.5.2-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 16-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 16-recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "16",
@@ -470,8 +470,8 @@
       "GDAL_CHECKOUT_SHA1": "447eb5238bb6ef2837e68bf2ec742c64007b680b",
       "GEOS_CHECKOUT": "tags/3.13.1",
       "GEOS_CHECKOUT_SHA1": "431568d6e311e0bbfb057b4ec3d44d0d3ba3335f",
-      "SFCGAL_CHECKOUT": "tags/v2.0.0",
-      "SFCGAL_CHECKOUT_SHA1": "5d4eb5e896c41e592534ba1e79ccc721c66d66e3",
+      "SFCGAL_CHECKOUT": "tags/v2.1.0",
+      "SFCGAL_CHECKOUT_SHA1": "60573cfb6b3fc01eceda563d275a226317ba01db",
       "CGAL_CHECKOUT": "tags/v6.0.1",
       "CGAL_CHECKOUT_SHA1": "50cfbde3b84dbeae8338268db2d78fe4fcb522de",
       "BOOST_VERSION": "1.74.0"
@@ -575,7 +575,7 @@
   },
   "17-recent": {
     "bookworm": {
-      "tags": "17-recent-bookworm 17-recent-postgis3.5.2-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.0.0-bookworm 17-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.0-bookworm 17-recent recent",
+      "tags": "17-recent-bookworm 17-recent-postgis3.5.2-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 17-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 17-recent recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "17",
@@ -592,8 +592,8 @@
       "GDAL_CHECKOUT_SHA1": "447eb5238bb6ef2837e68bf2ec742c64007b680b",
       "GEOS_CHECKOUT": "tags/3.13.1",
       "GEOS_CHECKOUT_SHA1": "431568d6e311e0bbfb057b4ec3d44d0d3ba3335f",
-      "SFCGAL_CHECKOUT": "tags/v2.0.0",
-      "SFCGAL_CHECKOUT_SHA1": "5d4eb5e896c41e592534ba1e79ccc721c66d66e3",
+      "SFCGAL_CHECKOUT": "tags/v2.1.0",
+      "SFCGAL_CHECKOUT_SHA1": "60573cfb6b3fc01eceda563d275a226317ba01db",
       "CGAL_CHECKOUT": "tags/v6.0.1",
       "CGAL_CHECKOUT_SHA1": "50cfbde3b84dbeae8338268db2d78fe4fcb522de",
       "BOOST_VERSION": "1.74.0"
