@@ -71,7 +71,7 @@
       "POSTGIS_VERSION": "3.5.2+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
-      "tags": "13-3.5-alpine3.20 13-3.5.2-alpine3.20",
+      "tags": "13-3.5-alpine3.20 13-3.5.3-alpine3.20",
       "readme_group": "alpine3.20",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -79,13 +79,13 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "13",
       "PG_DOCKER": "13",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     },
     "alpine3.21": {
-      "tags": "13-3.5-alpine3.21 13-3.5.2-alpine3.21 13-3.5-alpine",
+      "tags": "13-3.5-alpine3.21 13-3.5.3-alpine3.21 13-3.5-alpine",
       "readme_group": "alpine3.21",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -93,10 +93,10 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "13",
       "PG_DOCKER": "13",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     }
   },
   "14-3.3": {
@@ -171,7 +171,7 @@
       "POSTGIS_VERSION": "3.5.2+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
-      "tags": "14-3.5-alpine3.20 14-3.5.2-alpine3.20",
+      "tags": "14-3.5-alpine3.20 14-3.5.3-alpine3.20",
       "readme_group": "alpine3.20",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -179,13 +179,13 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "14",
       "PG_DOCKER": "14",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     },
     "alpine3.21": {
-      "tags": "14-3.5-alpine3.21 14-3.5.2-alpine3.21 14-3.5-alpine",
+      "tags": "14-3.5-alpine3.21 14-3.5.3-alpine3.21 14-3.5-alpine",
       "readme_group": "alpine3.21",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -193,10 +193,10 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "14",
       "PG_DOCKER": "14",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     }
   },
   "15-3.3": {
@@ -271,7 +271,7 @@
       "POSTGIS_VERSION": "3.5.2+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
-      "tags": "15-3.5-alpine3.20 15-3.5.2-alpine3.20",
+      "tags": "15-3.5-alpine3.20 15-3.5.3-alpine3.20",
       "readme_group": "alpine3.20",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -279,13 +279,13 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "15",
       "PG_DOCKER": "15",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     },
     "alpine3.21": {
-      "tags": "15-3.5-alpine3.21 15-3.5.2-alpine3.21 15-3.5-alpine",
+      "tags": "15-3.5-alpine3.21 15-3.5.3-alpine3.21 15-3.5-alpine",
       "readme_group": "alpine3.21",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -293,10 +293,10 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "15",
       "PG_DOCKER": "15",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     }
   },
   "16-3.3": {
@@ -371,7 +371,7 @@
       "POSTGIS_VERSION": "3.5.2+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
-      "tags": "16-3.5-alpine3.20 16-3.5.2-alpine3.20",
+      "tags": "16-3.5-alpine3.20 16-3.5.3-alpine3.20",
       "readme_group": "alpine3.20",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -379,13 +379,13 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "16",
       "PG_DOCKER": "16",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     },
     "alpine3.21": {
-      "tags": "16-3.5-alpine3.21 16-3.5.2-alpine3.21 16-3.5-alpine",
+      "tags": "16-3.5-alpine3.21 16-3.5.3-alpine3.21 16-3.5-alpine",
       "readme_group": "alpine3.21",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -393,10 +393,10 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "16",
       "PG_DOCKER": "16",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     }
   },
   "16-3.5-bundle0": {
@@ -453,7 +453,7 @@
   },
   "16-recent": {
     "bookworm": {
-      "tags": "16-recent-bookworm 16-recent-postgis3.5.2-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 16-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 16-recent",
+      "tags": "16-recent-bookworm 16-recent-postgis3.5.3-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 16-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 16-recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "16",
@@ -461,8 +461,8 @@
       "arch": "amd64 arm64",
       "template": "Dockerfile.master.template",
       "initfile": "initdb-postgis.sh",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91",
       "PROJ_CHECKOUT": "tags/9.6.0",
       "PROJ_CHECKOUT_SHA1": "cd190c47f33d7ea8bfc34b4cc217ea0db78959e4",
       "GDAL_BUILD": "with_extra",
@@ -519,7 +519,7 @@
       "POSTGIS_VERSION": "3.5.2+dfsg-1.pgdg120+1"
     },
     "alpine3.20": {
-      "tags": "17-3.5-alpine3.20 17-3.5.2-alpine3.20",
+      "tags": "17-3.5-alpine3.20 17-3.5.3-alpine3.20",
       "readme_group": "alpine3.20",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -527,13 +527,13 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "17",
       "PG_DOCKER": "17",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     },
     "alpine3.21": {
-      "tags": "17-3.5-alpine3.21 17-3.5.2-alpine3.21 17-3.5-alpine alpine",
+      "tags": "17-3.5-alpine3.21 17-3.5.3-alpine3.21 17-3.5-alpine alpine",
       "readme_group": "alpine3.21",
       "postgis": "3.5",
       "arch": "amd64 arm64",
@@ -541,10 +541,10 @@
       "initfile": "initdb-postgis.sh",
       "PG_MAJOR": "17",
       "PG_DOCKER": "17",
-      "POSTGIS_VERSION": "3.5.2",
-      "POSTGIS_SHA256": "71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45"
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     }
   },
   "17-master": {
@@ -575,7 +575,7 @@
   },
   "17-recent": {
     "bookworm": {
-      "tags": "17-recent-bookworm 17-recent-postgis3.5.2-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 17-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 17-recent recent",
+      "tags": "17-recent-bookworm 17-recent-postgis3.5.3-geos3.13.1-proj9.6.0-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 17-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 17-recent recent",
       "postgis": "recent",
       "readme_group": "recent",
       "PG_MAJOR": "17",
@@ -583,8 +583,8 @@
       "arch": "amd64 arm64",
       "template": "Dockerfile.master.template",
       "initfile": "initdb-postgis.sh",
-      "POSTGIS_CHECKOUT": "tags/3.5.2",
-      "POSTGIS_CHECKOUT_SHA1": "dea6d0ac1cd0c9a98e9012ce2f61b676d1d7ae45",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91",
       "PROJ_CHECKOUT": "tags/9.6.0",
       "PROJ_CHECKOUT_SHA1": "cd190c47f33d7ea8bfc34b4cc217ea0db78959e4",
       "GDAL_BUILD": "with_extra",
