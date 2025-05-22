@@ -52,7 +52,7 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
-      DOCKER_APT_PKG_VER: '5:28.0.0-1~ubuntu.24.04~noble'
+      DOCKER_APT_PKG_VER: '5:28.1.1-1~ubuntu.24.04~noble'
 
     steps:
     - name: Install/config specific version of Docker packages
@@ -70,6 +70,8 @@ jobs:
           $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
           sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           sudo apt-get update
+        echo "*****  Check available docker-ce versions ."
+        sudo apt policy docker-ce
         echo "***** Installing Docker packages..."
         sudo apt-get install docker-ce=${{ env.DOCKER_APT_PKG_VER }} docker-ce-cli=${{ env.DOCKER_APT_PKG_VER }} containerd.io docker-buildx-plugin docker-compose-plugin
         echo "***** Verifying initial Docker installation..."
