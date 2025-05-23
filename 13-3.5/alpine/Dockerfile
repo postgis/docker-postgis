@@ -5,11 +5,11 @@ ARG BASE_IMAGE=postgres:13-alpine3.21
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.5.2 spatial database extension with PostgreSQL 13 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.5.3 spatial database extension with PostgreSQL 13 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION 3.5.2
-ENV POSTGIS_SHA256 71d8f5d06debec0bdd94525a5a1d42417ed2a1f65d0070a1a3e3e381b606ee35
+ENV POSTGIS_VERSION 3.5.3
+ENV POSTGIS_SHA256 44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
@@ -78,7 +78,7 @@ RUN set -eux \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS=--extension   PGUSER=postgres \
+    && make -j$(nproc) check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \

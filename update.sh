@@ -36,6 +36,7 @@ declare -A debianSuite=(
     [15]='bullseye-slim'
     [16]='bullseye-slim'
     [17]='bullseye-slim'
+    [18]='bullseye-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
@@ -46,6 +47,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
     [3.3]='3'
     [3.4]='3'
     [3.5]='3'
+    [3.6]='3'
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
@@ -249,11 +251,17 @@ for version in "${versions[@]}"; do
         _postgisMinor=$(echo "$postgisMajMin" | cut -d. -f2)
 
         # Find the latest non-preview release for this minor version
-        srcVersion=$(echo "$postgis_all_v3_versions_array_string" | tr ' ' '\n' | grep "^${_postgisMajor}\.${_postgisMinor}\." | grep -v '[a-zA-Z]' | head -n 1)
+        srcVersion=$(echo "$postgis_all_v3_versions_array_string" | tr ' ' '\n' | grep "^${_postgisMajor}\.${_postgisMinor}\." | grep -v '[a-zA-Z]' | head -n 1 || true)
 
         # If no stable release found, fall back to the debian version
         if [ -z "$srcVersion" ]; then
-            srcVersion="${postgisFullVersion%%+*}"
+            echo " No stable release found for ${_postgisMajor}.${_postgisMinor}. Falling back ..."
+            # For alpha/beta/rc versions, use the version from directory name
+            if [[ "$postgisVersion" =~ alpha|beta|rc ]]; then
+                srcVersion="$postgisVersion"
+            else
+                srcVersion="${postgisFullVersion%%+*}"
+            fi
         fi
 
         srcSha256="$(curl -sSL "https://github.com/postgis/postgis/archive/$srcVersion.tar.gz" | sha256sum | awk '{ print $1 }')"

@@ -382,7 +382,7 @@ RUN set -ex \
     && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && ldconfig \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
+    && make -j$(nproc) check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \

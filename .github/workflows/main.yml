@@ -36,6 +36,15 @@ jobs:
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
+          - postgres: 17
+            postgis: '3.6.0alpha1'
+            variant: alpine
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 17
+            postgis: '3.6.0alpha1'
+            variant: alpine
+            runner-platform: 'ubuntu-24.04-arm'
+
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.runner-platform }}
     runs-on: ${{ matrix.runner-platform }}
@@ -43,7 +52,7 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
-      DOCKER_APT_PKG_VER: '5:28.0.0-1~ubuntu.24.04~noble'
+      DOCKER_APT_PKG_VER: '5:28.1.1-1~ubuntu.24.04~noble'
 
     steps:
     - name: Install/config specific version of Docker packages
@@ -61,6 +70,8 @@ jobs:
           $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
           sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           sudo apt-get update
+        echo "*****  Check available docker-ce versions ."
+        sudo apt policy docker-ce
         echo "***** Installing Docker packages..."
         sudo apt-get install docker-ce=${{ env.DOCKER_APT_PKG_VER }} docker-ce-cli=${{ env.DOCKER_APT_PKG_VER }} containerd.io docker-buildx-plugin docker-compose-plugin
         echo "***** Verifying initial Docker installation..."
