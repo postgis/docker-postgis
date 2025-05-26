@@ -30,7 +30,7 @@ This image ensures that the default database created by the parent `postgres` im
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
 
-## Versions (2025-05-18)
+## Versions (2025-05-26)
 
 
 We provide multi-platform image support for the following architectures:
@@ -71,11 +71,11 @@ For those new to PostGIS, we recommend the following image versions:
 <!-- bookworm_begin  -->
 | `docker.io/imresamu/postgis:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
-| [`13-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.5-bookworm), [`13-3.5.2-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.5.2-bookworm), [`13-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 13 | 3.5.2 |
-| [`14-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.5-bookworm), [`14-3.5.2-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.5.2-bookworm), [`14-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 14 | 3.5.2 |
-| [`15-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5-bookworm), [`15-3.5.2-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5.2-bookworm), [`15-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 15 | 3.5.2 |
-| [`16-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bookworm), [`16-3.5.2-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.2-bookworm), [`16-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.2 |
-| [`17-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bookworm), [`17-3.5.2-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5.2-bookworm), [`17-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5), [`latest`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=latest) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 17 | 3.5.2 |
+| [`13-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.5-bookworm), [`13-3.5.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.5.3-bookworm), [`13-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=13-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/13-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 13 | 3.5.3 |
+| [`14-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.5-bookworm), [`14-3.5.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.5.3-bookworm), [`14-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=14-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/14-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 14 | 3.5.3 |
+| [`15-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5-bookworm), [`15-3.5.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5.3-bookworm), [`15-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 15 | 3.5.3 |
+| [`16-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bookworm), [`16-3.5.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.3-bookworm), [`16-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.3 |
+| [`17-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bookworm), [`17-3.5.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5.3-bookworm), [`17-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5), [`latest`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=latest) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 17 | 3.5.3 |
 <!-- bookworm_end  -->
 
 ### 📘Debian - bullseye
@@ -118,7 +118,7 @@ Please note that the included package list is subject to change as we continue t
 <!-- bundle0_begin  -->
 | `docker.io/imresamu/postgis:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
-| [`16-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0-bookworm), [`16-3.5.2-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.2-bundle0-bookworm), [`16-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.2 |
+| [`16-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0-bookworm), [`16-3.5.3-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.3-bundle0-bookworm), [`16-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.3 |
 <!-- bundle0_end  -->
 
 

@@ -109,11 +109,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:13-3.5-bookworm \
     --target ${dockername}:13-3.5-bookworm || true
 
-echo "manifest: ${dockername}:13-3.5.2-bookworm"
+echo "manifest: ${dockername}:13-3.5.3-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.2-bookworm \
-    --target ${dockername}:13-3.5.2-bookworm || true
+    --template ${dockername}-ARCHVARIANT:13-3.5.3-bookworm \
+    --target ${dockername}:13-3.5.3-bookworm || true
 
 echo "manifest: ${dockername}:13-3.5"
 manifest-tool push from-args \
@@ -231,11 +231,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.5-bookworm \
     --target ${dockername}:14-3.5-bookworm || true
 
-echo "manifest: ${dockername}:14-3.5.2-bookworm"
+echo "manifest: ${dockername}:14-3.5.3-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.2-bookworm \
-    --target ${dockername}:14-3.5.2-bookworm || true
+    --template ${dockername}-ARCHVARIANT:14-3.5.3-bookworm \
+    --target ${dockername}:14-3.5.3-bookworm || true
 
 echo "manifest: ${dockername}:14-3.5"
 manifest-tool push from-args \
@@ -367,11 +367,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.5-bookworm \
     --target ${dockername}:15-3.5-bookworm || true
 
-echo "manifest: ${dockername}:15-3.5.2-bookworm"
+echo "manifest: ${dockername}:15-3.5.3-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.2-bookworm \
-    --target ${dockername}:15-3.5.2-bookworm || true
+    --template ${dockername}-ARCHVARIANT:15-3.5.3-bookworm \
+    --target ${dockername}:15-3.5.3-bookworm || true
 
 echo "manifest: ${dockername}:15-3.5"
 manifest-tool push from-args \
@@ -489,11 +489,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.5-bookworm \
     --target ${dockername}:16-3.5-bookworm || true
 
-echo "manifest: ${dockername}:16-3.5.2-bookworm"
+echo "manifest: ${dockername}:16-3.5.3-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.2-bookworm \
-    --target ${dockername}:16-3.5.2-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.3-bookworm \
+    --target ${dockername}:16-3.5.3-bookworm || true
 
 echo "manifest: ${dockername}:16-3.5"
 manifest-tool push from-args \
@@ -523,11 +523,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.5-bundle0-bookworm \
     --target ${dockername}:16-3.5-bundle0-bookworm || true
 
-echo "manifest: ${dockername}:16-3.5.2-bundle0-bookworm"
+echo "manifest: ${dockername}:16-3.5.3-bundle0-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.5.2-bundle0-bookworm \
-    --target ${dockername}:16-3.5.2-bundle0-bookworm || true
+    --template ${dockername}-ARCHVARIANT:16-3.5.3-bundle0-bookworm \
+    --target ${dockername}:16-3.5.3-bundle0-bookworm || true
 
 echo "manifest: ${dockername}:16-3.5-bundle0"
 manifest-tool push from-args \
@@ -643,11 +643,11 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:17-3.5-bookworm \
     --target ${dockername}:17-3.5-bookworm || true
 
-echo "manifest: ${dockername}:17-3.5.2-bookworm"
+echo "manifest: ${dockername}:17-3.5.3-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5.2-bookworm \
-    --target ${dockername}:17-3.5.2-bookworm || true
+    --template ${dockername}-ARCHVARIANT:17-3.5.3-bookworm \
+    --target ${dockername}:17-3.5.3-bookworm || true
 
 echo "manifest: ${dockername}:17-3.5"
 manifest-tool push from-args \
