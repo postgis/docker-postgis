@@ -28,40 +28,40 @@ jobs:
 #
 #matrix-include-start
            - { version: "13-3.3", variant: "alpine3.21" }
-           - { version: "13-3.4", variant: "alpine3.20" }
            - { version: "13-3.4", variant: "alpine3.21" }
-           - { version: "13-3.5", variant: "alpine3.20" }
+           - { version: "13-3.4", variant: "alpine3.22" }
            - { version: "13-3.5", variant: "alpine3.21" }
+           - { version: "13-3.5", variant: "alpine3.22" }
            - { version: "13-3.5", variant: "bookworm" }
            - { version: "13-3.5", variant: "bullseye" }
            - { version: "14-3.3", variant: "alpine3.21" }
-           - { version: "14-3.4", variant: "alpine3.20" }
            - { version: "14-3.4", variant: "alpine3.21" }
-           - { version: "14-3.5", variant: "alpine3.20" }
+           - { version: "14-3.4", variant: "alpine3.22" }
            - { version: "14-3.5", variant: "alpine3.21" }
+           - { version: "14-3.5", variant: "alpine3.22" }
            - { version: "14-3.5", variant: "bookworm" }
            - { version: "14-3.5", variant: "bullseye" }
            - { version: "14-l3.1.9gcp", variant: "bookworm" }
            - { version: "15-3.3", variant: "alpine3.21" }
-           - { version: "15-3.4", variant: "alpine3.20" }
            - { version: "15-3.4", variant: "alpine3.21" }
-           - { version: "15-3.5", variant: "alpine3.20" }
+           - { version: "15-3.4", variant: "alpine3.22" }
            - { version: "15-3.5", variant: "alpine3.21" }
+           - { version: "15-3.5", variant: "alpine3.22" }
            - { version: "15-3.5", variant: "bookworm" }
            - { version: "15-3.5", variant: "bullseye" }
            - { version: "16-3.3", variant: "alpine3.21" }
-           - { version: "16-3.4", variant: "alpine3.20" }
            - { version: "16-3.4", variant: "alpine3.21" }
-           - { version: "16-3.5", variant: "alpine3.20" }
+           - { version: "16-3.4", variant: "alpine3.22" }
            - { version: "16-3.5", variant: "alpine3.21" }
+           - { version: "16-3.5", variant: "alpine3.22" }
 # --skip-- - { version: "16-3.5", variant: "bookworm" } -->  generated with the related bundle job!
            - { version: "16-3.5", variant: "bullseye" }
            - { version: "16-3.5-bundle0", variant: "bookworm" }
            - { version: "16-master", variant: "bookworm" }
            - { version: "16-recent", variant: "bookworm" }
            - { version: "17-3.4", variant: "alpine3.21" }
-           - { version: "17-3.5", variant: "alpine3.20" }
            - { version: "17-3.5", variant: "alpine3.21" }
+           - { version: "17-3.5", variant: "alpine3.22" }
            - { version: "17-3.5", variant: "bookworm" }
            - { version: "17-3.5", variant: "bullseye" }
            - { version: "17-master", variant: "bookworm" }

@@ -18,11 +18,11 @@ source tools/environment_init.sh
 api_preference="github"
 #api_preference="osgeo"  -- not working yet
 
-alpine_variants=" alpine3.20 alpine3.21 "
+alpine_variants=" alpine3.21 alpine3.22 "
 debian_variants=" bullseye bookworm "
 
 debian_latest="bookworm"
-alpine_latest="alpine3.21"
+alpine_latest="alpine3.22"
 postgis_latest="3.5"
 postgres_latest="17"
 postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5"
@@ -59,8 +59,8 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 declare -A boostVersion=(
     ["bullseye"]="1.74.0"
     ["bookworm"]="1.74.0" # 1.81.0 is not yet optimal. The current bookworm packages mixed use of 1.74.0 and 1.81.0
-    ["alpine3.19"]="1.82.0"
-    ["alpine3.20"]="1.82.0"
+    ["alpine3.21"]="1.82.0"
+    ["alpine3.22"]="1.82.0"
 )
 
 # function get_tag_hash() {

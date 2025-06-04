@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-ARG PGIS1_BASE_IMAGE=postgres:14-alpine3.20
+ARG PGIS1_BASE_IMAGE=postgres:13-alpine3.22
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.3
 ARG PGIS1_POSTGIS_CHECKOUT_SHA1=aab5f55897aa2e8eb5f17c3996b61268c5f1ec91
@@ -16,7 +16,7 @@ ARG PGIS1_POSTGIS_CHECKOUT
 ARG PGIS1_POSTGIS_CHECKOUT_SHA1
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS ${PGIS1_POSTGIS_CHECKOUT} spatial database extension with PostgreSQL 14 alpine3.20" \
+      org.opencontainers.image.description="PostGIS ${PGIS1_POSTGIS_CHECKOUT} spatial database extension with PostgreSQL 13 alpine3.22" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 RUN set -eux \
