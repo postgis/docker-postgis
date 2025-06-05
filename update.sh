@@ -25,7 +25,7 @@ githubrepolink="https://github.com/postgis/docker-postgis/blob/master"
 # sort version numbers with highest last (so it goes first in .travis.yml)
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
-defaultAlpinenSuite='3.21'
+defaultAlpinenSuite='3.22'
 defaultDebianSuite='bullseye-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
