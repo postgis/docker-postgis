@@ -58,13 +58,6 @@ IMAGE_NAME ?= postgis
 DOCKER=docker
 DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:latest
 
-# choice between buildx and build depending on the PLATFORMS variable
-ifdef PLATFORMS
-  BUILD := buildx build --platform $(PLATFORMS)
-else
-  BUILD := build
-endif
-
 GIT=git
 OFFIMG_LOCAL_CLONE=$(HOME)/official-images
 OFFIMG_REPO_URL=https://github.com/docker-library/official-images.git
@@ -83,12 +76,12 @@ update:
 define build-version
 build-$1:
 ifeq ($(do_default),true)
-	$(DOCKER) $(BUILD) --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
+	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1) $1
 	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)
 endif
 ifeq ($(do_alpine),true)
 ifneq ("$(wildcard $1/alpine)","")
-	$(DOCKER) $(BUILD) --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
+	$(DOCKER) build --pull -t $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine $1/alpine
 	$(DOCKER) images          $(REPO_NAME)/$(IMAGE_NAME):$(shell echo $1)-alpine
 endif
 endif
