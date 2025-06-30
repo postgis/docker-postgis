@@ -30,7 +30,7 @@ This image ensures that the default database created by the parent `postgres` im
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
 
-## Versions (2025-06-16)
+## Versions (2025-06-30)
 
 
 We provide multi-platform image support for the following architectures:
@@ -58,14 +58,14 @@ For those new to PostGIS, we recommend the following image versions:
 
 - `imresamu/postgis:17-3.5-bookworm`: This image includes a minimal setup of PostgreSQL with the PostGIS extension. ( debian bookworm based, easy to extend with debian packages )
 - `imresamu/postgis:17-recent-bookworm`: (experimental) Latest postgis with the latest geos,proj,gdal,sfcgal. ( debian based, extending is complex ! )
-- `imresamu/postgis:16-3.4-bundle0-bookworm`: (experimental) This image includes additional geospatial-related extras along with PostgreSQL and PostGIS.
+- `imresamu/postgis:16-3.5-bundle0-bookworm`: (experimental) This image includes additional geospatial-related extras along with PostgreSQL and PostGIS.
 
 ### 🥇Debian - bookworm  (recommended)
 
 - This Docker-PostGIS version has a cautious release cycle to guarantee high stability.
   - By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
 - We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
-  - In the Debian Bullseye repository, the versions are: geos=3.11, gdal=3.6, proj=9.1, and sfcgal=1.4.
+  The versions are: geos=3.11, gdal=3.6, proj=9.1, and sfcgal=1.4.
 - This version is easy to extend and has matured over time.
 
 <!-- bookworm_begin  -->
@@ -119,6 +119,7 @@ Please note that the included package list is subject to change as we continue t
 | `docker.io/imresamu/postgis:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
 | [`16-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0-bookworm), [`16-3.5.3-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.3-bundle0-bookworm), [`16-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | 3.5.3 |
+| [`17-3.5-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bundle0-bookworm), [`17-3.5.3-bundle0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5.3-bundle0-bookworm), [`17-3.5-bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-bundle0), [`bundle0`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=bundle0) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.5-bundle0/bookworm/Dockerfile) | amd64 arm64 | bookworm | 17 | 3.5.3 |
 <!-- bundle0_end  -->
 
 
@@ -164,6 +165,7 @@ Please note that the included package list is subject to change as we continue t
 | [`15-3.5-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5-alpine3.22), [`15-3.5.3-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5.3-alpine3.22), [`15-3.5-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=15-3.5-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/15-3.5/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 15 | 3.5.3 |
 | [`16-3.4-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine3.22), [`16-3.4.4-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4.4-alpine3.22), [`16-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.4/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 16 | 3.4.4 |
 | [`16-3.5-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-alpine3.22), [`16-3.5.3-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5.3-alpine3.22), [`16-3.5-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-3.5-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-3.5/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 16 | 3.5.3 |
+| [`17-3.4-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.4-alpine3.22), [`17-3.4.4-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.4.4-alpine3.22), [`17-3.4-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.4-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.4/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 17 | 3.4.4 |
 | [`17-3.5-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-alpine3.22), [`17-3.5.3-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5.3-alpine3.22), [`17-3.5-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.5-alpine), [`alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.5/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 17 | 3.5.3 |
 <!-- alpine3.22_end  -->
 
@@ -181,15 +183,31 @@ Please note that the included package list is subject to change as we continue t
 
 ### 📋Test images
 
-- We provide alpha, beta, release candidate (rc), and development (identified as ~master) versions.
-- The template for the `*-master` images is updated manually, which might lead to a delay of a few weeks sometimes.
-- The ~master SFCGAL version is 1.5 or higher. The cgal version is locked on the [5.6.x-branch](https://github.com/CGAL/cgal/tree/5.6.x-branch).
+  These experimental images are designed for testing and development purposes. They include:
+
+  **🔬 Pre-release versions (alpha, beta, rc):** Tagged versions of upcoming PostgreSQL or PostGIS releases that are not yet stable. These use specific version tags (e.g.,
+  `18beta1`, `3.6.0alpha1`) and provide early access to new features for testing compatibility.
+
+  **⚙️ Development builds (`*-master`):** Built from the latest development code in the main branches of PostgreSQL, PostGIS, and all geospatial dependencies (geos, proj, gdal, 
+  cgal, sfcgal). These represent cutting-edge functionality but may contain unstable features.
+
+  **⚠️ Important notes:**
+  - Pre-release and master images may have breaking changes or bugs
+  - The `*-master` template is updated manually and may lag behind actual development by a few weeks
+  - Master builds use SFCGAL 1.5+ and CGAL locked to the [5.6.x-branch](https://github.com/CGAL/cgal/tree/5.6.x-branch)
+  - Use these images for testing only, not in production environments
 
 <!-- test_begin  -->
 | `docker.io/imresamu/postgis:` tags | Dockerfile | Arch | OS | Postgres | PostGIS |
 | ---- | :-: | :-: | :-: | :-: | :-: |
 | [`16-master-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-master-bookworm), [`16-master`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/16-master/bookworm/Dockerfile) | amd64 arm64 | bookworm | 16 | development: postgis, geos, proj, gdal, cgal, sfcgal |
+| [`17-3.6.0alpha1-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.6.0alpha1-alpine3.22), [`17-3.6.0alpha1-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-3.6.0alpha1-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-3.6/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 17 | 3.6.0alpha1 |
 | [`17-master-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-master-bookworm), [`17-master`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/17-master/bookworm/Dockerfile) | amd64 arm64 | bookworm | 17 | development: postgis, geos, proj, gdal, cgal, sfcgal |
+| [`18beta1-3.5-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.5-alpine3.22), [`18beta1-3.5.3-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.5.3-alpine3.22), [`18beta1-3.5-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.5-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/18-3.5/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 18beta1 | 3.5.3 |
+| [`18beta1-3.5-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.5-bookworm), [`18beta1-3.5.3-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.5.3-bookworm), [`18beta1-3.5`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.5) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/18-3.5/bookworm/Dockerfile) | amd64 arm64 | bookworm | 18beta1 | 3.5.3 |
+| [`18beta1-3.6.0alpha1-alpine3.22`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.6.0alpha1-alpine3.22), [`18beta1-3.6.0alpha1-alpine`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-3.6.0alpha1-alpine) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/18-3.6/alpine3.22/Dockerfile) | amd64 arm64 | alpine3.22 | 18beta1 | 3.6.0alpha1 |
+| [`18beta1-master-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-master-bookworm), [`18beta1-master`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-master) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/18-master/bookworm/Dockerfile) | amd64 arm64 | bookworm | 18beta1 | development: postgis, geos, proj, gdal, cgal, sfcgal |
+| [`18beta1-recent-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-recent-bookworm), [`18beta1-recent-postgis3.5.3-geos3.13.1-proj9.6.2-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-recent-postgis3.5.3-geos3.13.1-proj9.6.2-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm), [`18beta1-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm), [`18beta1-recent`](https://registry.hub.docker.com/r/imresamu/postgis/tags?page=1&name=18beta1-recent) | [Dockerfile](https://github.com/imresamu/docker-postgis/blob/master/18-recent/bookworm/Dockerfile) | amd64 arm64 | bookworm | 18beta1 | postgis=tags/3.5.3, geos=tags/3.13.1, proj=tags/9.6.2, gdal=tags/v3.11.0, cgal=tags/v6.0.1, sfcgal=tags/v2.1.0 |
 <!-- test_end  -->
 
 ## 🚀Usage
@@ -263,7 +281,7 @@ It's crucial to be aware that in a cloud environment, with default settings, the
 
 - Note that ports which are not bound to the host (i.e., `-p 5432:5432` instead of `-p 127.0.0.1:5432:5432`) will be accessible from the outside. This also applies if you configured UFW to block this specific port, as Docker manages its own iptables rules. ( [Read More](https://docs.docker.com/network/iptables/) )
 
-#### Recomendations:
+#### Recommendations:
 
 - You can add options for using SSL ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
   - `-c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key`

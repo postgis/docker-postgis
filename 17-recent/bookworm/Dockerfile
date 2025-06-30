@@ -8,6 +8,10 @@
 
 ARG PGIS1_BASE_IMAGE=postgres:17-bookworm
 
+# usable for forking the image
+ARG PGIS1_SOURCE_REPO="https://github.com/postgis/docker-postgis"
+ARG PGIS1_MAINTAINER="PostGIS Project - https://postgis.net - ${PGIS1_SOURCE_REPO}/issues"
+
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
 ARG PGIS1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
@@ -43,10 +47,19 @@ FROM ${PGIS1_BASE_IMAGE} as builder
 WORKDIR /
 
 ARG PGIS1_BOOST_VERSION
+ARG PGIS1_CMAKE_BUILD_TYPE
+ARG PGIS1_BASE_IMAGE
 ENV PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
 # apt-get install
 RUN set -eux \
+    # Export build environment for child images
+    && echo "export PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE}" > /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_BASE_IMAGE=${PGIS1_BASE_IMAGE}" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_GDAL_BUILD=with_extra" >> /usr/local/share/docker-postgis-env.sh \
+    && chmod +x /usr/local/share/docker-postgis-env.sh \
+    \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
@@ -292,12 +305,14 @@ RUN set -eux \
     # add backports \
     && apt-get update \
     && apt install -y -V ca-certificates wget \
-    && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
+    && wget -q --timeout=30 --tries=3 https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
+       || { echo "Failed to download Arrow apt source"; exit 1; } \
     && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
     && apt-get update \
     # Automatically determine the latest PGIS1 Arrow version and SOVERSION
     && apt-cache showpkg libarrow-dev \
-    && PGIS1_ARROW_VERSION=$(apt-cache showpkg libarrow-dev | grep -m1 'Versions:' -A1 | tail -n1 | grep -oP '^\S+') \
+    && PGIS1_ARROW_VERSION=$(apt-cache madison libarrow-dev | head -1 | awk '{print $3}') \
+    && [ -n "$PGIS1_ARROW_VERSION" ] || { echo "Failed to detect Arrow version"; exit 1; } \
     && apt-cache depends libarrow-dev=${PGIS1_ARROW_VERSION} | tee /_pgis1_libarrow-dev-dependencies.txt \
     && PGIS1_ARROW_SOVERSION=$(grep 'Depends: libarrow' /_pgis1_libarrow-dev-dependencies.txt | grep -oP 'libarrow\K[0-9]+') \
     && echo "Detected PGIS1_ARROW_VERSION=$PGIS1_ARROW_VERSION" \
@@ -437,9 +452,26 @@ RUN set -eux \
 # -------------------------------------------
 FROM ${PGIS1_BASE_IMAGE}
 
-LABEL maintainer="PostGIS Project - https://postgis.net" \
+ARG PGIS1_SOURCE_REPO
+ARG PGIS1_MAINTAINER
+ARG PGIS1_BASE_IMAGE
+
+LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.opencontainers.image.description="PostGIS - 17-recent spatial database extension with PostgreSQL 17 bookworm" \
-      org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
+      org.opencontainers.image.source="${PGIS1_SOURCE_REPO}" \
+      org.opencontainers.image.version="17-recent" \
+      org.opencontainers.image.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+      org.opencontainers.image.base.name="${PGIS1_BASE_IMAGE}" \
+      \
+      # child friendly image labels, so some duplacted labels expected
+      org.postgis.base.maintainer="${PGIS1_MAINTAINER}" \
+      org.postgis.base.description="PostGIS - 17-recent spatial database extension with PostgreSQL 17 bookworm" \
+      org.postgis.base.source="${PGIS1_SOURCE_REPO}" \
+      org.postgis.base.version="17-recent" \
+      org.postgis.base.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+      org.postgis.base.extensions="postgis,postgis_raster,postgis_sfcgal,postgis_topology,postgis_tiger_geocoder,address_standardizer" \
+      org.postgis.base.name="${PGIS1_BASE_IMAGE}" \
+      org.postgis.base.repositories="POSTGIS:${PGIS1_POSTGIS_REPOSITORY},GEOS:${PGIS1_GEOS_REPOSITORY},GDAL:${PGIS1_GDAL_REPOSITORY},PROJ:${PGIS1_PROJ_REPOSITORY},SFCGAL:${PGIS1_SFCGAL_REPOSITORY},CGAL:${PGIS1_CGAL_REPOSITORY}"
 
 ARG PGIS1_CMAKE_BUILD_TYPE
 ARG PGIS1_BASE_IMAGE
@@ -450,7 +482,10 @@ ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
     PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
 RUN set -eux \
+    # Update environment export with runtime packages
     && apt-get update \
+    && BOOST_INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' libboost-atomic${PGIS1_BOOST_VERSION} 2>/dev/null || echo "not-found") \
+    && echo "export BOOST_INSTALLED_VERSION=${BOOST_INSTALLED_VERSION}" >> /usr/local/share/docker-postgis-env.sh \
     && apt-get install -y -V --no-install-recommends \
       \
       curl \
@@ -487,7 +522,8 @@ RUN set -eux \
     # Install Arrow + Parquet
     && apt-get update \
     && apt-get install -y -V ca-certificates wget \
-    && wget https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
+    && wget -q --timeout=30 --tries=3 https://apache.jfrog.io/artifactory/arrow/debian/apache-arrow-apt-source-latest-bookworm.deb \
+       || { echo "Failed to download Arrow apt source"; exit 1; } \
     && apt-get install -y -V ./apache-arrow-apt-source-latest-bookworm.deb \
     && apt-get update \
     # Load the PGIS1_ARROW version variables
@@ -669,6 +705,12 @@ RUN set -eux \
     && rm -rf /tmp/logfile \
     && rm -rf /tmp/pgis_reg \
 # clean
+    # Add final version information to environment export
+    && echo "PostGIS build completed at $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> /usr/local/share/docker-postgis-env.sh \
+    && find /_pgis*_commit.txt -type f -exec basename {} \; | while read commit_file; do \
+         commit_hash=$(cat "/${commit_file}" | head -1 | awk '{print $2}') \
+         && echo "export ${commit_file%.txt}=\"${commit_hash}\"" >> /usr/local/share/docker-postgis-env.sh; \
+       done \
     && cd / \
     && rm -rf /usr/src/postgis \
     && apt-get purge -y --autoremove \

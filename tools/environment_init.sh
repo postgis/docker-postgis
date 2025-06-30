@@ -60,8 +60,14 @@ IMAGE_VERSION_ID=""
 # Generate IMAGE_VERSION_ID if ENABLE_IMAGE_VERSION_ID is set to true
 if [[ "${ENABLE_IMAGE_VERSION_ID:-}" == "true" ]]; then
     # Note: Make sure to keep this synchronized with the corresponding section in Makefile
-    COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%d)
-    COMMIT_HASH=$(git log -1 --pretty=format:%h)
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+        COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%d)
+        COMMIT_HASH=$(git log -1 --pretty=format:%h)
+    else
+        echo "Warning: Not in a git repository. Using fallback values for IMAGE_VERSION_ID." >&2
+        COMMIT_DATE="00000000"
+        COMMIT_HASH="00000000"
+    fi
     BUILD_WEEK=$(date '+%Yw%V')
     IMAGE_VERSION_ID="-ver${COMMIT_DATE}-${COMMIT_HASH}-${BUILD_WEEK}"
 fi

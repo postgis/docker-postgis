@@ -159,11 +159,19 @@ workflows:
                 "16-master-bookworm",
                 "16-recent-bookworm",
                 "17-3.4-alpine3.21",
+                "17-3.4-alpine3.22",
                 "17-3.5-alpine3.21",
                 "17-3.5-alpine3.22",
-                "17-3.5-bookworm",
+#   --skip--    "17-3.5-bookworm",  -->  generated with the related bundle job!
                 "17-3.5-bullseye",
+                "17-3.5-bundle0-bookworm",
+                "17-3.6-alpine3.22",
                 "17-master-bookworm",
                 "17-recent-bookworm",
+                "18-3.5-alpine3.22",
+                "18-3.5-bookworm",
+                "18-3.6-alpine3.22",
+                "18-master-bookworm",
+                "18-recent-bookworm",
 #circleci-targets-end
               ]

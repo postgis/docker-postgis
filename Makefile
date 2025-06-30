@@ -30,11 +30,17 @@ endif
 
 IMAGE_VERSION_ID :=""
 ifeq ($(ENABLE_IMAGE_VERSION_ID),true)
-	# Note: Make sure to keep this synchronized with the corresponding section in ./tools/environment_init.sh
-	COMMIT_DATE=$(shell git log -1 --format=%cd --date=format:%Y%m%d)
-	COMMIT_HASH=$(shell git log -1 --pretty=format:%h)
-	BUILD_WEEK=$(shell date '+%Yw%V')
-	IMAGE_VERSION_ID=-ver$(COMMIT_DATE)-$(COMMIT_HASH)-$(BUILD_WEEK)
+# Note: Make sure to keep this synchronized with the corresponding section in ./tools/environment_init.sh
+ifeq ($(shell git rev-parse --git-dir 2>/dev/null),)
+$(warning Warning: Not in a git repository. Using fallback values for IMAGE_VERSION_ID.)
+COMMIT_DATE=00000000
+COMMIT_HASH=00000000
+else
+COMMIT_DATE=$(shell git log -1 --format='%cd' --date=format:'%Y%m%d')
+COMMIT_HASH=$(shell git log -1 --pretty=format:'%h')
+endif
+BUILD_WEEK=$(shell date '+%Yw%V')
+IMAGE_VERSION_ID=-ver$(COMMIT_DATE)-$(COMMIT_HASH)-$(BUILD_WEEK)
 endif
 
 PUSH_FULL_IMAGENAME = ;$(DOCKER) image push $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):
@@ -55,8 +61,8 @@ OFFIMG_REPO_URL ?=https://github.com/docker-library/official-images.git
 #   the existence of Dockerfile at the depth of two directories
 #     where the first directory names starting with a number.
 DOCKERFILE_DIRS := $(shell find . -mindepth 2 -maxdepth 2 -type d -exec test -e '{}/Dockerfile' \; -print | sed 's|./||' | awk '/^[0-9]/ {print}')
-VERSIONS := $(sort $(shell echo '$(DOCKERFILE_DIRS)' | tr ' ' '\n' | cut -d'/' -f1))
-VARIANTS := $(sort $(shell echo '$(DOCKERFILE_DIRS)' | tr ' ' '\n' | cut -d'/' -f2))
+VERSIONS := $(sort $(foreach dir,$(DOCKERFILE_DIRS),$(firstword $(subst /, ,$(dir)))))
+VARIANTS := $(sort $(foreach dir,$(DOCKERFILE_DIRS),$(lastword $(subst /, ,$(dir)))))
 
 check_variant:
 ifeq ($(VARIANT),default)
@@ -304,6 +310,138 @@ imageclean:
 imageclean_${REPO_NAME}_${IMAGE_NAME}:
 	docker image ls | grep "^${REPO_NAME}/${IMAGE_NAME}" | awk '{print $$3}' | sort -u | xargs -rt docker rmi -f
 
+# Add new PostgreSQL version support
+# Usage: make add-postgres-version PG_VERSION=19 POSTGIS_VERSION=3.5 TYPE=master
+# TYPE options: master (latest debian), postgis (all debian+alpine variants), bundle (latest debian)
+add-postgres-version:
+	@if [ -z "$(PG_VERSION)" ]; then \
+		echo "Error: PG_VERSION is required."; \
+		echo "Usage: make add-postgres-version PG_VERSION=19 POSTGIS_VERSION=3.5 TYPE=master"; \
+		echo "  TYPE options: master (latest debian), postgis (all debian+alpine), bundle (latest debian)"; \
+		exit 1; \
+	fi
+	@if [ -z "$(POSTGIS_VERSION)" ]; then \
+		echo "Error: POSTGIS_VERSION is required."; \
+		echo "Usage: make add-postgres-version PG_VERSION=19 POSTGIS_VERSION=3.5 TYPE=master"; \
+		echo "  TYPE options: master (latest debian), postgis (all debian+alpine), bundle (latest debian)"; \
+		exit 1; \
+	fi
+	@if [ -z "$(TYPE)" ]; then \
+		echo "Error: TYPE is required."; \
+		echo "Usage: make add-postgres-version PG_VERSION=19 POSTGIS_VERSION=3.5 TYPE=master"; \
+		echo "  TYPE options: master (latest debian), postgis (all debian+alpine), bundle (latest debian)"; \
+		exit 1; \
+	fi
+	@echo "Adding PostgreSQL $(PG_VERSION) with PostGIS $(POSTGIS_VERSION) support ($(TYPE) type)..."
+	@echo "Step 1: Adding $(PG_VERSION) to tools/versions.sh postgres_versions"
+	@if ! grep -q " $(PG_VERSION)" tools/versions.sh; then \
+		sed -i 's/postgres_versions="\([^"]*\)"/postgres_versions="\1 $(PG_VERSION)"/' tools/versions.sh; \
+		echo "  Added $(PG_VERSION) to postgres_versions"; \
+	else \
+		echo "  $(PG_VERSION) already exists in postgres_versions"; \
+	fi
+	@echo "Step 2: Creating directory structure based on type $(TYPE)"
+	@DEBIAN_VARIANTS=$$(grep '^debian_variants=' tools/versions.sh | cut -d'"' -f2 | xargs); \
+	ALPINE_VARIANTS=$$(grep '^alpine_variants=' tools/versions.sh | cut -d'"' -f2 | xargs); \
+	DEBIAN_LATEST=$$(grep '^debian_latest=' tools/versions.sh | cut -d'"' -f2); \
+	if [ "$(TYPE)" = "master" ]; then \
+		echo "  Creating master variant ($$DEBIAN_LATEST only)"; \
+		mkdir -p $(PG_VERSION)-master/$$DEBIAN_LATEST; \
+		touch $(PG_VERSION)-master/$$DEBIAN_LATEST/Dockerfile; \
+	elif [ "$(TYPE)" = "postgis" ]; then \
+		echo "  Creating PostGIS variant (all debian + alpine variants)"; \
+		for variant in $$DEBIAN_VARIANTS $$ALPINE_VARIANTS; do \
+			echo "    Creating $(PG_VERSION)-$(POSTGIS_VERSION)/$$variant"; \
+			mkdir -p $(PG_VERSION)-$(POSTGIS_VERSION)/$$variant; \
+			touch $(PG_VERSION)-$(POSTGIS_VERSION)/$$variant/Dockerfile; \
+		done; \
+	elif [ "$(TYPE)" = "bundle" ]; then \
+		echo "  Creating bundle variant ($$DEBIAN_LATEST only)"; \
+		mkdir -p $(PG_VERSION)-$(POSTGIS_VERSION)-bundle0/$$DEBIAN_LATEST; \
+		touch $(PG_VERSION)-$(POSTGIS_VERSION)-bundle0/$$DEBIAN_LATEST/Dockerfile; \
+	else \
+		echo "Error: Invalid TYPE. Must be master, postgis, or bundle"; \
+		exit 1; \
+	fi
+	@echo "Step 3: Adding configuration to locked.yml"
+	@if [ "$(TYPE)" = "master" ]; then \
+		echo "" >> locked.yml; \
+		echo "'$(PG_VERSION)-master':" >> locked.yml; \
+		echo "  'bookworm':" >> locked.yml; \
+		echo "    _comment: \"source: ./locked.yml - PostgreSQL $(PG_VERSION) master testing\"" >> locked.yml; \
+		echo "    tags: '$(PG_VERSION)-master-bookworm $(PG_VERSION)-master'" >> locked.yml; \
+		echo "    postgis: 'master'" >> locked.yml; \
+		echo "    readme_group: 'test'" >> locked.yml; \
+		echo "    PG_MAJOR: '$(PG_VERSION)'" >> locked.yml; \
+		echo "    PG_DOCKER: '$(PG_VERSION)beta1'" >> locked.yml; \
+		echo "    arch: 'amd64 arm64'" >> locked.yml; \
+		echo "    template: 'Dockerfile.master.template'" >> locked.yml; \
+		echo "    initfile: 'initdb-postgis.sh'" >> locked.yml; \
+		echo "    POSTGIS_CHECKOUT: 'master'" >> locked.yml; \
+		echo "    POSTGIS_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
+		echo "    CGAL_CHECKOUT: 'master'" >> locked.yml; \
+		echo "    CGAL_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
+		echo "    SFCGAL_CHECKOUT: 'master'" >> locked.yml; \
+		echo "    SFCGAL_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
+		echo "    PROJ_CHECKOUT: 'master'" >> locked.yml; \
+		echo "    PROJ_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
+		echo "    GDAL_BUILD: 'with_extra'" >> locked.yml; \
+		echo "    GDAL_CHECKOUT: 'master'" >> locked.yml; \
+		echo "    GDAL_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
+		echo "    GEOS_CHECKOUT: 'main'" >> locked.yml; \
+		echo "    GEOS_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
+		echo "    BOOST_VERSION: '1.74.0'" >> locked.yml; \
+		echo "  Added $(PG_VERSION)-master configuration to locked.yml"; \
+	else \
+		echo "  For PostGIS/bundle variants, configuration will be auto-generated by update.sh"; \
+	fi
+	@echo "Step 4: Adding optional pg_hint_plan support to tools/versions.sh"
+	@if ! grep -q "get_latest_version_and_hash_optional.*REL$(PG_VERSION)" tools/versions.sh; then \
+		sed -i '/get_latest_version_and_hash_optional.*REL18/a get_latest_version_and_hash_optional "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL$(PG_VERSION) ""' tools/versions.sh; \
+		echo "  Added REL$(PG_VERSION) pg_hint_plan support"; \
+	else \
+		echo "  REL$(PG_VERSION) pg_hint_plan support already exists"; \
+	fi
+	@echo ""
+	@echo "✅ Successfully created PostgreSQL $(PG_VERSION) directory structure!"
+	@echo ""
+	@echo "Next steps:"
+	@echo "  1. Run update script:  ./update.sh"
+	@if [ "$(TYPE)" = "master" ]; then \
+		echo "  2. Build the image:    make build-$(PG_VERSION)-master-bookworm"; \
+		echo "  3. Test the image:     make test-$(PG_VERSION)-master-bookworm"; \
+		echo "  4. Start container:    make start-$(PG_VERSION)-master-bookworm"; \
+		echo "  5. Connect to DB:      make psql-$(PG_VERSION)-master-bookworm"; \
+	elif [ "$(TYPE)" = "postgis" ]; then \
+		echo "  2. Build all variants: make build-$(PG_VERSION)-$(POSTGIS_VERSION)"; \
+		echo "  3. Test all variants:  make test-$(PG_VERSION)-$(POSTGIS_VERSION)"; \
+	elif [ "$(TYPE)" = "bundle" ]; then \
+		echo "  2. Build the bundle:   make build-$(PG_VERSION)-$(POSTGIS_VERSION)-bundle0-bookworm"; \
+		echo "  3. Test the bundle:    make test-$(PG_VERSION)-$(POSTGIS_VERSION)-bundle0-bookworm"; \
+	fi
+	@echo ""
+	@echo "Created directories:"
+	@DEBIAN_VARIANTS=$$(grep '^debian_variants=' tools/versions.sh | cut -d'"' -f2 | xargs); \
+	ALPINE_VARIANTS=$$(grep '^alpine_variants=' tools/versions.sh | cut -d'"' -f2 | xargs); \
+	DEBIAN_LATEST=$$(grep '^debian_latest=' tools/versions.sh | cut -d'"' -f2); \
+	if [ "$(TYPE)" = "master" ]; then \
+		echo "  - $(PG_VERSION)-master/$$DEBIAN_LATEST/"; \
+	elif [ "$(TYPE)" = "postgis" ]; then \
+		for variant in $$DEBIAN_VARIANTS $$ALPINE_VARIANTS; do \
+			echo "  - $(PG_VERSION)-$(POSTGIS_VERSION)/$$variant/"; \
+		done; \
+	elif [ "$(TYPE)" = "bundle" ]; then \
+		echo "  - $(PG_VERSION)-$(POSTGIS_VERSION)-bundle0/$$DEBIAN_LATEST/"; \
+	fi
+	@echo ""
+	@echo "Modified files:"
+	@echo "  - tools/versions.sh (postgres_versions and pg_hint_plan)"
+	@if [ "$(TYPE)" = "master" ]; then \
+		echo "  - locked.yml (added $(PG_VERSION)-master configuration)"; \
+	fi
+	@echo ""
+	@echo "Note: versions.json will be auto-generated when you run ./update.sh"
+
 # Help target
 help: check_variant
 	@echo ' Available make targets:'
@@ -337,6 +475,7 @@ help: check_variant
 	@echo '# clean docker image and volume'
 	@echo $(foreach dir,$(DOCKERFILE_DIRS),' clean-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))')
 	@echo ' '
+	@echo 'add-postgres-version PG_VERSION=X PG_DOCKER_TAG=Y : Add new PostgreSQL version support'
 	@echo 'all          : Local run: "update" "build" "test" (without push)'
 	@echo 'check_version: Check the architecture and version id'
 	@echo 'check-gh-rate: Check the github ratelimit'
@@ -353,7 +492,7 @@ help: check_variant
 	@echo 'You can check the the command without executing: make -n <target> '
 	@echo ' '
 
-.PHONY: help build all update test-prepare test push push-readme manifest \
+.PHONY: help build all update test-prepare test push push-readme manifest add-postgres-version \
         check-gh-rate check_version dockerlist lint imageclean imageclean_${REPO_NAME}_${IMAGE_NAME} \
 	$(foreach version,$(VERSIONS),' build-$(version)') \
 	$(foreach dir,$(DOCKERFILE_DIRS),' build-$(word 1,$(subst /, ,$(dir)))-$(word 2,$(subst /, ,$(dir)))') \

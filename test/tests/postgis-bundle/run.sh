@@ -31,7 +31,7 @@ psql() {
 # Set default values for POSTGRES_TEST_TRIES and POSTGRES_TEST_SLEEP if they are not set.
 # You can change the default value of POSTGRES_TEST_TRIES and the POSTGRES_TEST_SLEEP in the CI build settings.
 # For special cases like Buildx/qemu tests, you may need to set POSTGRES_TEST_TRIES to 42.
-: "${POSTGRES_TEST_TRIES:=15}"
+: "${POSTGRES_TEST_TRIES:=30}"
 : "${POSTGRES_TEST_SLEEP:=2}"
 tries="$POSTGRES_TEST_TRIES"
 while ! echo 'SELECT 1' | psql &>/dev/null; do
@@ -44,25 +44,48 @@ while ! echo 'SELECT 1' | psql &>/dev/null; do
     sleep "$POSTGRES_TEST_SLEEP"
 done
 
+# -------- not working ; need more debug ----------
+##""
+##-- create extension if not exists periods           cascade;
+##-- create extension if not exists pg_cron           cascade;
+##-- create extension if not exists pg_stat_kcache    cascade;
+##-- create extension if not exists pg_xenophile      cascade;
+##-- create extension if not exists pgsodium          cascade;
+##"""
+
 ## Minimal create extension test
 echo "
-create extension if not exists asn1oid cascade;
-create extension if not exists ddlx cascade;
-create extension if not exists gzip cascade;
-create extension if not exists h3 cascade;
-create extension if not exists h3_postgis cascade;
+create extension if not exists age               cascade;
+create extension if not exists byteamagic        cascade;
+create extension if not exists credcheck         cascade;
+create extension if not exists ddlx              cascade;
+create extension if not exists file_fdw          cascade;
+create extension if not exists first_last_agg    cascade;
+create extension if not exists gzip              cascade;
+create extension if not exists gzip              cascade;
+create extension if not exists h3                cascade;
+create extension if not exists h3_postgis        cascade;
 create extension if not exists hstore_plpython3u cascade;
-create extension if not exists http cascade;
-create extension if not exists mobilitydb cascade;
-create extension if not exists ogr_fdw cascade;
-create extension if not exists pg_curl cascade;
-create extension if not exists pg_uuidv7 cascade;
-create extension if not exists pgrouting cascade;
-create extension if not exists pgtap cascade;
-create extension if not exists plpython3u cascade;
-create extension if not exists prioritize cascade;
-create extension if not exists q3c cascade;
-create extension if not exists vector cascade;
+create extension if not exists http              cascade;
+create extension if not exists hypopg            cascade;
+create extension if not exists icu_ext           cascade;
+create extension if not exists json_accessors    cascade;
+create extension if not exists mobilitydb        cascade;
+create extension if not exists moddatetime       cascade;
+create extension if not exists numeral           cascade;
+create extension if not exists ogr_fdw           cascade;
+create extension if not exists permuteseq        cascade;
+create extension if not exists pg_buffercache    cascade;
+create extension if not exists pg_curl           cascade;
+create extension if not exists pg_fact_loader    cascade;
+create extension if not exists pg_show_plans     cascade;
+create extension if not exists pg_uuidv7         cascade;
+create extension if not exists pgrouting         cascade;
+create extension if not exists pgtap             cascade;
+create extension if not exists plpython3u        cascade;
+create extension if not exists prioritize        cascade;
+create extension if not exists q3c               cascade;
+create extension if not exists vector            cascade;
 " | psql
 
 echo "

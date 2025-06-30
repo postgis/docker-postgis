@@ -8,6 +8,10 @@
 
 ARG PGIS1_BASE_IMAGE=postgres:14-bookworm
 
+# usable for forking the image
+ARG PGIS1_SOURCE_REPO="https://github.com/postgis/docker-postgis"
+ARG PGIS1_MAINTAINER="PostGIS Project - https://postgis.net - ${PGIS1_SOURCE_REPO}/issues"
+
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
 ARG PGIS1_GEOS_REPOSITORY=https://github.com/libgeos/geos.git
 ARG PGIS1_GDAL_REPOSITORY=https://github.com/OSGeo/gdal.git
@@ -43,10 +47,19 @@ FROM ${PGIS1_BASE_IMAGE} as builder
 WORKDIR /
 
 ARG PGIS1_BOOST_VERSION
+ARG PGIS1_CMAKE_BUILD_TYPE
+ARG PGIS1_BASE_IMAGE
 ENV PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
 # apt-get install
 RUN set -eux \
+    # Export build environment for child images
+    && echo "export PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE}" > /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_BASE_IMAGE=${PGIS1_BASE_IMAGE}" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_GDAL_BUILD=minimal" >> /usr/local/share/docker-postgis-env.sh \
+    && chmod +x /usr/local/share/docker-postgis-env.sh \
+    \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
@@ -378,9 +391,26 @@ RUN set -eux \
 # -------------------------------------------
 FROM ${PGIS1_BASE_IMAGE}
 
-LABEL maintainer="PostGIS Project - https://postgis.net" \
+ARG PGIS1_SOURCE_REPO
+ARG PGIS1_MAINTAINER
+ARG PGIS1_BASE_IMAGE
+
+LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.opencontainers.image.description="PostGIS - 14-l3.1.9gcp spatial database extension with PostgreSQL 14 bookworm" \
-      org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
+      org.opencontainers.image.source="${PGIS1_SOURCE_REPO}" \
+      org.opencontainers.image.version="14-l3.1.9gcp" \
+      org.opencontainers.image.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+      org.opencontainers.image.base.name="${PGIS1_BASE_IMAGE}" \
+      \
+      # child friendly image labels, so some duplacted labels expected
+      org.postgis.base.maintainer="${PGIS1_MAINTAINER}" \
+      org.postgis.base.description="PostGIS - 14-l3.1.9gcp spatial database extension with PostgreSQL 14 bookworm" \
+      org.postgis.base.source="${PGIS1_SOURCE_REPO}" \
+      org.postgis.base.version="14-l3.1.9gcp" \
+      org.postgis.base.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+      org.postgis.base.extensions="postgis,postgis_raster,postgis_sfcgal,postgis_topology,postgis_tiger_geocoder,address_standardizer" \
+      org.postgis.base.name="${PGIS1_BASE_IMAGE}" \
+      org.postgis.base.repositories="POSTGIS:${PGIS1_POSTGIS_REPOSITORY},GEOS:${PGIS1_GEOS_REPOSITORY},GDAL:${PGIS1_GDAL_REPOSITORY},PROJ:${PGIS1_PROJ_REPOSITORY},SFCGAL:${PGIS1_SFCGAL_REPOSITORY},CGAL:${PGIS1_CGAL_REPOSITORY}"
 
 ARG PGIS1_CMAKE_BUILD_TYPE
 ARG PGIS1_BASE_IMAGE
@@ -391,7 +421,10 @@ ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} \
     PGIS1_BOOST_VERSION=${PGIS1_BOOST_VERSION}
 
 RUN set -eux \
+    # Update environment export with runtime packages
     && apt-get update \
+    && BOOST_INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' libboost-atomic${PGIS1_BOOST_VERSION} 2>/dev/null || echo "not-found") \
+    && echo "export BOOST_INSTALLED_VERSION=${BOOST_INSTALLED_VERSION}" >> /usr/local/share/docker-postgis-env.sh \
     && apt-get install -y -V --no-install-recommends \
       \
       curl \
@@ -573,6 +606,12 @@ RUN set -eux \
     && rm -rf /tmp/logfile \
     && rm -rf /tmp/pgis_reg \
 # clean
+    # Add final version information to environment export
+    && echo "PostGIS build completed at $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> /usr/local/share/docker-postgis-env.sh \
+    && find /_pgis*_commit.txt -type f -exec basename {} \; | while read commit_file; do \
+         commit_hash=$(cat "/${commit_file}" | head -1 | awk '{print $2}') \
+         && echo "export ${commit_file%.txt}=\"${commit_hash}\"" >> /usr/local/share/docker-postgis-env.sh; \
+       done \
     && cd / \
     && rm -rf /usr/src/postgis \
     && apt-get purge -y --autoremove \

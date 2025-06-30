@@ -19,3 +19,6 @@ apply-*.sh
 
 trivy_cache
 tmp/
+
+venv-docker-postgis/
+tools/dive

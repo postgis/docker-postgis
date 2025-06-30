@@ -1,5 +1,4 @@
 
-
 # Experimental Geo Bundle package.
 # This is a work in progress and not yet ready for production.
 # Some packages will be removed from this bundle and others will be added.
@@ -13,22 +12,9 @@ ARG IMAGE_NAME={{ env.IMAGE_NAME }}
 
 ARG PGIS1_BASE_IMAGE=${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:{{ .[env.variant].PG_DOCKER }}-{{ .[env.variant].postgis }}-{{ env.variant }}
 
-ARG PGIS1_MOBILITYDB_REPOSITORY=https://github.com/MobilityDB/MobilityDB.git
-ARG PGIS1_MOBILITYDB_CHECKOUT={{ .[env.variant].MOBILITYDB_CHECKOUT }}
-ARG PGIS1_MOBILITYDB_CHECKOUT_SHA1={{ .[env.variant].MOBILITYDB_CHECKOUT_SHA1 }}
-
-ARG PGIS1_PGSQL_HTTP_REPOSITORY=https://github.com/pramsey/pgsql-http.git
-ARG PGIS1_PGSQL_HTTP_CHECKOUT={{ .[env.variant].PGSQL_HTTP_CHECKOUT }}
-ARG PGIS1_PGSQL_HTTP_CHECKOUT_SHA1={{ .[env.variant].PGSQL_HTTP_CHECKOUT_SHA1 }}
-
 ARG PGIS1_PGSQL_GZIP_REPOSITORY=https://github.com/pramsey/pgsql-gzip.git
 ARG PGIS1_PGSQL_GZIP_CHECKOUT={{ .[env.variant].PGSQL_GZIP_CHECKOUT }}
 ARG PGIS1_PGSQL_GZIP_CHECKOUT_SHA1={{ .[env.variant].PGSQL_GZIP_CHECKOUT_SHA1 }}
-
-ARG PGIS1_TIMESCALEDB_APACHE_ONLY=false
-ARG PGIS1_TIMESCALEDB_REPOSITORY=https://github.com/timescale/timescaledb.git
-ARG PGIS1_TIMESCALEDB_CHECKOUT={{ .[env.variant].TIMESCALEDB_CHECKOUT }}
-ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1={{ .[env.variant].TIMESCALEDB_CHECKOUT_SHA1 }}
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT={{ .[env.variant].PG_HINT_PLAN_CHECKOUT }}
@@ -36,9 +22,15 @@ ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1={{ .[env.variant].PG_HINT_PLAN_CHECKOUT_SHA
 
 ARG PGIS1_DUCKDB_CHECKOUT={{ .[env.variant].DUCKDB_CHECKOUT }}
 
+# usable for forking the image
+ARG PGIS1_OPTIMIZATION_FLAGS=" -O3 -mtune=generic "
+ARG PGIS1_SOURCE_REPO="https://github.com/postgis/docker-postgis"
+ARG PGIS1_MAINTAINER="PostGIS Project - https://postgis.net - ${PGIS1_SOURCE_REPO}/issues"
+
 FROM ${PGIS1_BASE_IMAGE} AS builder
 
 ARG PGIS1_DUCKDB_CHECKOUT
+ARG PGIS1_OPTIMIZATION_FLAGS
 
 RUN set -eux \
     && apt-get update \
@@ -58,36 +50,20 @@ RUN set -eux \
       postgresql-server-dev-$PG_MAJOR \
       unzip \
       wget \
-      # MobilityDB
-      libgeos++-dev \
-      libgsl-dev \
-      libjson-c-dev \
-      libproj-dev \
-      # TimescaleDB
-      libkrb5-dev \
-      # pgsql-http
-      libcurl4-gnutls-dev \
-      # hydra (columnar)
-      liblz4-dev \
       #  pgsql-gzip
       zlib1g-dev \
       # sqlite_fdw
       sqlite3 \
-      # plv8
-      ninja-build \
-      pkg-config \
       # bytemagic
       libmagic-dev \
       # pgsoudium \
       libsodium-dev \
+      # pg_curl
+      libcurl4-gnutls-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-FROM builder as builder-http-gzip
-
-ARG PGIS1_PGSQL_HTTP_REPOSITORY
-ARG PGIS1_PGSQL_HTTP_CHECKOUT
-ARG PGIS1_PGSQL_HTTP_CHECKOUT_SHA1
+FROM builder as builder-gzip
 
 ARG PGIS1_PGSQL_GZIP_REPOSITORY
 ARG PGIS1_PGSQL_GZIP_CHECKOUT
@@ -106,79 +82,6 @@ RUN set -eux \
     && make -j$(nproc) \
     && make install
 
-RUN set -eux \
-    && mkdir -p /pgsql-http \
-    && cd pgsql-http \
-    && git init \
-    && git remote add origin ${PGIS1_PGSQL_HTTP_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS1_PGSQL_HTTP_CHECKOUT} \
-    && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_PGSQL_HTTP_CHECKOUT_SHA1" ]; then exit 1; fi \
-    && git log -1 > /_pgsql_http_last_commit.txt \
-    && make -j$(nproc) \
-    && make install
-
-
-FROM builder as builder-timescaledb
-
-ARG PGIS1_TIMESCALEDB_APACHE_ONLY
-ARG PGIS1_TIMESCALEDB_REPOSITORY
-ARG PGIS1_TIMESCALEDB_CHECKOUT
-ARG PGIS1_TIMESCALEDB_CHECKOUT_SHA1
-
-# Install TimescaleDB; no Arm64 apt support, so build from source
-RUN set -eux \
-    && mkdir -p /timescaledb \
-    && cd timescaledb \
-    && git init \
-    && git remote add origin ${PGIS1_TIMESCALEDB_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS1_TIMESCALEDB_CHECKOUT} \
-    && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_TIMESCALEDB_CHECKOUT_SHA1" ]; then exit 1; fi \
-    && git log -1 > /_timescaledb_last_commit.txt \
-    && ./bootstrap \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
-            -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
-            \
-            -DAPACHE_ONLY=${PGIS1_TIMESCALEDB_APACHE_ONLY} \
-            -DREGRESS_CHECKS=OFF \
-            -DSEND_TELEMETRY_DEFAULT=NO \
-            -DTAP_CHECKS=OFF \
-            -DWARNINGS_AS_ERRORS=OFF \
-            -DENABLE_DEBUG_UTILS=OFF \
-    && cd build \
-    && make -j$(nproc) \
-    && make install
-
-FROM builder as builder-mobilitydb
-
-ARG PGIS1_MOBILITYDB_REPOSITORY
-ARG PGIS1_MOBILITYDB_CHECKOUT
-ARG PGIS1_MOBILITYDB_CHECKOUT_SHA1
-
-# Install MobilityDB
-RUN set -eux \
-    && mkdir -p /MobilityDB \
-    && cd MobilityDB \
-    && git init \
-    && git remote add origin ${PGIS1_MOBILITYDB_REPOSITORY} \
-    && git fetch --depth 1 origin ${PGIS1_MOBILITYDB_CHECKOUT} \
-    && git checkout FETCH_HEAD \
-    # Verify that the commit hash matches the known good one
-    && if [ "$(git rev-parse HEAD)" != "$PGIS1_MOBILITYDB_CHECKOUT_SHA1" ]; then exit 1; fi \
-    && git log -1 > /_MobilityDB_last_commit.txt \
-    && mkdir build \
-    && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=Release \
-             -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
-             -DCMAKE_POLICY_DEFAULT_CMP0069=NEW \
-             .. \
-    && make -j$(nproc) \
-    && make install
-
 
 FROM builder as builder-pgxn
 
@@ -187,8 +90,6 @@ RUN pgxn install --verbose ddlx
 RUN pgxn install --verbose dsef
 RUN pgxn install --verbose json_accessors
 RUN pgxn install --verbose lostgis
-
-#RUN pgxn install --verbose parray_gin # not working on CircleCI arm .. yet
 RUN pgxn install --verbose permuteseq
 RUN pgxn install --verbose pg_curl   # https://github.com/RekGRpth/pg_curl
 RUN pgxn install --verbose pg_roaringbitmap
@@ -198,47 +99,29 @@ RUN pgxn install --verbose pg_xenophile
 RUN pgxn install --verbose pg_xxhash
 RUN pgxn install --verbose pgsodium
 RUN pgxn install --verbose pgsql_tweaks
+# RUN pgxn install --verbose sqlite_fdw
 
 {{ if env.version | startswith("17") then ( -}}
-# sqlite_fdw is not available for PG17
+# pgxman pg_duckdb is not available / not working for PG17 yet
 {{ ) else ( -}}
-RUN USE_PGXS=1 pgxn install sqlite_fdw
+# pg_duckdb
+RUN set -eux \
+    && curl -sfL https://install.pgx.sh -o /tmp/pgx-install.sh \
+    && chmod +x /tmp/pgx-install.sh \
+    && /tmp/pgx-install.sh \
+    && rm /tmp/pgx-install.sh
+RUN pgxman install pg_duckdb
 {{ ) end -}}
 
+#RUN pgxman install hydra_columnar
+#RUN pgxman install pgvectorscale
+#RUN pgxman install pg_quack
 
 FROM builder as builder-other
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1
-
-
-{{ if env.version | startswith("17") then ( -}}
-#  hydradatabase/hydra is not available for PG17
-{{ ) else ( -}}
-# Add hydradatabase
-RUN set -eux \
-    && git clone --depth 1 https://github.com/hydradatabase/hydra  \
-    && cd hydra/columnar \
-    && git checkout main \
-    && export COLUMNAR_O3=1 \
-    && ./configure \
-    && make -j$(nproc) \
-    && make install
-{{ ) end -}}
-
-#  {{ if env.version | startswith("16") then ( -}}
-#  # pg_quack is not available for PG16
-#  # - https://github.com/hydradatabase/pg_quack/issues/3
-#  {{ ) else ( -}}
-#  # add pg_quack: PG 14 and PG 15 only (PG 16 is not yet supported)
-#  # TODO: add pg_quack version!
-#  RUN set -eux \
-#      && git clone --depth 1  https://github.com/hydradatabase/pg_quack  \
-#      && cd pg_quack \
-#      && make -j$(nproc) \
-#      && make install
-#  {{ ) end -}}
 
 # install pg_hint_plan
 RUN set -eux \
@@ -266,9 +149,45 @@ RUN set -eux \
 
 FROM ${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:{{ .[env.variant].PG_DOCKER }}-{{ .[env.variant].postgis }}-{{ env.variant }}
 
-LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS Bundle - {{ .[env.variant].PG_DOCKER }}-{{ .[env.variant].postgis }}-{{ env.variant }} " \
-      org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
+ARG PGIS1_OPTIMIZATION_FLAGS
+ARG PGIS1_SOURCE_REPO
+ARG PGIS1_MAINTAINER
+ARG PGIS1_TIMESCALEDB_TELEMETRY
+
+# Export build environment for child images (enterprise-grade package version locking)
+RUN set -eux \
+    # Ensure docker-postgis-env.sh exists (create empty if missing)
+    && touch /usr/local/share/docker-postgis-env.sh \
+    # Export bundle-specific build versions for child images
+    && echo "# Bundle0 Extension Versions" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_OPTIMIZATION_FLAGS='${PGIS1_OPTIMIZATION_FLAGS}'" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_PG_HINT_PLAN_CHECKOUT='{{ .[env.variant].PG_HINT_PLAN_CHECKOUT }}'" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_DUCKDB_CHECKOUT='{{ .[env.variant].DUCKDB_CHECKOUT }}'" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_PGSQL_GZIP_CHECKOUT='{{ .[env.variant].PGSQL_GZIP_CHECKOUT }}'" >> /usr/local/share/docker-postgis-env.sh \
+    && chmod +x /usr/local/share/docker-postgis-env.sh \
+    # Source the environment after populating it
+    && . /usr/local/share/docker-postgis-env.sh
+
+# Only override opencontainers labels for bundle-specific info
+# org.postgis.base.* labels are inherited from base image and should NOT be overridden
+LABEL maintainer="${PGIS1_MAINTAINER}" \
+      org.opencontainers.image.description="PostGIS Bundle - {{ .[env.variant].PG_DOCKER }}-{{ .[env.variant].postgis }}-{{ env.variant }} with MobilityDB, TimescaleDB, DuckDB and 40+ extensions" \
+      org.opencontainers.image.source="${PGIS1_SOURCE_REPO}" \
+      org.opencontainers.image.version="{{ .[env.variant].POSTGIS_VERSION }}-bundle0" \
+      org.opencontainers.image.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+      org.opencontainers.image.base.name="${PGIS1_BASE_IMAGE}" \
+      \
+      # Bundle-specific additional extensions (base PostGIS extensions inherited from org.postgis.base.extensions)
+{{ if env.version | startswith("17") then ( -}}
+      org.postgis.bundle0.additional.extensions="timescaledb,mobilitydb,pgsql_http,pgsql_gzip,pgrouting,pgvector,h3,pointcloud,pgaudit,byteamagic,ddlx,dsef,json_accessors,lostgis,permuteseq,pg_curl,pg_roaringbitmap,pg_rowalesce,pg_uuidv7,pg_xenophile,pg_xxhash,pgsodium,pgsql_tweaks,asn1oid,extra_window_functions,first_last_agg,hll,hypopg,icu_ext,jsquery,numeral,ogr_fdw,partman,periods,pg_fact_loader,pg_failover_slots,pg_stat_kcache,pg_wait_sampling,pgl_ddl_deploy,pglogical,pgmp,pgpcre,pgq3,pgsphere,pgtap,pldebugger,plpgsql_check,prefix,prioritize,q3c,repack,rum,show_plans,squeeze" \
+      org.postgis.bundle0.excluded.pg17="sqlite_fdw,age,decoderbufs" \
+{{ ) else ( -}}
+      org.postgis.bundle0.additional.extensions="timescaledb,mobilitydb,pgsql_http,pgsql_gzip,pgrouting,pgvector,h3,pointcloud,pgaudit,byteamagic,ddlx,dsef,json_accessors,lostgis,permuteseq,pg_curl,pg_roaringbitmap,pg_rowalesce,pg_uuidv7,pg_xenophile,pg_xxhash,pgsodium,pgsql_tweaks,sqlite_fdw,age,decoderbufs,asn1oid,extra_window_functions,first_last_agg,hll,hypopg,icu_ext,jsquery,numeral,ogr_fdw,partman,periods,pg_fact_loader,pg_failover_slots,pg_stat_kcache,pg_wait_sampling,pgl_ddl_deploy,pglogical,pgmp,pgpcre,pgq3,pgsphere,pgtap,pldebugger,plpgsql_check,prefix,prioritize,q3c,repack,rum,show_plans,squeeze" \
+{{ ) end -}}
+      org.postgis.bundle0.permanently.excluded="parray_gin,pg_quack" \
+      org.postgis.bundle0.optimization.flags="${PGIS1_OPTIMIZATION_FLAGS}" \
+      org.postgis.bundle0.timescaledb.telemetry="${PGIS1_TIMESCALEDB_TELEMETRY}" \
+      org.postgis.bundle0.duckdb.version="{{ .[env.variant].DUCKDB_CHECKOUT }}"
 
 # install all utf8 locales;
 # helping: https://github.com/docker-library/docs/tree/master/postgres#locale-customization
@@ -317,23 +236,28 @@ RUN set -eux \
         pspg \
         vip-manager \
         \
+        # add any exceptions for PG17 or PPG16 here
 {{ if env.version | startswith("17") then ( -}}
-        #postgresql-$PG_MAJOR-age \             #  not available for PG17
-        #postgresql-$PG_MAJOR-decoderbufs \     #  not available for PG17
+        # PostgreSQL 17 specific packages
 {{ ) else ( -}}
-        postgresql-$PG_MAJOR-age \
-        postgresql-$PG_MAJOR-decoderbufs \
+        # PostgreSQL 16 and earlier packages
 {{ ) end -}}
         \
+        postgresql-$PG_MAJOR-age \
         postgresql-$PG_MAJOR-asn1oid \
+        postgresql-$PG_MAJOR-auto-failover \
+        postgresql-$PG_MAJOR-credcheck \
         postgresql-$PG_MAJOR-cron \
+        postgresql-$PG_MAJOR-decoderbufs \
         postgresql-$PG_MAJOR-extra-window-functions \
         postgresql-$PG_MAJOR-first-last-agg \
         postgresql-$PG_MAJOR-h3 \
         postgresql-$PG_MAJOR-hll \
+        postgresql-$PG_MAJOR-http \
         postgresql-$PG_MAJOR-hypopg \
         postgresql-$PG_MAJOR-icu-ext \
         postgresql-$PG_MAJOR-jsquery \
+        postgresql-$PG_MAJOR-mobilitydb \
         postgresql-$PG_MAJOR-numeral \
         postgresql-$PG_MAJOR-ogr-fdw \
         postgresql-$PG_MAJOR-partman \
@@ -363,8 +287,7 @@ RUN set -eux \
         postgresql-$PG_MAJOR-rum \
         postgresql-$PG_MAJOR-show-plans \
         postgresql-$PG_MAJOR-squeeze \
-        # add MobilityDb missing dependency from libgsl-dev
-        libgsl27 \
+        postgresql-$PG_MAJOR-timescaledb \
         # MeCab based tokenizer for pgdg-pgroonga
         groonga-tokenizer-mecab \
         # bytemagic
@@ -379,40 +302,42 @@ RUN set -eux \
 ARG PGIS1_DUCKDB_CHECKOUT
 ENV PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}
 RUN arch=$(uname -m) \
-    && DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed 's/tags\///') \
+    && DUCKDB_VERSION=$(echo "$PGIS1_DUCKDB_CHECKOUT" | sed -E 's|^.*/||; s|^tags/||; s|^v||') \
     && echo "DUCKDB_VERSION=${DUCKDB_VERSION}" \
     && echo "PGIS1_DUCKDB_CHECKOUT=${PGIS1_DUCKDB_CHECKOUT}" \
     && case "$arch" in \
         x86_64) \
             duck_binary="duckdb_cli-linux-amd64.zip" ;; \
         aarch64) \
-            duck_binary="duckdb_cli-linux-aarch64.zip" ;; \
+            duck_binary="duckdb_cli-linux-arm64.zip" ;; \
         *) \
             echo "Unsupported architecture: $arch"; exit 1 ;; \
     esac \
-    && wget https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/$duck_binary \
+    && wget https://github.com/duckdb/duckdb/releases/download/v${DUCKDB_VERSION}/$duck_binary \
     && unzip $duck_binary -d /usr/local/bin \
     && rm $duck_binary \
     && duckdb --version
 
-# install extensions
-# https://duckdb.org/docs/extensions/overview.html
-ENV DUCKDB_EXTENSIONS="arrow autocomplete excel fts httpfs icu inet json parquet postgres_scanner spatial sqlite_scanner substrait tpcds tpch visualizer"
+# install duckdb extensions
+ENV DUCKDB_EXTENSIONS="excel fts httpfs inet postgres_scanner spatial sqlite_scanner tpcds tpch"
 RUN for e in ${DUCKDB_EXTENSIONS} ; do \
         echo "Installing $e ..."; \
-        duckdb -c "INSTALL $e;"; \
-        echo "LOAD $e;" >> $HOME/.duckdbrc; \
-    done
+        if duckdb -c "INSTALL $e;" 2>&1 | tee /tmp/duckdb-install-$e.log; then \
+            echo "Successfully installed $e"; \
+            echo "LOAD $e;" >> $HOME/.duckdbrc; \
+        else \
+            echo "Failed to install $e, check /tmp/duckdb-install-$e.log"; \
+        fi; \
+    done \
+    # Add core extensions to .duckdbrc (these are built-in)
+    && echo "LOAD autocomplete;" >> $HOME/.duckdbrc \
+    && echo "LOAD icu;" >> $HOME/.duckdbrc \
+    && echo "LOAD json;" >> $HOME/.duckdbrc \
+    && echo "LOAD parquet;" >> $HOME/.duckdbrc
 
 # Install from stages
-COPY --from=builder-http-gzip   /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
-COPY --from=builder-http-gzip   /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
-
-COPY --from=builder-mobilitydb  /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
-COPY --from=builder-mobilitydb  /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
-
-COPY --from=builder-timescaledb /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
-COPY --from=builder-timescaledb /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
+COPY --from=builder-gzip   /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
+COPY --from=builder-gzip   /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
 
 COPY --from=builder-pgxn        /usr/share/postgresql/$PG_MAJOR/extension/ /usr/share/postgresql/$PG_MAJOR/extension/
 COPY --from=builder-pgxn        /usr/lib/postgresql/$PG_MAJOR/lib          /usr/lib/postgresql/$PG_MAJOR/lib
@@ -441,7 +366,7 @@ RUN set -eux \
 RUN set -eux \
     && cp -v /usr/share/postgresql/postgresql.conf.sample /usr/share/postgresql/postgresql.conf.sample.orig; \
     # add MobilityDB and TimescaleDB requirements
-	echo "shared_preload_libraries = 'pg_hint_plan,postgis-3,timescaledb,pg_cron,pg_stat_statements'" >>  /usr/share/postgresql/postgresql.conf.sample; \
+    echo "shared_preload_libraries = 'postgis-3,pg_stat_statements,timescaledb'" >>  /usr/share/postgresql/postgresql.conf.sample ; \
     # MobilityDB recomendation
 	echo "max_locks_per_transaction = 128" >>  /usr/share/postgresql/postgresql.conf.sample; \
     echo "timescaledb.telemetry_level=off" >>  /usr/share/postgresql/postgresql.conf.sample

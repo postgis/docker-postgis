@@ -4,6 +4,7 @@ set -Eeuo pipefail
 
 # Source environment variables and necessary configurations
 source tools/environment_init.sh
+source tools/cache_helper.sh
 [ -f ./versions.json ]
 
 # This code derived from:
@@ -25,8 +26,8 @@ debian_latest="bookworm"
 alpine_latest="alpine3.22"
 postgis_latest="3.5"
 postgres_latest="17"
-postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5"
-postgres_versions="13 14 15 16 17"
+postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5 3.6"
+postgres_versions="13 14 15 16 17 18"
 
 # MASTER_BRANCH_MODE='flexible'=if you want to use the latest version of the dependencies - automatically
 #   if not set, it will use the locked version, and the checkout hash will be used
@@ -73,10 +74,19 @@ function get_tag_hash() {
     # remove tag/ prefix if exists.
     version=${version#tags/}
 
-    git ls-remote --sort="v:refname" "$repo" refs/tags/"$version"* |
-        grep -E 'refs/tags/'"$version"'(\^\{\})?$' |
-        tail -n1 |
-        awk '{print $1}'
+    # Cache git ls-remote calls (6 hour TTL)
+    local cache_key
+    cache_key="git_tag_hash_${repo//[^a-zA-Z0-9]/_}_$version"
+    if tagResponse=$(cache_get "$cache_key" 6); then
+        echo "$tagResponse"
+    else
+        tagResponse=$(git ls-remote --sort="v:refname" "$repo" refs/tags/"$version"* |
+            grep -E 'refs/tags/'"$version"'(\^\{\})?$' |
+            tail -n1 |
+            awk '{print $1}')
+        cache_store "$cache_key" "$tagResponse"
+        echo "$tagResponse"
+    fi
 }
 
 # extracts a version number and limits it to up to two segments (digits separated by dots).
@@ -115,10 +125,11 @@ function fetch_postgres_docker_versions() {
     postgres_all_docker_versions=""
     while true; do
         local response
-        response=$(curl --silent "https://registry.hub.docker.com/v2/repositories/library/postgres/tags?page=${page}&page_size=${PAGE_SIZE}") || {
+        # Try cache first, then API call
+        if ! response=$(cached_curl "dockerhub_postgres_page_${page}" "https://registry.hub.docker.com/v2/repositories/library/postgres/tags?page=${page}&page_size=${PAGE_SIZE}" 6); then
             echo "Failed to fetch from registry.hub.docker.com"
             return 1
-        }
+        fi
 
         # Extract tag names from the JSON response
         local tags
@@ -158,38 +169,57 @@ for variant in ${postgres_versions}; do
 done
 echo " "
 
-# Check if the github api is limited <= 8 requests; if so, do not continue
-if [ "$api_preference" == "github" ]; then
-    rateLimitRemaining=$(curl -iks https://api.github.com/users/postgis 2>&1 | grep -im1 'X-Ratelimit-Remaining:' | grep -o '[[:digit:]]*')
-    echo "github rateLimitRemaining = ${rateLimitRemaining}"
-    echo " "
-    if [ "${rateLimitRemaining}" -le 8 ]; then
-        echo
-        echo " You do not have enough github requests available to continue!"
-        echo
-        echo " Without logging - the github api is limited to 60 requests per hour"
-        echo "    see: https://developer.github.com/v3/#rate-limiting "
-        echo " You can check your remaining requests with :"
-        echo "    curl -sI https://api.github.com/users/postgis | grep x-ratelimit "
-        echo
-        echo " ------------------------ "
-        curl -sI https://api.github.com/users/postgis | grep x-ratelimit
-        echo
-        echo " The limit will be reset at :"
-        curl -sI https://api.github.com/users/postgis | grep x-ratelimit-reset | cut -d' ' -f2 | xargs -I {} date -d @{}
+
+packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
+
+# Check if we need to fetch git branch HEADs (check cache first)
+need_git_calls=false
+for git_check in "git_branch_cgal_5.6.x" "git_branch_sfcgal_master" "git_branch_proj_master" "git_branch_gdal_master" "git_branch_geos_main" "git_branch_postgis_master"; do
+    if ! cache_get "$git_check" 2 >/dev/null; then
+        need_git_calls=true
+        break
+    fi
+done
+
+# Check GitHub rate limit before git ls-remote calls (if needed)
+if [ "$need_git_calls" = true ]; then
+    if ! check_github_rate_limit 10; then  # Need ~6 requests for git ls-remote calls
         exit 1
     fi
 fi
 
-packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
-cgal5XGitHash="$(git ls-remote https://github.com/CGAL/cgal.git heads/5.6.x-branch | awk '{ print $1}')"
-sfcgalGitHash="$(git ls-remote https://gitlab.com/sfcgal/SFCGAL.git heads/master | awk '{ print $1}')"
-projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
-gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"
-geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/main | awk '{ print $1}')"
-postgisGitHash="$(git ls-remote https://github.com/postgis/postgis.git heads/master | awk '{ print $1}')"
+# Cache git branch HEAD hashes (2 hour TTL)
+if ! cgal5XGitHash=$(cache_get "git_branch_cgal_5.6.x" 2); then
+    cgal5XGitHash="$(git ls-remote https://github.com/CGAL/cgal.git heads/5.6.x-branch | awk '{ print $1}')"
+    cache_store "git_branch_cgal_5.6.x" "$cgal5XGitHash"
+fi
 
-# Function to get the latest version tag and its SHA1 hash
+if ! sfcgalGitHash=$(cache_get "git_branch_sfcgal_master" 2); then
+    sfcgalGitHash="$(git ls-remote https://gitlab.com/sfcgal/SFCGAL.git heads/master | awk '{ print $1}')"
+    cache_store "git_branch_sfcgal_master" "$sfcgalGitHash"
+fi
+
+if ! projGitHash=$(cache_get "git_branch_proj_master" 2); then
+    projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
+    cache_store "git_branch_proj_master" "$projGitHash"
+fi
+
+if ! gdalGitHash=$(cache_get "git_branch_gdal_master" 2); then
+    gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"
+    cache_store "git_branch_gdal_master" "$gdalGitHash"
+fi
+
+if ! geosGitHash=$(cache_get "git_branch_geos_main" 2); then
+    geosGitHash="$(git ls-remote https://github.com/libgeos/geos.git heads/main | awk '{ print $1}')"
+    cache_store "git_branch_geos_main" "$geosGitHash"
+fi
+
+if ! postgisGitHash=$(cache_get "git_branch_postgis_master" 2); then
+    postgisGitHash="$(git ls-remote https://github.com/postgis/postgis.git heads/master | awk '{ print $1}')"
+    cache_store "git_branch_postgis_master" "$postgisGitHash"
+fi
+
+# Function to get the latest version tag and its SHA1 hash (with caching)
 get_latest_version_and_hash() {
     # Argument 1: Repository URL
     local repo_url="$1"
@@ -205,7 +235,39 @@ get_latest_version_and_hash() {
     # remove tag/ prefix if exists.
     checkout_lock=${checkout_lock#tags/}
 
+    # Save original repo_only for cache key
+    local original_repo_only="$repo_only"
+    
+    # Create cache key based on all parameters
+    local cache_key="lastversion_${repo_id}_${repo_development}_${original_repo_only}_${checkout_lock}"
+    cache_key=${cache_key//[^a-zA-Z0-9]/_}
+    
     echo "[+] Checking lastversion : $repo_id  - $repo_url"
+    
+    # Try cache first (6 hour TTL)
+    if cachedResult=$(cache_get "$cache_key" 6); then
+        echo "    Using cached result for $repo_id"
+        # Parse cached result: version|sha1
+        local cached_version
+        local cached_sha1
+        cached_version=$(echo "$cachedResult" | cut -d'|' -f1)
+        cached_sha1=$(echo "$cachedResult" | cut -d'|' -f2)
+        
+        # Set the variables as the original function would (after repo_only processing)
+        if [[ "$repo_only" == "norepo" ]]; then
+            repo_only=""
+        fi
+        local var_name="lastversion_${repo_id}${repo_only}"
+        eval "${var_name}=${cached_version}"
+        eval "${var_name}_sha1=${cached_sha1}"
+        
+        echo "    lastversion_${repo_id}${repo_only} = ${cached_version}"
+        echo "    lastversion_${repo_id}${repo_only}_sha1 = ${cached_sha1}"
+        echo "    "
+        return 0
+    fi
+    
+    # Cache miss - fetch from API
     # Fetch the latest version tag using the lastversion command
 
     if [[ "${repo_development}" == "pre-releases" ]]; then
@@ -247,6 +309,9 @@ get_latest_version_and_hash() {
     local sha1_value=${!sha1_var_name}
     echo "    lastversion_${repo_id}${repo_only}_sha1 = ${sha1_value}"
     echo "    "
+    
+    # Store result in cache: version|sha1
+    cache_store "$cache_key" "${last_version}|${sha1_value}"
 
     if [ -z "$last_version" ]; then
         echo "[-] Error: could not get the latest version tag! Stopping!"
@@ -259,10 +324,54 @@ get_latest_version_and_hash() {
     fi
 }
 
-get_latest_version_and_hash "https://github.com/MobilityDB/MobilityDB" "mobilitydb" releases norepo ""
+# Function to get version and hash with optional failure for missing releases
+get_latest_version_and_hash_optional() {
+    local repo_url="$1"
+    local repo_id="$2"
+    local repo_development="${3:-}"
+    local repo_only="${4:-}"
+    local checkout_lock="${5:-}"
+
+    echo "[+] Checking lastversion (optional): $repo_id  - $repo_url"
+    
+    # Try to get the version, but don't exit on failure
+    if [ -z "$repo_only" ]; then
+        local version_result
+        version_result=$(lastversion "${repo_development}" --format tag "${repo_url}" 2>/dev/null || echo "")
+        eval "lastversion_${repo_id}=${version_result}"
+    else
+        local version_result
+        version_result=$(lastversion "${repo_development}" --format tag --only "${repo_only}" "${repo_url}" 2>/dev/null || echo "")
+        eval "lastversion_${repo_id}${repo_only}=${version_result}"
+    fi
+
+    local var_name="lastversion_${repo_id}${repo_only}"
+    local last_version=${!var_name}
+
+    if [ -n "$last_version" ]; then
+        # Only get SHA1 if we have a version
+        eval "lastversion_${repo_id}${repo_only}_sha1=$(get_tag_hash "${repo_url}" "${last_version}" 2>/dev/null || echo "")"
+        local sha1_var_name="lastversion_${repo_id}${repo_only}_sha1"
+        local sha1_value=${!sha1_var_name}
+        echo "    lastversion_${repo_id}${repo_only} = ${last_version}"
+        echo "    lastversion_${repo_id}${repo_only}_sha1 = ${sha1_value}"
+    else
+        # Set empty values for missing releases
+        eval "lastversion_${repo_id}${repo_only}="
+        eval "lastversion_${repo_id}${repo_only}_sha1="
+        echo "    lastversion_${repo_id}${repo_only} = (not found - optional)"
+        echo "    lastversion_${repo_id}${repo_only}_sha1 = (not found - optional)"
+    fi
+    echo "    "
+}
+
+# Check GitHub rate limit before making multiple lastversion calls
+if ! check_github_rate_limit 10; then  # Reduced from 25 - most calls are now cached
+    exit 1
+fi
+
 get_latest_version_and_hash "https://github.com/pramsey/pgsql-http" "pgsql_http" releases norepo ""
 get_latest_version_and_hash "https://github.com/pramsey/pgsql-gzip" "pgsql_gzip" releases norepo ""
-get_latest_version_and_hash "https://github.com/timescale/timescaledb" "timescaledb" releases norepo ""
 get_latest_version_and_hash "https://github.com/duckdb/duckdb" "duckdb" releases norepo ""
 
 get_latest_version_and_hash "https://github.com/postgis/postgis" "postgis" releases norepo ""
@@ -272,6 +381,10 @@ get_latest_version_and_hash "https://github.com/OSGeo/gdal" "gdal" releases nore
 get_latest_version_and_hash "https://github.com/OSGeo/PROJ" "proj" releases norepo "${PROJ_CHECKOUT_LOCK}"
 get_latest_version_and_hash "https://gitlab.com/sfcgal/SFCGAL" "sfcgal" releases norepo "${SFCGAL_CHECKOUT_LOCK}"
 
+get_latest_version_and_hash_optional "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL18 ""
+get_latest_version_and_hash_optional "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL20 ""
+get_latest_version_and_hash_optional "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL19 ""
+get_latest_version_and_hash_optional "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL17 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL17 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL16 ""
 get_latest_version_and_hash "https://github.com/ossc-db/pg_hint_plan" "pg_hint_plan" releases REL15 ""
@@ -290,10 +403,11 @@ function fetch_postgis_versions() {
     while true; do
         local response
         if [ "$api_preference" == "github" ]; then
-            response=$(curl --silent "https://api.github.com/repos/$REPO/tags?per_page=$PER_PAGE&page=$page") || {
+            # Try cache first, then API call
+            if ! response=$(cached_curl "github_postgis_tags_page_${page}" "https://api.github.com/repos/$REPO/tags?per_page=$PER_PAGE&page=$page" 6); then
                 echo "Failed to fetch postgis_versions from api.github.com/repos/$REPO/tags"
                 return 1
-            }
+            fi
         elif [ "$api_preference" == "osgeo" ]; then
             response=$(curl --silent "https://git.osgeo.org/gitea/api/v1/repos/${REPO}/tags?page=$page&limit=$PER_PAGE") || {
                 echo "Failed to fetch postgis_versions from git.osgeo.org/gitea/api/v1/repos/${REPO}/tags"
@@ -328,6 +442,13 @@ function fetch_postgis_versions() {
         ((page++))
     done
 }
+
+# Check GitHub rate limit before fetching PostGIS versions
+if [ "$api_preference" == "github" ]; then
+    if ! check_github_rate_limit 8; then  # Reduced from 15 - PostGIS pages are cached
+        exit 1
+    fi
+fi
 
 fetch_postgis_versions || {
     echo "Error fetching postgis versions! Maybe network or server error!"
@@ -368,7 +489,17 @@ for variant in ${postgis_versions}; do
         postgisSrcSha1[$variant]=""
     else
         if [ "$api_preference" == "github" ]; then
-            postgisSrcSha256[$variant]="$(curl -sSL "https://github.com/postgis/postgis/archive/${postgisLastTags[$variant]}.tar.gz" | sha256sum | awk '{ print $1 }')"
+            # Cache PostGIS SHA256 hash (cache the computed hash, not the binary file)
+            cache_key="postgis_sha256_${postgisLastTags[$variant]}"
+            if cached_sha256=$(cache_get "$cache_key" 168); then  # 7 days TTL for SHA256 hashes
+                postgisSrcSha256[$variant]="$cached_sha256"
+                echo "# PostGIS SHA256 cache hit: ${postgisLastTags[$variant]} = $cached_sha256"
+            else
+                echo "# Computing PostGIS SHA256 for ${postgisLastTags[$variant]}..."
+                postgisSrcSha256[$variant]="$(curl -sSL "https://github.com/postgis/postgis/archive/${postgisLastTags[$variant]}.tar.gz" | sha256sum | awk '{ print $1 }')"
+                cache_store "$cache_key" "${postgisSrcSha256[$variant]}"
+                echo "# PostGIS SHA256 computed and cached: ${postgisLastTags[$variant]} = ${postgisSrcSha256[$variant]}"
+            fi
             postgisSrcSha1[$variant]=$(get_tag_hash https://github.com/postgis/postgis.git "${postgisLastTags[$variant]}")
         elif [ "$api_preference" == "osgeo" ]; then
             postgisSrcSha256[$variant]="$(curl -sSL "https://git.osgeo.org/gitea/postgis/postgis/archive/${postgisLastTags[$variant]}.tar.gz" | sha256sum | awk '{ print $1 }')"
@@ -676,25 +807,22 @@ for version in "${versions[@]}"; do
                             printf "    template: '%s'\n" "Dockerfile.${bundleType}.template"
                             printf "    initfile: '%s'\n" "initdb-${bundleType}.sh"
 
-                            printf "    MOBILITYDB_CHECKOUT:  'tags/%s'\n" "$lastversion_mobilitydb"
-                            printf "    MOBILITYDB_CHECKOUT_SHA1:  '%s'\n" "$lastversion_mobilitydb_sha1"
-
                             printf "    PGSQL_HTTP_CHECKOUT:  'tags/%s'\n" "$lastversion_pgsql_http"
                             printf "    PGSQL_HTTP_CHECKOUT_SHA1:  '%s'\n" "$lastversion_pgsql_http_sha1"
 
                             printf "    PGSQL_GZIP_CHECKOUT:  'tags/%s'\n" "$lastversion_pgsql_gzip"
                             printf "    PGSQL_GZIP_CHECKOUT_SHA1:  '%s'\n" "$lastversion_pgsql_gzip_sha1"
 
-                            printf "    TIMESCALEDB_CHECKOUT: 'tags/%s'\n" "$lastversion_timescaledb"
-                            printf "    TIMESCALEDB_CHECKOUT_SHA1: '%s'\n" "$lastversion_timescaledb_sha1"
-
                             printf "    DUCKDB_CHECKOUT: 'tags/%s'\n" "$lastversion_duckdb"
                             printf "    DUCKDB_CHECKOUT_SHA1: '%s'\n" "$lastversion_duckdb_sha1"
 
                             lastversion_pg_hint_plan="lastversion_pg_hint_planREL${postgresVersion}"
                             lastversion_pg_hint_plan_sha1="lastversion_pg_hint_planREL${postgresVersion}_sha1"
-                            printf "    PG_HINT_PLAN_CHECKOUT: 'tags/%s'\n" "${!lastversion_pg_hint_plan}"
-                            printf "    PG_HINT_PLAN_CHECKOUT_SHA1: '%s'\n" "${!lastversion_pg_hint_plan_sha1}"
+                            # Only add pg_hint_plan if version exists (for beta PostgreSQL versions)
+                            if [ -n "${!lastversion_pg_hint_plan}" ]; then
+                                printf "    PG_HINT_PLAN_CHECKOUT: 'tags/%s'\n" "${!lastversion_pg_hint_plan}"
+                                printf "    PG_HINT_PLAN_CHECKOUT_SHA1: '%s'\n" "${!lastversion_pg_hint_plan_sha1}"
+                            fi
 
                         fi
 

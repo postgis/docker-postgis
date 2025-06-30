@@ -409,14 +409,10 @@
       "arch": "amd64 arm64",
       "template": "Dockerfile.bundle0.template",
       "initfile": "initdb-bundle0.sh",
-      "MOBILITYDB_CHECKOUT": "tags/v1.2.0",
-      "MOBILITYDB_CHECKOUT_SHA1": "60048b5b4b7ce2f7560c024d1af024db73b3bd5b",
       "PGSQL_HTTP_CHECKOUT": "tags/v1.6.3",
       "PGSQL_HTTP_CHECKOUT_SHA1": "865e72b328050bc8d1bf8bd2f982edb7a4eb4e26",
       "PGSQL_GZIP_CHECKOUT": "tags/v1.0.0",
       "PGSQL_GZIP_CHECKOUT_SHA1": "7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49",
-      "TIMESCALEDB_CHECKOUT": "tags/2.20.3",
-      "TIMESCALEDB_CHECKOUT_SHA1": "7b30533d4d9b6ce1353b8bac0ba6215be20f2633",
       "DUCKDB_CHECKOUT": "tags/v1.3.1",
       "DUCKDB_CHECKOUT_SHA1": "2063dda3e6bd955c364ce8e61939c6248a907be6",
       "PG_HINT_PLAN_CHECKOUT": "tags/REL16_1_6_1",
@@ -491,6 +487,20 @@
       "POSTGIS_SHA256": "e4a95ee95e675c70c21f1a96438a4cbd2c54d4e3ddd0d4ee2850c00624211f42",
       "POSTGIS_CHECKOUT": "tags/3.4.4",
       "POSTGIS_CHECKOUT_SHA1": "e5ae0d451ef9ad3abc5c1c4ef43f9c149c05fd9d"
+    },
+    "alpine3.22": {
+      "tags": "17-3.4-alpine3.22 17-3.4.4-alpine3.22 17-3.4-alpine",
+      "readme_group": "alpine3.22",
+      "postgis": "3.4",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.alpine.template",
+      "initfile": "initdb-postgis.sh",
+      "PG_MAJOR": "17",
+      "PG_DOCKER": "17",
+      "POSTGIS_VERSION": "3.4.4",
+      "POSTGIS_SHA256": "e4a95ee95e675c70c21f1a96438a4cbd2c54d4e3ddd0d4ee2850c00624211f42",
+      "POSTGIS_CHECKOUT": "tags/3.4.4",
+      "POSTGIS_CHECKOUT_SHA1": "e5ae0d451ef9ad3abc5c1c4ef43f9c149c05fd9d"
     }
   },
   "17-3.5": {
@@ -547,6 +557,44 @@
       "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
     }
   },
+  "17-3.5-bundle0": {
+    "bookworm": {
+      "tags": "17-3.5-bundle0-bookworm 17-3.5.3-bundle0-bookworm 17-3.5-bundle0 bundle0",
+      "postgis": "3.5",
+      "readme_group": "bundle0",
+      "PG_MAJOR": "17",
+      "PG_DOCKER": "17",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.bundle0.template",
+      "initfile": "initdb-bundle0.sh",
+      "PGSQL_HTTP_CHECKOUT": "tags/v1.6.3",
+      "PGSQL_HTTP_CHECKOUT_SHA1": "865e72b328050bc8d1bf8bd2f982edb7a4eb4e26",
+      "PGSQL_GZIP_CHECKOUT": "tags/v1.0.0",
+      "PGSQL_GZIP_CHECKOUT_SHA1": "7c26e8b0056631ec0bb7c8fdd9bf2a24076e4a49",
+      "DUCKDB_CHECKOUT": "tags/v1.3.1",
+      "DUCKDB_CHECKOUT_SHA1": "2063dda3e6bd955c364ce8e61939c6248a907be6",
+      "PG_HINT_PLAN_CHECKOUT": "tags/REL17_1_7_0",
+      "PG_HINT_PLAN_CHECKOUT_SHA1": "85e07af6ca4675a26fa2281370c37371b883b2a9",
+      "POSTGIS_MAJOR": "3",
+      "POSTGIS_VERSION": "3.5.3+dfsg-1~exp1.pgdg120+1"
+    }
+  },
+  "17-3.6": {
+    "alpine3.22": {
+      "tags": "17-3.6.0alpha1-alpine3.22 17-3.6.0alpha1-alpine",
+      "readme_group": "test",
+      "postgis": "3.6.0alpha1",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.alpine.template",
+      "initfile": "initdb-postgis.sh",
+      "PG_MAJOR": "17",
+      "PG_DOCKER": "17",
+      "POSTGIS_VERSION": "3.6.0alpha1",
+      "POSTGIS_SHA256": "9f1981716001afff2e4ec75e4107cb64e8d3d9d26ad2abf573444038db0830eb",
+      "POSTGIS_CHECKOUT": "tags/3.6.0alpha1",
+      "POSTGIS_CHECKOUT_SHA1": "b32829d707ef65515df1224361b9f2d5889db348"
+    }
+  },
   "17-master": {
     "bookworm": {
       "tags": "17-master-bookworm 17-master",
@@ -580,6 +628,102 @@
       "readme_group": "recent",
       "PG_MAJOR": "17",
       "PG_DOCKER": "17",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.master.template",
+      "initfile": "initdb-postgis.sh",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91",
+      "PROJ_CHECKOUT": "tags/9.6.2",
+      "PROJ_CHECKOUT_SHA1": "7c3d4a1fa9c1d5a3941b5eaee7c8d149f5936f54",
+      "GDAL_BUILD": "with_extra",
+      "GDAL_CHECKOUT": "tags/v3.11.0",
+      "GDAL_CHECKOUT_SHA1": "447eb5238bb6ef2837e68bf2ec742c64007b680b",
+      "GEOS_CHECKOUT": "tags/3.13.1",
+      "GEOS_CHECKOUT_SHA1": "431568d6e311e0bbfb057b4ec3d44d0d3ba3335f",
+      "SFCGAL_CHECKOUT": "tags/v2.1.0",
+      "SFCGAL_CHECKOUT_SHA1": "60573cfb6b3fc01eceda563d275a226317ba01db",
+      "CGAL_CHECKOUT": "tags/v6.0.1",
+      "CGAL_CHECKOUT_SHA1": "50cfbde3b84dbeae8338268db2d78fe4fcb522de",
+      "BOOST_VERSION": "1.74.0"
+    }
+  },
+  "18-3.5": {
+    "bookworm": {
+      "tags": "18beta1-3.5-bookworm 18beta1-3.5.3-bookworm 18beta1-3.5",
+      "postgis": "3.5",
+      "readme_group": "test",
+      "PG_MAJOR": "18",
+      "PG_DOCKER": "18beta1",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.debian.template",
+      "initfile": "initdb-postgis.sh",
+      "POSTGIS_MAJOR": "3",
+      "POSTGIS_VERSION": "3.5.3+dfsg-1~exp1.pgdg120+1"
+    },
+    "alpine3.22": {
+      "tags": "18beta1-3.5-alpine3.22 18beta1-3.5.3-alpine3.22 18beta1-3.5-alpine",
+      "readme_group": "test",
+      "postgis": "3.5",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.alpine.template",
+      "initfile": "initdb-postgis.sh",
+      "PG_MAJOR": "18",
+      "PG_DOCKER": "18beta1",
+      "POSTGIS_VERSION": "3.5.3",
+      "POSTGIS_SHA256": "44222ed2b8f742ffc1ceb429b09ebb484c7880f9ba27bf7b6b197346cdd25437",
+      "POSTGIS_CHECKOUT": "tags/3.5.3",
+      "POSTGIS_CHECKOUT_SHA1": "aab5f55897aa2e8eb5f17c3996b61268c5f1ec91"
+    }
+  },
+  "18-3.6": {
+    "alpine3.22": {
+      "tags": "18beta1-3.6.0alpha1-alpine3.22 18beta1-3.6.0alpha1-alpine",
+      "readme_group": "test",
+      "postgis": "3.6.0alpha1",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.alpine.template",
+      "initfile": "initdb-postgis.sh",
+      "PG_MAJOR": "18",
+      "PG_DOCKER": "18beta1",
+      "POSTGIS_VERSION": "3.6.0alpha1",
+      "POSTGIS_SHA256": "9f1981716001afff2e4ec75e4107cb64e8d3d9d26ad2abf573444038db0830eb",
+      "POSTGIS_CHECKOUT": "tags/3.6.0alpha1",
+      "POSTGIS_CHECKOUT_SHA1": "b32829d707ef65515df1224361b9f2d5889db348"
+    }
+  },
+  "18-master": {
+    "bookworm": {
+      "tags": "18beta1-master-bookworm 18beta1-master",
+      "postgis": "master",
+      "readme_group": "test",
+      "PG_MAJOR": "18",
+      "PG_DOCKER": "18beta1",
+      "arch": "amd64 arm64",
+      "template": "Dockerfile.master.template",
+      "initfile": "initdb-postgis.sh",
+      "POSTGIS_CHECKOUT": "master",
+      "POSTGIS_CHECKOUT_SHA1": "nocheck",
+      "CGAL_CHECKOUT": "master",
+      "CGAL_CHECKOUT_SHA1": "nocheck",
+      "SFCGAL_CHECKOUT": "master",
+      "SFCGAL_CHECKOUT_SHA1": "nocheck",
+      "PROJ_CHECKOUT": "master",
+      "PROJ_CHECKOUT_SHA1": "nocheck",
+      "GDAL_BUILD": "with_extra",
+      "GDAL_CHECKOUT": "master",
+      "GDAL_CHECKOUT_SHA1": "nocheck",
+      "GEOS_CHECKOUT": "main",
+      "GEOS_CHECKOUT_SHA1": "nocheck",
+      "BOOST_VERSION": "1.74.0"
+    }
+  },
+  "18-recent": {
+    "bookworm": {
+      "tags": "18beta1-recent-bookworm 18beta1-recent-postgis3.5.3-geos3.13.1-proj9.6.2-gdal3.11.0-cgal6.0.1-sfcgal2.1.0-bookworm 18beta1-recent-postgis3.5-geos3.13-proj9.6-gdal3.11-cgal6.0-sfcgal2.1-bookworm 18beta1-recent",
+      "postgis": "recent",
+      "readme_group": "test",
+      "PG_MAJOR": "18",
+      "PG_DOCKER": "18beta1",
       "arch": "amd64 arm64",
       "template": "Dockerfile.master.template",
       "initfile": "initdb-postgis.sh",

@@ -1,16 +1,16 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-# https://github.com/wagoodman/dive/releases/tag/v0.12.0
-version="0.12.0"
+# https://github.com/wagoodman/dive/releases/tag/v0.13.1
+version="0.13.1"
 
 # Determine IMAGE_ARCH based on the machine architecture
 if [[ "$(uname -m)" == "x86_64" ]]; then
     IMAGE_ARCH=amd64
-    checksum="20a7966523a0905f950c4fbf26471734420d6788cfffcd4a8c4bc972fded3e96  tools/dive_0.12.0_linux_amd64.tar.gz"
+    checksum="0970549eb4a306f8825a84145a2534153badb4d7dcf3febd1967c706367c3d0e  tools/dive_0.13.1_linux_amd64.tar.gz"
 elif [[ "$(uname -m)" == "aarch64" ]]; then
     IMAGE_ARCH=arm64
-    checksum="a2a1470302cdfa367a48f80b67bbf11c0cd8039af9211e39515bd2bbbda58fea  tools/dive_0.12.0_linux_arm64.tar.gz"
+    checksum="2fcd2cf20f634ccdb41efac44048b204bfc867c115641f37a7420693ed480a18  tools/dive_0.13.1_linux_arm64.tar.gz"
 else
     echo "Architecture not supported: $(uname -m)"
     exit 1

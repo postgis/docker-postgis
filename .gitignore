@@ -3,4 +3,7 @@
 _*
 .vscode/
 trivy_cache
-tmp/ 
+tmp/
+_cache/
+venv-docker-postgis/
+tools/dive
