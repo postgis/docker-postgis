@@ -1,10 +1,20 @@
-name: Auto-re-run Random Test (helper)
+name: Auto-rerun Failed Builds (helper)
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Retry Test | Random Failure Test Workflow"]
+    workflows:
+      - workflow-build-alpine
+      - workflow-build-debian
+      - workflow-build-development
+      - workflow-build-test
+      - workflow-build-retrytest
+
     types: [completed]
+
+concurrency:
+  group: "${{ github.event.workflow_run.id }}-helper"
+  cancel-in-progress: true
 
 permissions:
   actions: write   # needed for rerun
@@ -14,7 +24,7 @@ jobs:
   rerun-failed:
     if: >
       github.event.workflow_run.conclusion == 'failure' &&
-      github.event.workflow_run.run_attempt < 3
+      github.event.workflow_run.attempt < 3
     runs-on: ubuntu-24.04
 
     steps:
@@ -22,5 +32,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "🔄 Queuing attempt $((${{ github.event.workflow_run.attempt }} + 1)) for workflow '${{ github.event.workflow_run.name }}'"
+          echo "📊 Failed run ID: ${{ github.event.workflow_run.id }}"
+          echo "📅 Original run started: ${{ github.event.workflow_run.created_at }}"
+          echo "🎯 Retrying only failed jobs..."
+          
           gh run rerun ${{ github.event.workflow_run.id }} --failed \
             --repo ${{ github.repository }}
+          
+          echo "✅ Retry queued successfully!"
