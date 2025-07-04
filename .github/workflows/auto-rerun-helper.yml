@@ -1,0 +1,25 @@
+name: Auto-re-run Random Test (helper)
+
+on:
+  workflow_run:
+    workflows: ["Retry Test | Random Failure Test Workflow"]
+    types: [completed]
+
+permissions:
+  actions: write   # needed for rerun
+  contents: read
+
+jobs:
+  rerun-failed:
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.run_attempt < 3
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Re-run only failed jobs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh run rerun ${{ github.event.workflow_run.id }} --failed \
+            --repo ${{ github.repository }}
