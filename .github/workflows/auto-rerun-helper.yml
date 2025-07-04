@@ -1,6 +1,7 @@
 name: Auto-re-run Random Test (helper)
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Retry Test | Random Failure Test Workflow"]
     types: [completed]
