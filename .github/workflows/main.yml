@@ -96,14 +96,14 @@ jobs:
 
     - name: Login to dockerhub
       uses: docker/login-action@v3
-      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      if: ${{ (github.repository == 'postgis/docker-postgis') && github.ref == 'refs/heads/master') && (github.event_name != 'pull_request') }}
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
     - name: Push docker image to dockerhub
       # !!!! ONLY push the images when built on ubuntu-24.04 x86 runner for now, NOT for ubuntu-24.04-arm runners
-      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request') && ( matrix.runner-platform == 'ubuntu-24.04' ) }}
+      if: ${{ (github.repository == 'postgis/docker-postgis') && github.ref == 'refs/heads/master') && (github.event_name != 'pull_request') && ( matrix.runner-platform == 'ubuntu-24.04' ) }}
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
