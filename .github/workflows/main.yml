@@ -52,7 +52,7 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
-      DOCKER_APT_PKG_VER: '5:28.1.1-1~ubuntu.24.04~noble'
+      DOCKER_APT_PKG_VER: '5:28.3.1-1~ubuntu.24.04~noble'
 
     steps:
     - name: Install/config specific version of Docker packages
@@ -78,8 +78,19 @@ jobs:
         docker run hello-world
         echo "***** Displaying Docker information..."
         docker info
-        echo "***** Configuring Docker for containerd image store..."
+        echo "***** Configuring Docker for containerd image store and builder keepStorage..."
         echo "{ \"features\": { \"containerd-snapshotter\": true }}" | sudo tee /etc/docker/daemon.json
+        echo $'{
+          "features": {
+            "containerd-snapshotter": true
+          },
+          "builder": {
+            "gc": {
+              "defaultKeepStorage": "20GB",
+              "enabled": true
+            }
+          }
+        }' | sudo tee /etc/docker/daemon.json
         sudo systemctl restart docker
         docker info -f '{{ .DriverStatus }}'
 
