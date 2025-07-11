@@ -52,7 +52,7 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
-      DOCKER_APT_PKG_VER: '5:28.3.1-1~ubuntu.24.04~noble'
+      DOCKER_APT_PKG_VER: '5:28.3.2-1~ubuntu.24.04~noble'
 
     steps:
     - name: Install/config specific version of Docker packages
