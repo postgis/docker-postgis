@@ -5,11 +5,11 @@ ARG BASE_IMAGE=postgres:17-alpine3.22
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.6.0alpha1 spatial database extension with PostgreSQL 17 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.6.0beta1 spatial database extension with PostgreSQL 17 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION 3.6.0alpha1
-ENV POSTGIS_SHA256 9f1981716001afff2e4ec75e4107cb64e8d3d9d26ad2abf573444038db0830eb
+ENV POSTGIS_VERSION 3.6.0beta1
+ENV POSTGIS_SHA256 fb38afeae97455202b81312245a82809a16787ee379e5e497ce813fa2c878ade
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
