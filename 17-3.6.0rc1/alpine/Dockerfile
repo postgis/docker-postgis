@@ -9,7 +9,7 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_VERSION 3.6.0rc1
-ENV POSTGIS_SHA256 9f1981716001afff2e4ec75e4107cb64e8d3d9d26ad2abf573444038db0830eb
+ENV POSTGIS_SHA256 fb03d4e21a58b701e61adee767acf1304138e8e5f2794c2362f37cd42d5f5f09
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
