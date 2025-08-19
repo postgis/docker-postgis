@@ -45,7 +45,7 @@ jobs:
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
           - postgres: 18beta3
-            postgis: master
+            postgis: '3.5'
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
 
