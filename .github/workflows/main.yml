@@ -37,14 +37,10 @@ jobs:
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
           - postgres: 17
-            postgis: '3.6.0alpha1'
-            variant: alpine
-            runner-platform: 'ubuntu-24.04'
-          - postgres: 17
-            postgis: '3.6.0alpha1'
+            postgis: '3.6.0rc1'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 18
+          - postgres: 18beta3
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
