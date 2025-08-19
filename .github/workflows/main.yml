@@ -47,6 +47,18 @@ jobs:
           - postgres: 18beta3
             postgis: '3.5'
             variant: default
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 18beta3
+            postgis: '3.5'
+            variant: default
+            runner-platform: 'ubuntu-24.04-arm'
+          - postgres: 18beta3
+            postgis: '3.6.0rc1'
+            variant: default
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 18beta3
+            postgis: '3.6.0rc1'
+            variant: default
             runner-platform: 'ubuntu-24.04-arm'
 
     name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.runner-platform }}
