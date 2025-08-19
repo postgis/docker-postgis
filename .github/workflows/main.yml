@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         runner-platform: ['ubuntu-24.04', 'ubuntu-24.04-arm']
-        postgres: [13, 14, 15, 16, 17, 18]
+        postgres: [13, 14, 15, 16, 17, 18beta3]
         postgis: ['3.5']
         variant: [default, alpine]
         include:
