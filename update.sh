@@ -163,6 +163,8 @@ for version in "${versions[@]}"; do
 
     if [ "$suite" = "bullseye" ]; then
         boostVersion="1.74.0"
+    elif [ "$suite" = "trixie" ]; then
+        boostVersion="1.88.0"
     else
         echo "Unknown debian version; stop"
         exit 1
