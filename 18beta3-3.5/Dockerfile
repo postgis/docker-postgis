@@ -1,24 +1,15 @@
 #
-# NOTE: THIS DOCKERFILE IS A TEMPORARY FILE AS DEFAULT TEMPLATING
-# DOES NOT WORK WITH PG 18beta3, FOR THE MOMENT
-#
-# AFTER COMPLETION OF ./update.sh, RUN:
-#      cp Dockerfile.manual Dockerfile 
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
 FROM postgres:18beta3-trixie
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.5.2+dfsg-1.pgdg110+1 spatial database extension with PostgreSQL 18 beta trixie" \
+      org.opencontainers.image.description="PostGIS 3.5.3+dfsg-1~exp1.pgdg130+1 spatial database extension with PostgreSQL 18beta3 trixie" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
 ENV POSTGIS_VERSION 3.5.3+dfsg-1~exp1.pgdg130+1
-
-# Get pg_repack extension version
-# RUN  apt-get update && \
-#       apt-get update && \
-#       apt list | grep postgresql | grep repack
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
@@ -34,3 +25,4 @@ RUN apt-get update \
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
+

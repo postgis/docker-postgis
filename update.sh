@@ -36,6 +36,7 @@ declare -A debianSuite=(
     [15]='bullseye-slim'
     [16]='bullseye-slim'
     [17]='bullseye-slim'
+    [18beta3]='trixie-slim'
     [18]='trixie-slim'
 )
 
