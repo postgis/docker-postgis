@@ -62,7 +62,6 @@ Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postg
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
 | [postgis/postgis:16-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-master/Dockerfile) | debian:bullseye | 16 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:17-3.6.0beta1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.6.0beta1-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.6.0beta1/alpine/Dockerfile) | alpine:3.22 | 17 | 3.6.0beta1 |
 | [postgis/postgis:17-3.6.0rc1-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.6.0rc1-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.6.0rc1/alpine/Dockerfile) | alpine:3.22 | 17 | 3.6.0rc1 |
 | [postgis/postgis:17-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-master/Dockerfile) | debian:bullseye | 17 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:18beta3-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18beta3-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18beta3-3.5/Dockerfile) | debian:trixie | 18beta3 | 3.5.3 |
