@@ -37,11 +37,11 @@ jobs:
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
           - postgres: 17
-            postgis: '3.6.0rc1'
+            postgis: '3.6.0rc2'
             variant: alpine
             runner-platform: 'ubuntu-24.04'
           - postgres: 17
-            postgis: '3.6.0rc1'
+            postgis: '3.6.0rc2'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
 
@@ -51,7 +51,7 @@ jobs:
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
-      DOCKER_APT_PKG_VER: '5:28.3.2-1~ubuntu.24.04~noble'
+      DOCKER_APT_PKG_VER: '5:28.3.3-1~ubuntu.24.04~noble'
 
     steps:
     - name: Install/config specific version of Docker packages
