@@ -66,6 +66,7 @@ Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postg
 | [postgis/postgis:17-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-master/Dockerfile) | debian:bullseye | 17 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:18beta3-3.5](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18beta3-3.5) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18beta3-3.5/Dockerfile) | debian:trixie | 18beta3 | 3.5.3 |
 | [postgis/postgis:18beta3-3.5-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18beta3-3.5-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18beta3-3.5/alpine/Dockerfile) | alpine:3.22 | 18beta3 | 3.5.3 |
+| [postgis/postgis:18beta3-3.6.0rc2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18beta3-3.6.0rc2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18beta3-3.6.0rc2/alpine/Dockerfile) | alpine:3.22 | 18beta3 | 3.6.0rc2 |
 
 ## Usage
 
