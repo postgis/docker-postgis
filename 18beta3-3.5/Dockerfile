@@ -5,11 +5,11 @@
 FROM postgres:18beta3-trixie
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.5.3+dfsg-1~exp1.pgdg130+1 spatial database extension with PostgreSQL 18beta3 trixie" \
+      org.opencontainers.image.description="PostGIS 3.5.3+dfsg-2.pgdg13+1 spatial database extension with PostgreSQL 18beta3 trixie" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR 3
-ENV POSTGIS_VERSION 3.5.3+dfsg-1~exp1.pgdg130+1
+ENV POSTGIS_VERSION 3.5.3+dfsg-2.pgdg13+1
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
