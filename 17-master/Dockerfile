@@ -87,7 +87,7 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL_GIT_HASH b2ba32307c065676668ec24383d54ee94ec9f402
-ENV SFCGAL_GIT_HASH affd8ea0c16d624180e682f9e956c5964dfcadd9
+ENV SFCGAL_GIT_HASH 9646ad8b696a6ad5a4d3880b12a41130a011b731
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -120,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH 080fd7ae4a4e5beb31fcd12b2bae025ee15fd19b
+ENV PROJ_GIT_HASH 5bb60a85366c8792fed15096b89cd2bd2a80c8c1
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 081119ff2b10fcfa85dba7733b9f6dded8624075
+ENV GDAL_GIT_HASH a0eb37ecf8c2696ff9506580788cd14e3a60b80f
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -300,10 +300,10 @@ COPY --from=builder /usr/local /usr/local
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL_GIT_HASH b2ba32307c065676668ec24383d54ee94ec9f402
-ENV SFCGAL_GIT_HASH affd8ea0c16d624180e682f9e956c5964dfcadd9
-ENV PROJ_GIT_HASH 080fd7ae4a4e5beb31fcd12b2bae025ee15fd19b
+ENV SFCGAL_GIT_HASH 9646ad8b696a6ad5a4d3880b12a41130a011b731
+ENV PROJ_GIT_HASH 5bb60a85366c8792fed15096b89cd2bd2a80c8c1
 ENV GEOS_GIT_HASH 3bdeea5375b13c4f57da6e9e399b2c4e39540737
-ENV GDAL_GIT_HASH 081119ff2b10fcfa85dba7733b9f6dded8624075
+ENV GDAL_GIT_HASH a0eb37ecf8c2696ff9506580788cd14e3a60b80f
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -322,7 +322,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 03f08a1f6e2162ba975f9a00a4d0975dc96db456
+ENV POSTGIS_GIT_HASH 799c1d873c39a3ae9c475c24e9dfeda6078aa956
 
 RUN set -ex \
     && apt-get update \

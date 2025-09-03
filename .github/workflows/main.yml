@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         runner-platform: ['ubuntu-24.04', 'ubuntu-24.04-arm']
-        postgres: [13, 14, 15, 16, 17, 18beta3]
+        postgres: [13, 14, 15, 16, 17 ]
         postgis: ['3.5']
         variant: [default, alpine]
         include:
@@ -52,6 +52,15 @@ jobs:
             postgis: '3.6'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
+          - postgres: 18beta3
+            postgis: '3.6'
+            variant: default
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 18beta3
+            postgis: '3.6'
+            variant: default
+            runner-platform: 'ubuntu-24.04-arm'
+
     name: ${{ matrix.postgres }}-${{ matrix.postgis }}-${{ matrix.variant }} ${{ matrix.runner-platform }} - Build Docker image
     runs-on: ${{ matrix.runner-platform }}
     continue-on-error: ${{ matrix.postgis == 'master' }}
