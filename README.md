@@ -29,7 +29,16 @@ Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postg
 * This Docker-PostGIS version has a cautious release cycle to guarantee high stability.
   * By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
 * We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
-  * In the Debian Bullseye repository, the versions are: geos=3.9, gdal=3.2, proj=7.2, and sfcgal=1.3.9.
+  * In the Debian Bullseye repository (for PostgreSQL12 to 17), the versions are:
+    * geos=3.9
+    * gdal=3.2
+    * proj=7.2
+    * sfcgal=1.3.9
+  * In the Debian trixie repository (for PostgreSQL18+), the versions are:
+    * geos=3.13
+    * gdal=3.10
+    * proj=9.6
+    * sfcgal2=2.0
 * This version is easy to extend and has matured over time.
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
@@ -43,7 +52,11 @@ Recommended versions for new users are: `postgis/postgis:17-3.5`, `postgis/postg
 ### Alpine based
 
 * The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
-* In the Alpine 3.22 version, the package versions are: geos=3.13.1, gdal=3.10.2, proj=9.6.0, and sfcgal=2.0.0
+* In the Alpine 3.22 version, the package versions are:
+  * geos=3.13.1
+  * gdal=3.10.2
+  * proj=9.6.0
+  * sfcgal=2.0.0
 * PostGIS is compiled from source, making it a bit more challenging to extend.
 
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
