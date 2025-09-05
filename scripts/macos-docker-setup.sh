@@ -98,27 +98,88 @@ install_docker_desktop() {
 start_docker_desktop() {
     info "Starting Docker Desktop"
     
+    # Kill any existing Docker processes to ensure clean start
+    pkill -f "Docker Desktop" 2>/dev/null || true
+    sleep 2
+    
     # Start Docker Desktop
+    info "Launching Docker Desktop application..."
     open -a Docker
     
-    # Wait for Docker to start (check every 5 seconds, timeout after 5 minutes)
-    local timeout=60  # 5 minutes
-    local count=0
+    # Wait for Docker Desktop process to start
+    info "Waiting for Docker Desktop process to start..."
+    local process_timeout=30  # 2.5 minutes for process to start
+    local process_count=0
     
-    info "Waiting for Docker Desktop to start..."
-    while ! docker info >/dev/null 2>&1; do
-        if [[ $count -ge $timeout ]]; then
-            error "Timeout waiting for Docker Desktop to start"
+    while ! pgrep -f "Docker Desktop" >/dev/null 2>&1; do
+        if [[ $process_count -ge $process_timeout ]]; then
+            error "Docker Desktop application failed to start"
+            info "Troubleshooting steps:"
+            info "1. Check if Docker.app exists: ls -la /Applications/Docker.app"
+            info "2. Try starting manually: open /Applications/Docker.app"
+            info "3. Check system logs: log show --predicate 'subsystem contains \"Docker\"' --last 5m"
             exit 1
         fi
         sleep 5
-        ((count++))
+        ((process_count++))
+        echo -n "."
+    done
+    echo
+    info "Docker Desktop process started"
+    
+    # Wait for Docker daemon to be ready (extended timeout for first-time setup)
+    local daemon_timeout=120  # 10 minutes for daemon to be ready
+    local daemon_count=0
+    
+    info "Waiting for Docker daemon to be ready (this may take up to 10 minutes on first run)..."
+    while ! docker info >/dev/null 2>&1; do
+        if [[ $daemon_count -ge $daemon_timeout ]]; then
+            error "Timeout waiting for Docker daemon to start"
+            info "Docker Desktop troubleshooting:"
+            info "1. Docker Desktop process status:"
+            ps aux | grep -i docker || echo "  No Docker processes found"
+            info "2. Check Docker Desktop GUI for error messages or required user actions"
+            info "3. Try restarting Docker Desktop manually:"
+            info "   - Close Docker Desktop: pkill -f 'Docker Desktop'"
+            info "   - Wait 10 seconds: sleep 10"
+            info "   - Restart: open -a Docker"
+            info "4. Check Docker Desktop logs:"
+            info "   ~/Library/Containers/com.docker.docker/Data/log/"
+            info "5. On first run, Docker Desktop may require:"
+            info "   - Accepting license agreement"
+            info "   - Granting system permissions"
+            info "   - Privileged access for installing components"
+            
+            # Try to get more diagnostic info
+            if command -v docker >/dev/null 2>&1; then
+                info "Docker CLI is available, trying to get more info..."
+                docker version 2>&1 | head -10 || echo "docker version failed"
+                docker context ls 2>&1 || echo "docker context failed"
+            fi
+            
+            exit 1
+        fi
+        
+        # Provide progress feedback
+        if [[ $((daemon_count % 12)) -eq 0 ]] && [[ $daemon_count -gt 0 ]]; then
+            info "Still waiting... (${daemon_count}/120, $(($daemon_count * 5)) seconds elapsed)"
+            info "If this is the first run, Docker Desktop may be installing components or require user interaction"
+        fi
+        
+        sleep 5
+        ((daemon_count++))
         echo -n "."
     done
     echo
     
-    info "Docker Desktop is running"
+    info "Docker Desktop is running successfully!"
     docker version
+    
+    # Verify Docker Desktop is properly configured
+    info "Docker Desktop status:"
+    docker info --format 'Architecture: {{.Architecture}}'
+    docker info --format 'Operating System: {{.OperatingSystem}}'
+    docker info --format 'Docker Root Dir: {{.DockerRootDir}}'
 }
 
 # Configure Docker for multiplatform builds
