@@ -1,0 +1,245 @@
+name: Docker PostGIS CI - macOS Experimental
+
+on:
+  # Manual trigger only for experimental workflow
+  workflow_dispatch:
+    inputs:
+      postgres_version:
+        description: 'PostgreSQL version'
+        required: true
+        default: '17'
+        type: choice
+        options:
+          - '13'
+          - '14'
+          - '15'
+          - '16'
+          - '17'
+      postgis_version:
+        description: 'PostGIS version'
+        required: true
+        default: '3.5'
+        type: choice
+        options:
+          - '3.5'
+          - 'master'
+      variant:
+        description: 'Build variant'
+        required: true
+        default: 'default'
+        type: choice
+        options:
+          - 'default'
+          - 'alpine'
+      build_platforms:
+        description: 'Target platforms for multiplatform build'
+        required: true
+        default: 'linux/arm64,linux/amd64'
+        type: string
+      skip_tests:
+        description: 'Skip running tests'
+        required: false
+        default: false
+        type: boolean
+  
+  # Also allow scheduled runs for testing
+  schedule:
+    # Run weekly on Sundays at 3 AM UTC (experimental only)
+    - cron: '0 3 * * 0'
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # Global environment variables
+  POSTGRES_VERSION: ${{ github.event.inputs.postgres_version || '17' }}
+  POSTGIS_VERSION: ${{ github.event.inputs.postgis_version || '3.5' }}
+  VARIANT: ${{ github.event.inputs.variant || 'default' }}
+  BUILD_PLATFORM: ${{ github.event.inputs.build_platforms || 'linux/arm64,linux/amd64' }}
+  SKIP_TESTS: ${{ github.event.inputs.skip_tests || 'false' }}
+
+jobs:
+  macos-build:
+    name: Build on macOS Apple Silicon (Experimental)
+    runs-on: macos-15  # Latest macOS runner with Apple Silicon
+    timeout-minutes: 120  # 2 hours timeout for Docker installation and builds
+    
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Shallow clone for faster checkout
+
+      - name: Display system information
+        run: |
+          echo "=== System Information ==="
+          uname -a
+          echo "Architecture: $(uname -m)"
+          echo "macOS version: $(sw_vers -productVersion)"
+          echo "Available disk space:"
+          df -h /
+          echo "Memory information:"
+          sysctl hw.memsize
+          echo "CPU information:"
+          sysctl -n machdep.cpu.brand_string
+          echo "Number of CPU cores: $(sysctl -n hw.ncpu)"
+          echo ""
+          echo "=== Build Configuration ==="
+          echo "PostgreSQL version: ${POSTGRES_VERSION}"
+          echo "PostGIS version: ${POSTGIS_VERSION}"
+          echo "Build variant: ${VARIANT}"
+          echo "Target platforms: ${BUILD_PLATFORM}"
+          echo "Skip tests: ${SKIP_TESTS}"
+
+      - name: Check for existing Docker installation
+        id: check-docker
+        run: |
+          if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+            echo "docker_installed=true" >> $GITHUB_OUTPUT
+            echo "Docker is already installed and running"
+            docker version
+            docker info --format '{{.Architecture}}'
+          else
+            echo "docker_installed=false" >> $GITHUB_OUTPUT
+            echo "Docker not found or not running"
+          fi
+
+      - name: Install and configure Docker Desktop (if needed)
+        if: steps.check-docker.outputs.docker_installed == 'false'
+        run: |
+          echo "Installing Docker Desktop for macOS..."
+          ./scripts/macos-docker-setup.sh install-docker
+
+      - name: Verify Docker installation
+        run: |
+          echo "=== Docker Information ==="
+          docker --version
+          docker info --format 'Architecture: {{.Architecture}}'
+          docker info --format 'Operating System: {{.OperatingSystem}}'
+          docker info --format 'Total Memory: {{.MemTotal}}'
+          echo ""
+          echo "=== Docker Buildx Information ==="
+          docker buildx version
+
+      - name: Configure Docker for multiplatform builds
+        run: |
+          echo "Configuring Docker for multiplatform builds with Rosetta2..."
+          ./scripts/macos-docker-setup.sh configure-multiplatform
+
+      - name: Prepare build environment
+        run: |
+          echo "=== Preparing build environment ==="
+          
+          # Check if update.sh needs to be run to generate Dockerfiles
+          VERSION_DIR="${POSTGRES_VERSION}-${POSTGIS_VERSION}"
+          DOCKERFILE_PATH="${VERSION_DIR}"
+          
+          if [ "${VARIANT}" != "default" ]; then
+            DOCKERFILE_PATH="${VERSION_DIR}/${VARIANT}"
+          fi
+          
+          echo "Checking for Dockerfile at: ${DOCKERFILE_PATH}/Dockerfile"
+          
+          if [ ! -f "${DOCKERFILE_PATH}/Dockerfile" ]; then
+            echo "Dockerfile not found. Running update.sh to generate Dockerfiles..."
+            # Run update.sh in a container to avoid dependency issues
+            docker run --rm -v "$(pwd):/work" -w /work buildpack-deps:bullseye-curl ./update.sh
+          else
+            echo "Dockerfile found at ${DOCKERFILE_PATH}/Dockerfile"
+          fi
+          
+          # Display the Dockerfile for debugging
+          echo "=== Dockerfile content preview (first 20 lines) ==="
+          head -20 "${DOCKERFILE_PATH}/Dockerfile" || echo "Could not read Dockerfile"
+
+      - name: Build Docker images
+        run: |
+          echo "=== Building Docker images ==="
+          ./scripts/macos-docker-setup.sh build-only
+
+      - name: Run tests
+        if: env.SKIP_TESTS != 'true'
+        run: |
+          echo "=== Running tests ==="
+          ./scripts/macos-docker-setup.sh test-only
+
+      - name: Display build results
+        run: |
+          echo "=== Build Results ==="
+          echo "Built images:"
+          docker images | grep -E "postgis|${POSTGRES_VERSION}-${POSTGIS_VERSION}" || echo "No matching images found"
+          
+          echo ""
+          echo "=== Docker buildx builders ==="
+          docker buildx ls
+          
+          echo ""
+          echo "=== Docker system information ==="
+          docker system df
+
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "=== Cleanup ==="
+          # Clean up build cache to free space
+          docker buildx prune -f || echo "Failed to prune buildx cache"
+          
+          # Remove temporary images
+          docker image prune -f || echo "Failed to prune images"
+          
+          echo "Remaining images:"
+          docker images
+          
+          echo "Disk space after cleanup:"
+          df -h /
+
+      - name: Upload build logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-logs-${{ env.POSTGRES_VERSION }}-${{ env.POSTGIS_VERSION }}-${{ env.VARIANT }}
+          path: |
+            /tmp/docker_*.log
+            ~/Library/Containers/com.docker.docker/Data/log/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # Summary job to report results
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [macos-build]
+    if: always()
+    steps:
+      - name: Report build status
+        run: |
+          echo "=== macOS Docker PostGIS Build Summary ==="
+          echo "PostgreSQL version: ${{ env.POSTGRES_VERSION }}"
+          echo "PostGIS version: ${{ env.POSTGIS_VERSION }}"
+          echo "Build variant: ${{ env.VARIANT }}"
+          echo "Target platforms: ${{ env.BUILD_PLATFORM }}"
+          echo ""
+          
+          if [ "${{ needs.macos-build.result }}" == "success" ]; then
+            echo "✅ macOS build completed successfully"
+            echo "This experimental workflow demonstrates that Docker Desktop on Apple Silicon"
+            echo "can successfully build multiplatform PostGIS Docker images using Rosetta2."
+          elif [ "${{ needs.macos-build.result }}" == "failure" ]; then
+            echo "❌ macOS build failed"
+            echo "Check the build logs for more details about the failure."
+          elif [ "${{ needs.macos-build.result }}" == "cancelled" ]; then
+            echo "🚫 macOS build was cancelled"
+          else
+            echo "⚠️  macOS build status: ${{ needs.macos-build.result }}"
+          fi
+          
+          echo ""
+          echo "=== Usage Instructions ==="
+          echo "This experimental workflow can be triggered manually from the Actions tab."
+          echo "It demonstrates building PostGIS Docker images on Apple Silicon runners."
+          echo ""
+          echo "Local usage:"
+          echo "1. Run: ./scripts/macos-docker-setup.sh"
+          echo "2. Or with custom parameters:"
+          echo "   POSTGRES_VERSION=16 POSTGIS_VERSION=3.5 VARIANT=alpine ./scripts/macos-docker-setup.sh"
