@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         runner-platform: ['ubuntu-24.04', 'ubuntu-24.04-arm']
-        postgres: [13, 14, 15, 16, 17]
+        postgres: [13, 14, 15, 16, 17 ]
         postgis: ['3.5']
         variant: [default, alpine]
         include:
@@ -37,22 +37,37 @@ jobs:
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
           - postgres: 17
-            postgis: '3.6.0beta1'
+            postgis: '3.6'
             variant: alpine
             runner-platform: 'ubuntu-24.04'
           - postgres: 17
-            postgis: '3.6.0beta1'
+            postgis: '3.6'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
+          - postgres: 18rc1
+            postgis: '3.6'
+            variant: alpine
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 18rc1
+            postgis: '3.6'
+            variant: alpine
+            runner-platform: 'ubuntu-24.04-arm'
+          - postgres: 18rc1
+            postgis: '3.6'
+            variant: default
+            runner-platform: 'ubuntu-24.04'
+          - postgres: 18rc1
+            postgis: '3.6'
+            variant: default
+            runner-platform: 'ubuntu-24.04-arm'
 
-
-    name: Build docker image for ${{ matrix.postgres }}-${{ matrix.postgis }} variant ${{ matrix.variant }} on ${{ matrix.runner-platform }}
+    name: ${{ matrix.postgres }}-${{ matrix.postgis }}-${{ matrix.variant }} ${{ matrix.runner-platform }} - Build Docker image
     runs-on: ${{ matrix.runner-platform }}
     continue-on-error: ${{ matrix.postgis == 'master' }}
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
-      DOCKER_APT_PKG_VER: '5:28.3.2-1~ubuntu.24.04~noble'
+      DOCKER_APT_PKG_VER: '5:28.3.3-1~ubuntu.24.04~noble'
 
     steps:
     - name: Install/config specific version of Docker packages
