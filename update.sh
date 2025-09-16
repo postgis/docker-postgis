@@ -36,7 +36,8 @@ declare -A debianSuite=(
     [15]='bullseye-slim'
     [16]='bullseye-slim'
     [17]='bullseye-slim'
-    [18]='bullseye-slim'
+    [18rc1]='trixie-slim'
+    [18]='trixie-slim'
 )
 
 defaultPostgisDebPkgNameVersionSuffix='3'
@@ -163,6 +164,8 @@ for version in "${versions[@]}"; do
 
     if [ "$suite" = "bullseye" ]; then
         boostVersion="1.74.0"
+    elif [ "$suite" = "trixie" ]; then
+        boostVersion="1.88.0"
     else
         echo "Unknown debian version; stop"
         exit 1
