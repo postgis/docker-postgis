@@ -86,8 +86,8 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH %%CGAL_GIT_HASH%%
-ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
+ENV CGAL_GIT_HASH=%%CGAL_GIT_HASH%%
+ENV SFCGAL_GIT_HASH=%%SFCGAL_GIT_HASH%%
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -120,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
+ENV PROJ_GIT_HASH=%%PROJ_GIT_HASH%%
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -150,7 +150,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
+ENV GEOS_GIT_HASH=%%GEOS_GIT_HASH%%
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+ENV GDAL_GIT_HASH=%%GDAL_GIT_HASH%%
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -299,11 +299,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH %%CGAL_GIT_HASH%%
-ENV SFCGAL_GIT_HASH %%SFCGAL_GIT_HASH%%
-ENV PROJ_GIT_HASH %%PROJ_GIT_HASH%%
-ENV GEOS_GIT_HASH %%GEOS_GIT_HASH%%
-ENV GDAL_GIT_HASH %%GDAL_GIT_HASH%%
+ENV CGAL_GIT_HASH=%%CGAL_GIT_HASH%%
+ENV SFCGAL_GIT_HASH=%%SFCGAL_GIT_HASH%%
+ENV PROJ_GIT_HASH=%%PROJ_GIT_HASH%%
+ENV GEOS_GIT_HASH=%%GEOS_GIT_HASH%%
+ENV GDAL_GIT_HASH=%%GDAL_GIT_HASH%%
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -322,7 +322,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH %%POSTGIS_GIT_HASH%%
+ENV POSTGIS_GIT_HASH=%%POSTGIS_GIT_HASH%%
 
 RUN set -ex \
     && apt-get update \
