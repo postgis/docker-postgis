@@ -44,19 +44,19 @@ jobs:
             postgis: '3.6'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 18rc1
+          - postgres: 18
             postgis: '3.6'
             variant: alpine
             runner-platform: 'ubuntu-24.04'
-          - postgres: 18rc1
+          - postgres: 18
             postgis: '3.6'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 18rc1
+          - postgres: 18
             postgis: '3.6'
             variant: default
             runner-platform: 'ubuntu-24.04'
-          - postgres: 18rc1
+          - postgres: 18
             postgis: '3.6'
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
