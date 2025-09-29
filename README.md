@@ -88,29 +88,28 @@ Recommended versions for new users are:
 
 In order to run a basic container capable of serving a PostGIS-enabled database, start a container as follows:
 
-    ```sh
-    docker run --name some-postgis -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
-    ```
+```sh
+docker run --name some-postgis -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
+```
 
 For more detailed instructions about how to start and control your Postgres container, see the documentation for the [postgres image](https://registry.hub.docker.com/_/postgres/).
 
 Once you have started a database container, you can then connect to the database either directly on the running container:
 
-    ```sh
-    docker exec -ti some-postgis psql -U postgres
-    ```
+```sh
+docker exec -ti some-postgis psql -U postgres
+```
 
 ... or starting a new container to run as a client. In this case you can use a user-defined network to link both containers:
 
-    ```sh
-    docker network create some-network
+```sh
+docker network create some-network
 
-    # Server container
-    docker run --name some-postgis --network some-network -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
+# Server container
+docker run --name some-postgis --network some-network -e POSTGRES_PASSWORD=mysecretpassword -d postgis/postgis
 
-    # Client container
-    docker run -it --rm --network some-network postgis/postgis psql -h some-postgis -U postgres
-    ```
+# Client container
+docker run -it --rm --network some-network postgis/postgis psql -h some-postgis -U postgres
 
 Check the documentation on the [`postgres` image](https://registry.hub.docker.com/_/postgres/) and [Docker networking](https://docs.docker.com/network/) for more details and alternatives on connecting different containers.
 
@@ -168,7 +167,7 @@ It's crucial to be aware that in a cloud environment, with default settings, the
 
 * Note that ports which are not bound to the host (i.e., `-p 5432:5432` instead of `-p 127.0.0.1:5432:5432`) will be accessible from the outside. This also applies if you configured UFW to block this specific port, as Docker manages its own iptables rules. ( [Read More](https://docs.docker.com/network/iptables/) )
 
-### Recomendations
+### Recommendations
 
 * You can add options for using SSL ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
   * `-c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key`
