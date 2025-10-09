@@ -2,11 +2,10 @@
 
 [![Build Status](https://github.com/postgis/docker-postgis/workflows/Docker%20PostGIS%20CI/badge.svg)](https://github.com/postgis/docker-postgis/actions) [![Join the chat at https://gitter.im/postgis/docker-postgis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/postgis/docker-postgis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides debian and alpine variants for PostGIS 3.5.x and 3.6.x, which is compatible with PostgreSQL versions 13, 14, 15, 16, 17 and 18. Additionally, image variants are provided for PostgreSQL 16 and 17, built with PostGIS (and its dependencies) from their respective master branches. These are tagged as `16-master` and `17-master`.
+**⚠️ Breaking change (PostgreSQL 18+):**
+Default `VOLUME` path changed to `/var/lib/postgresql`
 
-> [!CAUTION]
-> ### Breaking Changes
-> * **PostgreSQL / PostGIS 18+**: the default `VOLUME` path changed to `/var/lib/postgresql`
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides Debian and Alpine variants for PostGIS 3.5.x and 3.6.x that are compatible with PostgreSQL versions 13, 14, 15, 16, 17 and 18. Additionally, image variants are provided for PostgreSQL 16 and 17, built with PostGIS (and its dependencies) from their respective master branches. These are tagged as `16-master` and `17-master`.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -15,32 +14,35 @@ This image ensures that the default database created by the parent `postgres` im
 | `postgis`                | yes |
 | `postgis_topology`       | yes |
 | `postgis_tiger_geocoder` | yes |
-| `postgis_raster` | |
-| `postgis_sfcgal` | |
-| `address_standardizer`| |
-| `address_standardizer_data_us`| |
+| `postgis_raster` | no (available) |
+| `postgis_sfcgal` | no (available) |
+| `address_standardizer`| no (available) |
+| `address_standardizer_data_us`| no (available) |
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-## Versions (2025-10-08)
+## Versions (2025-10-09)
 
-Supported architecture: `amd64` (also known as X86-64)"
+Supported architecture: `amd64` (x86-64)
 
 Recommended versions for new users are:
 
-* `postgis/postgis:18-3.6` - ⚠️ **VOLUME path changed to `/var/lib/postgresql` in PostgreSQL 18+**
+* `postgis/postgis:18-3.6`
+  * ⚠️ Uses `VOLUME` path `/var/lib/postgresql` (changed in PostgreSQL 18+)
+* `postgis/postgis:17-3.5`
+  * Uses legacy `VOLUME` path `/var/lib/postgresql/data`
 
 ### Debian based (recommended)
 
-* This Docker-PostGIS version has a cautious release cycle to guarantee high stability.
+* This Docker-PostGIS image has a cautious release cycle to guarantee high stability.
   * By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
 * We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
-  * In the Debian Bullseye repository (for PostgreSQL13 to 17), the versions are:
+  * In the Debian Bullseye repository (for PostgreSQL 13 to 17), the versions are:
     * geos=3.9
     * gdal=3.2
     * proj=7.2
     * sfcgal=1.3.9
-  * In the Debian trixie repository (for PostgreSQL18+), the versions are:
+  * In the Debian Trixie repository (for PostgreSQL 18+), the versions are:
     * geos=3.13
     * gdal=3.10
     * proj=9.6
@@ -137,27 +139,39 @@ Since the docker-postgis repository is an extension of the official Docker Postg
 * `POSTGRES_INITDB_ARGS`
 * `POSTGRES_INITDB_WALDIR`
 * `POSTGRES_HOST_AUTH_METHOD`
-* `PGDATA`  :  [⚠️ Changed in Docker PostgreSQL 18 ! ⚠️ ](https://github.com/docker-library/docs/blob/master/postgres/README.md#pgdata )
-
-> [!IMPORTANT]
-> ### `PGDATA` Volume Path Change
->
-> The data directory (`VOLUME`) location has changed in **PostgreSQL 18 and later**,  
-> which affects all corresponding **`postgis/postgis:18-*`** images.
->
-> * **PostgreSQL / PostGIS 18+** → `/var/lib/postgresql`
-> * **PostgreSQL / PostGIS 13–17** → `/var/lib/postgresql/data`
->
-> Please adjust your volume mounts accordingly when upgrading to `postgis/postgis:18-*` or newer.
->
-> For more details, see [this upstream change](https://github.com/docker-library/postgres/pull/1259).
-
+* `PGDATA`  [⚠️ Changed in Docker PostgreSQL >=18 ! ⚠️ ](https://github.com/docker-library/docs/blob/master/postgres/README.md#pgdata )
 
 Read more in the [docker-postgres README page](https://github.com/docker-library/docs/blob/master/postgres/README.md)
 
-Warning: **the Docker specific variables will only have an effect if you start the container with a data directory that is empty;** any pre-existing database will be left untouched on container startup.
 
-It's important to note that the environment variables for the Docker image are different from those of the [libpq — C Library](https://www.postgresql.org/docs/current/libpq-envars.html)  (`PGDATABASE`,`PGUSER`,`PGPASSWORD` )
+### ⚠️ `PGDATA` Volume Path Change
+
+Starting from **PostgreSQL 18**, the default data directory (`VOLUME`) path has changed.
+This affects all corresponding **`postgis/postgis:18-*`** and newer images.
+
+**Summary of volume paths:**
+
+| Image name | Image tag range | `--volume` path |
+|-------------|-----------------|-----------------|
+| `postgis/postgis` | `18-*` … | `/var/lib/postgresql` |
+| `postgis/postgis` | `13-*` … `17-*` | `/var/lib/postgresql/data` |
+
+Please adjust your volume mounts for 18+ images.
+For more details, see the [upstream change](https://github.com/docker-library/postgres/pull/1259).
+
+### Initialize Only on Empty Data Directory
+
+Docker-specific environment variables (for example, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`)
+take effect **only when the container is started with an empty data directory**.
+Any pre-existing database will be left **untouched** on container startup.
+
+If you need to re-initialize or change settings, make sure to remove or re-create the volume first.
+
+### `libpq` Environment Variables
+
+Please note that Docker environment variables are **different** from those used by the
+[libpq — C Library](https://www.postgresql.org/docs/current/libpq-envars.html).
+These include: `PGDATABASE`, `PGUSER`, `PGPASSWORD`, and others used by client tools.
 
 ## Troubleshooting tips
 
@@ -169,10 +183,10 @@ Troubleshooting can often be challenging. It's important to know that the docker
 * Docker Community Slack: https://dockr.ly/slack
 * Stack Overflow: https://stackoverflow.com/questions/tagged/docker+postgresql
 
-If your problem is Postgis related:
+If your problem is PostGIS related:
 
 * Stack Overflow : docker + postgis https://stackoverflow.com/questions/tagged/docker+postgis
-* Postgis issue tracker: https://trac.osgeo.org/postgis/report
+* PostGIS issue tracker: https://trac.osgeo.org/postgis/report
 
 And if you don't have a postgres docker experience - read this blog post:
 
@@ -184,9 +198,10 @@ It's crucial to be aware that in a cloud environment, with default settings, the
 
 * Note that ports which are not bound to the host (i.e., `-p 5432:5432` instead of `-p 127.0.0.1:5432:5432`) will be accessible from the outside. This also applies if you configured UFW to block this specific port, as Docker manages its own iptables rules. ( [Read More](https://docs.docker.com/network/iptables/) )
 
-#### io_uring
-Every `postgis/postgis:18*` image includes **`io_uring` capabilities** for asynchronous I/O.  However, some container runtimes (for example, [containerd](https://github.com/containerd/containerd/issues/9048)) have **disabled `io_uring` support** in the past due to **security concerns**. 
-If you wish to experiment with this feature, please do so **at your own risk**, and only **after explicitly enabling `io_uring` in your [seccomp profile](https://docs.docker.com/engine/security/seccomp/)**.
+### io_uring
+
+Every `postgis/postgis:18-*` image includes `io_uring` capabilities for asynchronous I/O.  However, some container runtimes (for example, [containerd](https://github.com/containerd/containerd/issues/9048)) have **disabled `io_uring` support** in the past due to **security concerns**.
+If you wish to experiment with this feature, please do so **at your own risk**, and only after explicitly enabling `io_uring` in your [seccomp profile](https://docs.docker.com/engine/security/seccomp/).
 
 ### Recommendations
 
@@ -196,9 +211,9 @@ If you wish to experiment with this feature, please do so **at your own risk**, 
 
 ### Security scanner information
 
-* Please also scan the base `postgres` docker Image:
-It's important to also scan the base `postgres` Docker image for potential security issues. If your security scanner reports vulnerabilities (known as CVEs) in the image, you may wonder why. To get a better understanding, please read the Docker Library FAQ, especially the section titled ["Why does my security scanner show that an image has CVEs?"](https://github.com/docker-library/faq#why-does-my-security-scanner-show-that-an-image-has-cves)
-For more specific issues related to the postgres docker image, you can search using these links:
+* Please also scan the base `postgres` Docker image for potential security issues.
+If your security scanner reports vulnerabilities (CVEs), check the [Docker Library FAQ](https://github.com/docker-library/faq#why-does-my-security-scanner-show-that-an-image-has-cves) — especially the section *“Why does my security scanner show that an image has CVEs?”*
+For more specific issues related to the Postgres Docker image, you can search using these links:
   * [search for repo:docker-library/postgres trivy](https://github.com/search?q=repo%3Adocker-library%2Fpostgres+trivy&type=issues)
   * [search for repo:docker-library/postgres CVE](https://github.com/search?q=repo%3Adocker-library%2Fpostgres+CVE&type=issues)
 
@@ -221,11 +236,11 @@ We are always open to suggestions to enhance security. If you have any ideas, pl
 
 ## Known Issues / Errors
 
-When You encounter errors due to PostGIS update `OperationalError: could not access file "$libdir/postgis-X.X`, run:
+When you encounter errors due to PostGIS update `OperationalError: could not access file "$libdir/postgis-X.X`, run:
 
 `docker exec some-postgis update-postgis.sh`
 
-It will update to Your newest PostGIS. Update is idempotent, so it won't hurt when You run it more than once, You will get notification like:
+It will update to your newest PostGIS. Update is idempotent, so it won't hurt when you run it more than once. You will get a notification like:
 
 ```log
 Updating PostGIS extensions template_postgis to X.X.X
@@ -247,6 +262,7 @@ This Docker-PostGIS project [is part of the PostGIS group](https://postgis.net/d
 * Please take a moment to review the current issues, discussions, and pull requests before you start.
 * If you have a major change in mind, we kindly ask you to start a discussion about it first.
 * After making changes to the templates, please run the `./update.sh` script.
+* The `README.md` must be written in plain and platform-compatible Markdown that renders correctly on both GitHub and [Docker Hub](https://hub.docker.com/r/postgis/postgis).
 
 ## Code of Conduct
 
