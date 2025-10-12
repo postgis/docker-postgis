@@ -6,7 +6,7 @@
 # "Experimental"; solely for testing purposes. Anticipate frequent changes!
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
-ARG PGIS1_BASE_IMAGE=postgres:18beta1-bookworm
+ARG PGIS1_BASE_IMAGE=postgres:18-bookworm
 
 # usable for forking the image
 ARG PGIS1_SOURCE_REPO="https://github.com/postgis/docker-postgis"
