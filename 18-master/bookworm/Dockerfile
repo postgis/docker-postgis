@@ -329,6 +329,7 @@ RUN set -eux \
       libparquet-dev=${PGIS1_ARROW_VERSION} \
       libarrow-acero-dev=${PGIS1_ARROW_VERSION} \
       libarrow-dataset-dev=${PGIS1_ARROW_VERSION} \
+      libarrow-compute-dev=${PGIS1_ARROW_VERSION} \
       \
       libblosc-dev \
       libcfitsio-dev \
@@ -534,6 +535,7 @@ RUN set -eux \
       libarrow${PGIS1_ARROW_SOVERSION} \
       libparquet${PGIS1_ARROW_SOVERSION} \
       libarrow-dataset${PGIS1_ARROW_SOVERSION} \
+      libarrow-compute${PGIS1_ARROW_SOVERSION} \
       \
       # Install GDAL extra dependencies
       libblosc1 \
