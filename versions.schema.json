@@ -28,7 +28,7 @@
     },
     "readme_group_type": {
       "type": "string",
-      "pattern": "^(alpine[0-9.]+|bullseye|bookworm|bundle0|locked|recent|test)$"
+      "pattern": "^(alpine[0-9.]+|trixie|bookworm|bundle0|locked|recent|test)$"
     },
     "distribution": {
       "type": "object",
@@ -88,7 +88,7 @@
     "^[0-9]+-[0-9.]+(?:-[a-zA-Z0-9]+)?$": {
       "type": "object",
       "patternProperties": {
-        "^(alpine[0-9.]+|bullseye|bookworm)$": {
+        "^(alpine[0-9.]+|trixie|bookworm)$": {
           "$ref": "#/definitions/distribution"
         }
       },

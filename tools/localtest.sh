@@ -31,7 +31,7 @@ fi
 
 check-jsonschema --schemafile versions.schema.json versions.json
 
-test_tag=17-3.5-bookworm
+test_tag=18-3.6-trixie
 
 # check commands
 make -n test-${test_tag}

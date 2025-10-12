@@ -20,12 +20,12 @@ api_preference="github"
 #api_preference="osgeo"  -- not working yet
 
 alpine_variants=" alpine3.21 alpine3.22 "
-debian_variants=" bullseye bookworm "
+debian_variants=" bookworm trixie"
 
-debian_latest="bookworm"
+debian_latest="trixie"
 alpine_latest="alpine3.22"
-postgis_latest="3.5"
-postgres_latest="17"
+postgis_latest="3.6"
+postgres_latest="18"
 postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5 3.6"
 postgres_versions="13 14 15 16 17 18"
 
@@ -58,11 +58,12 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 )
 
 declare -A boostVersion=(
-    ["bullseye"]="1.74.0"
     ["bookworm"]="1.74.0" # 1.81.0 is not yet optimal. The current bookworm packages mixed use of 1.74.0 and 1.81.0
+    ["trixie"]="1.83.0"
     ["alpine3.21"]="1.82.0"
-    ["alpine3.22"]="1.82.0"
+    ["alpine3.22"]="1.84.0"
 )
+
 
 # function get_tag_hash() {
 #    hash_value=$(get_tag_hash "https://github.com/postgis/postgis.git" "3.4.0")
@@ -237,13 +238,13 @@ get_latest_version_and_hash() {
 
     # Save original repo_only for cache key
     local original_repo_only="$repo_only"
-    
+
     # Create cache key based on all parameters
     local cache_key="lastversion_${repo_id}_${repo_development}_${original_repo_only}_${checkout_lock}"
     cache_key=${cache_key//[^a-zA-Z0-9]/_}
-    
+
     echo "[+] Checking lastversion : $repo_id  - $repo_url"
-    
+
     # Try cache first (6 hour TTL)
     if cachedResult=$(cache_get "$cache_key" 6); then
         echo "    Using cached result for $repo_id"
@@ -252,7 +253,7 @@ get_latest_version_and_hash() {
         local cached_sha1
         cached_version=$(echo "$cachedResult" | cut -d'|' -f1)
         cached_sha1=$(echo "$cachedResult" | cut -d'|' -f2)
-        
+
         # Set the variables as the original function would (after repo_only processing)
         if [[ "$repo_only" == "norepo" ]]; then
             repo_only=""
@@ -260,13 +261,13 @@ get_latest_version_and_hash() {
         local var_name="lastversion_${repo_id}${repo_only}"
         eval "${var_name}=${cached_version}"
         eval "${var_name}_sha1=${cached_sha1}"
-        
+
         echo "    lastversion_${repo_id}${repo_only} = ${cached_version}"
         echo "    lastversion_${repo_id}${repo_only}_sha1 = ${cached_sha1}"
         echo "    "
         return 0
     fi
-    
+
     # Cache miss - fetch from API
     # Fetch the latest version tag using the lastversion command
 
@@ -309,7 +310,7 @@ get_latest_version_and_hash() {
     local sha1_value=${!sha1_var_name}
     echo "    lastversion_${repo_id}${repo_only}_sha1 = ${sha1_value}"
     echo "    "
-    
+
     # Store result in cache: version|sha1
     cache_store "$cache_key" "${last_version}|${sha1_value}"
 
@@ -333,7 +334,7 @@ get_latest_version_and_hash_optional() {
     local checkout_lock="${5:-}"
 
     echo "[+] Checking lastversion (optional): $repo_id  - $repo_url"
-    
+
     # Try to get the version, but don't exit on failure
     if [ -z "$repo_only" ]; then
         local version_result

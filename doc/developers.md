@@ -7,7 +7,7 @@
 ## Development Goals Prior to Public Discussion:
 
 - [x] Use Dockerfile templates and version.json, and follow best practices from the official PostgreSQL Dockerfiles as closely as possible.
-- [x] Support for multiple Debian and Alpine releases (e.g., Buster, Bullseye, Alpine 3.18)
+- [x] Support for multiple Debian and Alpine releases (e.g., Bookworm, Trixie, Alpine 3.22)
 - [x] Release new Geo bundle version with pgRouting,MobilityDB,H3,...
   - [ ] need more test, refactoring
 - [x] Support multi tags
