@@ -1,0 +1,46 @@
+name: Update docker hub Readme
+
+# This is the x86_64/Amd64 build worklow
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  make-readme:
+    name: update readme
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - run: pip3 install --upgrade pip
+    - run: pip3 install --upgrade lastversion check-jsonschema
+    - run: tools/install_manifest-tool.sh
+    - run: tools/environment_init.sh
+    - run: make check_version
+
+    - name: Login to dockerhub
+      uses: docker/login-action@v3
+      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+    - name: Docker Ratelimit Check
+      # https://docs.docker.com/docker-hub/download-rate-limit/
+      run: |
+        TOKEN=$(curl --user "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" "https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull" | jq -r .token)
+        HEADERS=$(curl --head -H "Authorization: Bearer $TOKEN" https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest)
+        echo "Rate Limit Info:"
+        echo "$HEADERS" | grep ratelimit
+
+    - name: push readme to docker hub api
+      if: ${{  (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request')  }}
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      run: make push-readme
