@@ -47,7 +47,7 @@ PUSH_FULL_IMAGENAME = ;$(DOCKER) image push $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAM
 FULL_IMAGENAME_WITH_T =  -t $(REGISTRY)/$(REPO_NAME)/$(IMAGE_NAME):
 
 DOCKER ?=docker
-DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:latest
+DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:4
 DOCKER_BUILDOPT ?= --network=host --progress=plain
 
 GIT ?=git
