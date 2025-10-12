@@ -16,12 +16,12 @@ on:
   push:
     paths:
       - '.github/workflows/test_manifest.yml'
-      - '18-3.5/bookworm/**'
+      - '18-3.6/trixie/**'
       - '18-3.6/alpine3.22/**'
   pull_request:
     paths:
       - '.github/workflows/test_manifest.yml'
-      - '18-3.5/bookworm/**'
+      - '18-3.6/trixie/**'
       - '18-3.6/alpine3.22/**'
 
 defaults:
@@ -40,20 +40,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 18-3.5/bookworm builds
-          - image_dir: "18-3.5/bookworm"
+          # 18-3.6/trixie builds
+          - image_dir: "18-3.6/trixie"
             target: "linux/amd64"
             runner: "ubuntu-22.04"
             arch_variant: "amd64"
-          - image_dir: "18-3.5/bookworm"
+          - image_dir: "18-3.6/trixie"
             target: "linux/arm64"
             runner: "ubuntu-22.04-arm"
             arch_variant: "arm64"
-#          - image_dir: "18-3.5/bookworm"
+#          - image_dir: "18-3.6/trixie"
 #            target: "linux/arm/v6"
 #            runner: "ubuntu-22.04-arm"
 #            arch_variant: "armv6"
-#          - image_dir: "18-3.5/bookworm"
+#          - image_dir: "18-3.6/trixie"
 #            target: "linux/arm/v7"
 #            runner: "ubuntu-22.04-arm"
 #            arch_variant: "armv7"
@@ -269,7 +269,7 @@ jobs:
     strategy:
       matrix:
         image_dir:
-          - "18-3.5/bookworm"
+          - "18-3.6/trixie"
           - "18-3.6/alpine3.22"
 
     steps:
@@ -467,8 +467,8 @@ jobs:
         - linux/arm64: ubuntu-22.04-arm (native testing)
 
         ### Images Built
-        - 18-3.5/bookworm: PostgreSQL 18beta1 + PostGIS 3.5 (Debian)
-        - 18-3.6/alpine3.22: PostgreSQL 18beta1 + PostGIS 3.6.0alpha1 (Alpine)
+        - 18-3.6/trixie: PostgreSQL 18beta1 + PostGIS 3.5 (Debian)
+        - 18-3.6/alpine3.22: PostgreSQL 18beta1 + PostGIS 3.6 (Alpine)
 
         ### Registry Configuration
         EOF
