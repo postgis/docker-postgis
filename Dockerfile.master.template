@@ -6,7 +6,7 @@
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-ARG CGAL_GIT_BRANCH=master
+ARG CGAL_GIT_BRANCH=main
 FROM postgres:%%PG_MAJOR%%-%%DEBIAN_VERSION%% as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \

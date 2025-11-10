@@ -6,7 +6,7 @@
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-ARG CGAL_GIT_BRANCH=master
+ARG CGAL_GIT_BRANCH=main
 FROM postgres:17-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
@@ -105,7 +105,7 @@ RUN set -ex \
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=
+ENV CGAL_GIT_HASH=af9490690393a185fe6c8ff40df158fc3da53c87
 ENV SFCGAL_GIT_HASH=fbe878cac797d3096afec7d954ba8fff9b06ce0a
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -318,7 +318,7 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=
+ENV CGAL_GIT_HASH=af9490690393a185fe6c8ff40df158fc3da53c87
 ENV SFCGAL_GIT_HASH=fbe878cac797d3096afec7d954ba8fff9b06ce0a
 ENV PROJ_GIT_HASH=160e432571fc9679bb08ea9cda54c153f03a1cc2
 ENV GEOS_GIT_HASH=93472ce0f6a02dd5dfcbf8e41eca4e75e714209f
