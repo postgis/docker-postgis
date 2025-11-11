@@ -15,7 +15,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates software-properties-common wget \
     && wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && add-apt-repository "deb https://apt-archive.postgresql.org/pub/repos/apt/ bullseye-pgdg-archive main 16"
-    #&& add-apt-repository "deb [ signed-by=/usr/local/share/keyrings/postgres.gpg.asc ] http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main 16" \
 
 
 RUN apt-get update \
