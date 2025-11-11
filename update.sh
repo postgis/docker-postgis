@@ -52,7 +52,7 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
 
-cgalGitHash="$(git ls-remote https://github.com/CGAL/cgal.git heads/master | awk '{ print $1}')"
+cgalGitHash="$(git ls-remote https://github.com/CGAL/cgal.git heads/main | awk '{ print $1}')"
 sfcgalGitHash="$(git ls-remote https://gitlab.com/SFCGAL/SFCGAL.git heads/master | awk '{ print $1}')"
 projGitHash="$(git ls-remote https://github.com/OSGeo/PROJ.git heads/master | awk '{ print $1}')"
 gdalGitHash="$(git ls-remote https://github.com/OSGeo/gdal.git refs/heads/master | grep '\srefs/heads/master' | awk '{ print $1}')"

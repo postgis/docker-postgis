@@ -6,7 +6,7 @@
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-ARG CGAL_GIT_BRANCH=master
+ARG CGAL_GIT_BRANCH=main
 FROM postgres:16-bullseye as builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
@@ -83,11 +83,30 @@ RUN set -ex \
 ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 
+# nlohmann/json - header-only library for SFCGAL (with CMake support)
+RUN set -ex \
+    && mkdir -p /usr/src \
+    && cd /usr/src \
+    # Get the latest release version dynamically
+    && NLOHMANN_JSON_VERSION=$(curl -s https://api.github.com/repos/nlohmann/json/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/') \
+    && echo "Installing nlohmann/json version: ${NLOHMANN_JSON_VERSION}" \
+    # Download and extract the full source with CMake support
+    && curl -L "https://github.com/nlohmann/json/archive/refs/tags/v${NLOHMANN_JSON_VERSION}.tar.gz" -o nlohmann-json.tar.gz \
+    && tar -xzf nlohmann-json.tar.gz \
+    && cd "json-${NLOHMANN_JSON_VERSION}" \
+    && mkdir build \
+    && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DJSON_BuildTests=OFF \
+    && make install \
+    && cd /usr/src \
+    && rm -rf "json-${NLOHMANN_JSON_VERSION}" nlohmann-json.tar.gz \
+    && echo "nlohmann/json ${NLOHMANN_JSON_VERSION} installed with CMake support" > /_pgis_nlohmann_json_version.txt
+
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=b3e2f204a41c1e508a6f018454b60b00aa3dc6fd
-ENV SFCGAL_GIT_HASH=bac4309ca1c06ee4fc919d32c84dc463da7170e2
+ENV CGAL_GIT_HASH=af9490690393a185fe6c8ff40df158fc3da53c87
+ENV SFCGAL_GIT_HASH=fbe878cac797d3096afec7d954ba8fff9b06ce0a
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -120,7 +139,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH=6ef4961358a7525703c0f485b240582530f01b02
+ENV PROJ_GIT_HASH=160e432571fc9679bb08ea9cda54c153f03a1cc2
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -150,7 +169,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH=2e12fa312d8ed12b36839ef20c193b49d695f1d4
+ENV GEOS_GIT_HASH=93472ce0f6a02dd5dfcbf8e41eca4e75e714209f
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +185,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH=b8d0f72f306e7fc0b5a511d96221277797301be5
+ENV GDAL_GIT_HASH=d424be4b7c9ff3d2c3b3aa98318eb7c04266f210
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -299,11 +318,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=b3e2f204a41c1e508a6f018454b60b00aa3dc6fd
-ENV SFCGAL_GIT_HASH=bac4309ca1c06ee4fc919d32c84dc463da7170e2
-ENV PROJ_GIT_HASH=6ef4961358a7525703c0f485b240582530f01b02
-ENV GEOS_GIT_HASH=2e12fa312d8ed12b36839ef20c193b49d695f1d4
-ENV GDAL_GIT_HASH=b8d0f72f306e7fc0b5a511d96221277797301be5
+ENV CGAL_GIT_HASH=af9490690393a185fe6c8ff40df158fc3da53c87
+ENV SFCGAL_GIT_HASH=fbe878cac797d3096afec7d954ba8fff9b06ce0a
+ENV PROJ_GIT_HASH=160e432571fc9679bb08ea9cda54c153f03a1cc2
+ENV GEOS_GIT_HASH=93472ce0f6a02dd5dfcbf8e41eca4e75e714209f
+ENV GDAL_GIT_HASH=d424be4b7c9ff3d2c3b3aa98318eb7c04266f210
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -322,7 +341,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH=d1c28c62c4c5de585a11c6b07cd34e7576546d09
+ENV POSTGIS_GIT_HASH=02bd21e4479d98ebe5fac1b25dabe17f91406cf8
 
 RUN set -ex \
     && apt-get update \
