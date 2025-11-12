@@ -264,6 +264,21 @@ This Docker-PostGIS project [is part of the PostGIS group](https://postgis.net/d
 * After making changes to the templates, please run the `./update.sh` script.
 * The `README.md` must be written in plain and platform-compatible Markdown that renders correctly on both GitHub and [Docker Hub](https://hub.docker.com/r/postgis/postgis).
 
+## Building Docker Images
+
+To build the all Docker images on your local machine, run:
+
+```sh
+make build
+```
+
+To build for a different platform, install `docker buildx` and run:
+
+```sh
+export PLATFORMS="linux/arm64,linux/amd64"
+make build
+```
+
 ## Code of Conduct
 
 Link to [the code of conduct](https://postgis.net/community/conduct/)
