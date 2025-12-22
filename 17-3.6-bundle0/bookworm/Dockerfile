@@ -25,7 +25,7 @@ ARG PGIS1_PG_HINT_PLAN_REPOSITORY=https://github.com/ossc-db/pg_hint_plan.git
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT=tags/REL17_1_7_1
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT_SHA1=1aee00c81ef8ed4cb4e1c6951298ec7ff9fb4a17
 
-ARG PGIS1_DUCKDB_CHECKOUT=tags/v1.4.1
+ARG PGIS1_DUCKDB_CHECKOUT=tags/v1.4.3
 
 # usable for forking the image
 ARG PGIS1_OPTIMIZATION_FLAGS=" -O3 -mtune=generic "
@@ -157,7 +157,7 @@ RUN set -eux \
     && echo "# Bundle0 Extension Versions" >> /usr/local/share/docker-postgis-env.sh \
     && echo "export PGIS1_OPTIMIZATION_FLAGS='${PGIS1_OPTIMIZATION_FLAGS}'" >> /usr/local/share/docker-postgis-env.sh \
     && echo "export PGIS1_PG_HINT_PLAN_CHECKOUT='tags/REL17_1_7_1'" >> /usr/local/share/docker-postgis-env.sh \
-    && echo "export PGIS1_DUCKDB_CHECKOUT='tags/v1.4.1'" >> /usr/local/share/docker-postgis-env.sh \
+    && echo "export PGIS1_DUCKDB_CHECKOUT='tags/v1.4.3'" >> /usr/local/share/docker-postgis-env.sh \
     && echo "export PGIS1_PGSQL_GZIP_CHECKOUT='tags/v1.0.0'" >> /usr/local/share/docker-postgis-env.sh \
     && chmod +x /usr/local/share/docker-postgis-env.sh \
     # Source the environment after populating it
@@ -168,7 +168,7 @@ RUN set -eux \
 LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.opencontainers.image.description="PostGIS Bundle - 17-3.6-bookworm with MobilityDB, TimescaleDB, DuckDB and 40+ extensions" \
       org.opencontainers.image.source="${PGIS1_SOURCE_REPO}" \
-      org.opencontainers.image.version="3.6.0+dfsg-2.pgdg12+1-bundle0" \
+      org.opencontainers.image.version="3.6.1+dfsg-1.pgdg12+1-bundle0" \
       org.opencontainers.image.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
       org.opencontainers.image.base.name="${PGIS1_BASE_IMAGE}" \
       \
@@ -178,7 +178,7 @@ LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.postgis.bundle0.permanently.excluded="parray_gin,pg_quack" \
       org.postgis.bundle0.optimization.flags="${PGIS1_OPTIMIZATION_FLAGS}" \
       org.postgis.bundle0.timescaledb.telemetry="${PGIS1_TIMESCALEDB_TELEMETRY}" \
-      org.postgis.bundle0.duckdb.version="tags/v1.4.1"
+      org.postgis.bundle0.duckdb.version="tags/v1.4.3"
 
 # install all utf8 locales;
 # helping: https://github.com/docker-library/docs/tree/master/postgres#locale-customization

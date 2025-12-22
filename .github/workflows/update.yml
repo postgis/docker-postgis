@@ -1,8 +1,8 @@
 name: "update_dockerfiles"
 # updating the image code and pushing to the local registry
 on:
-  schedule:
-      - cron: '57 19 * * *'
+#  schedule:
+#      - cron: '57 19 * * *'
   workflow_dispatch:  # Allow manual triggering
 
 env:

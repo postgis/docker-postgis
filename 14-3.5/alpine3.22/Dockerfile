@@ -6,8 +6,8 @@
 
 ARG PGIS1_BASE_IMAGE=postgres:14-alpine3.22
 ARG PGIS1_POSTGIS_REPOSITORY=https://github.com/postgis/postgis.git
-ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.3
-ARG PGIS1_POSTGIS_CHECKOUT_SHA1=aab5f55897aa2e8eb5f17c3996b61268c5f1ec91
+ARG PGIS1_POSTGIS_CHECKOUT=tags/3.5.4
+ARG PGIS1_POSTGIS_CHECKOUT_SHA1=2fc837ec43f5acb631613b12117115f5c2654bd2
 
 # usable for forking the image
 ARG PGIS1_OPTIMIZATION_FLAGS=" -O3 -mtune=generic "
@@ -27,7 +27,7 @@ ARG PGIS1_BASE_IMAGE
 LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.opencontainers.image.description="PostGIS ${PGIS1_POSTGIS_CHECKOUT} spatial database extension with PostgreSQL 14 alpine3.22" \
       org.opencontainers.image.source="${PGIS1_SOURCE_REPO}" \
-      org.opencontainers.image.version="3.5.3" \
+      org.opencontainers.image.version="3.5.4" \
       org.opencontainers.image.revision="${PGIS1_POSTGIS_CHECKOUT_SHA1}" \
       org.opencontainers.image.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
       org.opencontainers.image.base.name="${PGIS1_BASE_IMAGE}" \
@@ -36,7 +36,7 @@ LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.postgis.base.maintainer="${PGIS1_MAINTAINER}" \
       org.postgis.base.description="PostGIS ${PGIS1_POSTGIS_CHECKOUT} spatial database extension with PostgreSQL 14 alpine3.22" \
       org.postgis.base.source="${PGIS1_SOURCE_REPO}" \
-      org.postgis.base.version="3.5.3" \
+      org.postgis.base.version="3.5.4" \
       org.postgis.base.revision="${PGIS1_POSTGIS_CHECKOUT_SHA1}" \
       org.postgis.base.created="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
       org.postgis.base.extensions="postgis,postgis_raster,postgis_sfcgal,postgis_topology,postgis_tiger_geocoder,address_standardizer" \

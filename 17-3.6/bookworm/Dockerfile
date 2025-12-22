@@ -5,7 +5,7 @@
 #
 ARG PGIS1_BASE_IMAGE=postgres:17-bookworm
 ARG PGIS1_POSTGRES_MAJOR=17
-ARG PGIS1_POSTGIS_VERSION=3.6.0+dfsg-2.pgdg12+1
+ARG PGIS1_POSTGIS_VERSION=3.6.1+dfsg-1.pgdg12+1
 ARG PGIS1_POSTGIS_MAJOR=3
 
 # usable for forking the image
