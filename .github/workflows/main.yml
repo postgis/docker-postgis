@@ -27,8 +27,6 @@ jobs:
 #       hence they must be generated within the bundle JOB.
 #
 #matrix-include-start
-           - { version: "14-3.4", variant: "alpine3.22" }
-           - { version: "14-3.4", variant: "alpine3.23" }
            - { version: "14-3.5", variant: "alpine3.22" }
            - { version: "14-3.5", variant: "alpine3.23" }
            - { version: "14-3.6", variant: "alpine3.22" }
@@ -36,22 +34,16 @@ jobs:
            - { version: "14-3.6", variant: "bookworm" }
            - { version: "14-3.6", variant: "trixie" }
            - { version: "14-l3.1.12gcp", variant: "bookworm" }
-           - { version: "15-3.4", variant: "alpine3.22" }
-           - { version: "15-3.4", variant: "alpine3.23" }
            - { version: "15-3.5", variant: "alpine3.22" }
            - { version: "15-3.5", variant: "alpine3.23" }
            - { version: "15-3.6", variant: "alpine3.22" }
            - { version: "15-3.6", variant: "alpine3.23" }
            - { version: "15-3.6", variant: "bookworm" }
            - { version: "15-3.6", variant: "trixie" }
-           - { version: "16-3.4", variant: "alpine3.22" }
-           - { version: "16-3.4", variant: "alpine3.23" }
            - { version: "16-3.6", variant: "alpine3.22" }
            - { version: "16-3.6", variant: "alpine3.23" }
            - { version: "16-3.6", variant: "bookworm" }
            - { version: "16-3.6", variant: "trixie" }
-           - { version: "17-3.4", variant: "alpine3.22" }
-           - { version: "17-3.4", variant: "alpine3.23" }
            - { version: "17-3.5", variant: "alpine3.22" }
            - { version: "17-3.5", variant: "alpine3.23" }
            - { version: "17-3.6", variant: "alpine3.22" }
