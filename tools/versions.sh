@@ -38,7 +38,7 @@ GEOS_BRANCH="main"
 GDAL_BRANCH="master"
 PROJ_BRANCH="master"
 SFCGAL_BRANCH="master"
-CGAL_BRANCH="master"
+CGAL_BRANCH="main"
 
 # locked:  extra locking versions for dependencies
 CGAL_CHECKOUT_LOCK=""

@@ -25,7 +25,7 @@ ARG PGIS1_GEOS_CHECKOUT=main
 ARG PGIS1_GDAL_CHECKOUT=master
 ARG PGIS1_PROJ_CHECKOUT=master
 ARG PGIS1_SFCGAL_CHECKOUT=master
-ARG PGIS1_CGAL_CHECKOUT=master
+ARG PGIS1_CGAL_CHECKOUT=main
 
 # Skip SHA1 check if PGIS1_*_CHECKOUT_SHA1 is empty or 'nocheck'
 # Otherwise, verify that the commit hash matches

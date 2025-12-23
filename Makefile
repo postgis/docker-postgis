@@ -379,7 +379,7 @@ add-postgres-version:
 		echo "    initfile: 'initdb-postgis.sh'" >> locked.yml; \
 		echo "    POSTGIS_CHECKOUT: 'master'" >> locked.yml; \
 		echo "    POSTGIS_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
-		echo "    CGAL_CHECKOUT: 'master'" >> locked.yml; \
+		echo "    CGAL_CHECKOUT: 'main'" >> locked.yml; \
 		echo "    CGAL_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
 		echo "    SFCGAL_CHECKOUT: 'master'" >> locked.yml; \
 		echo "    SFCGAL_CHECKOUT_SHA1: 'nocheck'" >> locked.yml; \
