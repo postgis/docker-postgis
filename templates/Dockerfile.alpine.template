@@ -138,14 +138,27 @@ RUN set -eux \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
+    # Test extensions - only create if control file exists
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; -- needed for postgis_tiger_geocoder"' \
+    && if [ -f "/usr/local/share/postgresql/extension/address_standardizer.control" ]; then \
+         su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"'; \
+       else \
+         echo "NOTICE: address_standardizer.control not found, skipping extension creation"; \
+       fi \
+    && if [ -f "/usr/local/share/postgresql/extension/address_standardizer_data_us.control" ]; then \
+         su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"'; \
+       else \
+         echo "NOTICE: address_standardizer_data_us.control not found, skipping extension creation"; \
+       fi \
+    && if [ -f "/usr/local/share/postgresql/extension/postgis_tiger_geocoder.control" ]; then \
+         su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"'; \
+       else \
+         echo "NOTICE: postgis_tiger_geocoder.control not found, skipping extension creation"; \
+       fi \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     && su postgres -c 'psql -t -c "SELECT version();"'              >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \

@@ -32,8 +32,8 @@ LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.postgis.base.extensions="postgis,postgis_raster,postgis_sfcgal,postgis_topology,postgis_tiger_geocoder,address_standardizer" \
       org.postgis.base.name="${PGIS1_BASE_IMAGE}"
 
-ENV POSTGIS_MAJOR ${PGIS1_POSTGIS_MAJOR}
-ENV POSTGIS_VERSION ${PGIS1_POSTGIS_VERSION}
+ENV POSTGIS_MAJOR=${PGIS1_POSTGIS_MAJOR}
+ENV POSTGIS_VERSION=${PGIS1_POSTGIS_VERSION}
 
 RUN set -eux \
     # Export Debian package environment for child images

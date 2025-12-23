@@ -13,184 +13,6 @@ source tools/environment_init.sh
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-# ----- 13-3.3-alpine3.21 -----
-
-echo "manifest: ${dockername}:13-3.3-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.3-alpine3.21 \
-    --target ${dockername}:13-3.3-alpine3.21 || true
-
-echo "manifest: ${dockername}:13-3.3.8-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.3.8-alpine3.21 \
-    --target ${dockername}:13-3.3.8-alpine3.21 || true
-
-# ----- 13-3.4-alpine3.21 -----
-
-echo "manifest: ${dockername}:13-3.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4-alpine3.21 \
-    --target ${dockername}:13-3.4-alpine3.21 || true
-
-echo "manifest: ${dockername}:13-3.4.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4.4-alpine3.21 \
-    --target ${dockername}:13-3.4.4-alpine3.21 || true
-
-# ----- 13-3.4-alpine3.22 -----
-
-echo "manifest: ${dockername}:13-3.4-alpine3.22"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4-alpine3.22 \
-    --target ${dockername}:13-3.4-alpine3.22 || true
-
-echo "manifest: ${dockername}:13-3.4.4-alpine3.22"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4.4-alpine3.22 \
-    --target ${dockername}:13-3.4.4-alpine3.22 || true
-
-echo "manifest: ${dockername}:13-3.4-alpine"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.4-alpine \
-    --target ${dockername}:13-3.4-alpine || true
-
-# ----- 13-3.5-alpine3.21 -----
-
-echo "manifest: ${dockername}:13-3.5-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5-alpine3.21 \
-    --target ${dockername}:13-3.5-alpine3.21 || true
-
-echo "manifest: ${dockername}:13-3.5.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.4-alpine3.21 \
-    --target ${dockername}:13-3.5.4-alpine3.21 || true
-
-# ----- 13-3.5-alpine3.22 -----
-
-echo "manifest: ${dockername}:13-3.5-alpine3.22"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5-alpine3.22 \
-    --target ${dockername}:13-3.5-alpine3.22 || true
-
-echo "manifest: ${dockername}:13-3.5.4-alpine3.22"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5.4-alpine3.22 \
-    --target ${dockername}:13-3.5.4-alpine3.22 || true
-
-echo "manifest: ${dockername}:13-3.5-alpine"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.5-alpine \
-    --target ${dockername}:13-3.5-alpine || true
-
-# ----- 13-3.6-alpine3.21 -----
-
-echo "manifest: ${dockername}:13-3.6-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6-alpine3.21 \
-    --target ${dockername}:13-3.6-alpine3.21 || true
-
-echo "manifest: ${dockername}:13-3.6.1-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6.1-alpine3.21 \
-    --target ${dockername}:13-3.6.1-alpine3.21 || true
-
-# ----- 13-3.6-alpine3.22 -----
-
-echo "manifest: ${dockername}:13-3.6-alpine3.22"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6-alpine3.22 \
-    --target ${dockername}:13-3.6-alpine3.22 || true
-
-echo "manifest: ${dockername}:13-3.6.1-alpine3.22"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6.1-alpine3.22 \
-    --target ${dockername}:13-3.6.1-alpine3.22 || true
-
-echo "manifest: ${dockername}:13-3.6-alpine"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6-alpine \
-    --target ${dockername}:13-3.6-alpine || true
-
-# ----- 13-3.6-bookworm -----
-
-echo "manifest: ${dockername}:13-3.6-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6-bookworm \
-    --target ${dockername}:13-3.6-bookworm || true
-
-echo "manifest: ${dockername}:13-3.6.1-bookworm"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6.1-bookworm \
-    --target ${dockername}:13-3.6.1-bookworm || true
-
-# ----- 13-3.6-trixie -----
-
-echo "manifest: ${dockername}:13-3.6-trixie"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6-trixie \
-    --target ${dockername}:13-3.6-trixie || true
-
-echo "manifest: ${dockername}:13-3.6.1-trixie"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6.1-trixie \
-    --target ${dockername}:13-3.6.1-trixie || true
-
-echo "manifest: ${dockername}:13-3.6"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:13-3.6 \
-    --target ${dockername}:13-3.6 || true
-
-# ----- 14-3.3-alpine3.21 -----
-
-echo "manifest: ${dockername}:14-3.3-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.3-alpine3.21 \
-    --target ${dockername}:14-3.3-alpine3.21 || true
-
-echo "manifest: ${dockername}:14-3.3.8-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.3.8-alpine3.21 \
-    --target ${dockername}:14-3.3.8-alpine3.21 || true
-
-# ----- 14-3.4-alpine3.21 -----
-
-echo "manifest: ${dockername}:14-3.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4-alpine3.21 \
-    --target ${dockername}:14-3.4-alpine3.21 || true
-
-echo "manifest: ${dockername}:14-3.4.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.4.4-alpine3.21 \
-    --target ${dockername}:14-3.4.4-alpine3.21 || true
-
 # ----- 14-3.4-alpine3.22 -----
 
 echo "manifest: ${dockername}:14-3.4-alpine3.22"
@@ -205,25 +27,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.4.4-alpine3.22 \
     --target ${dockername}:14-3.4.4-alpine3.22 || true
 
+# ----- 14-3.4-alpine3.23 -----
+
+echo "manifest: ${dockername}:14-3.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.4-alpine3.23 \
+    --target ${dockername}:14-3.4-alpine3.23 || true
+
+echo "manifest: ${dockername}:14-3.4.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.4.4-alpine3.23 \
+    --target ${dockername}:14-3.4.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:14-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:14-3.4-alpine \
     --target ${dockername}:14-3.4-alpine || true
-
-# ----- 14-3.5-alpine3.21 -----
-
-echo "manifest: ${dockername}:14-3.5-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5-alpine3.21 \
-    --target ${dockername}:14-3.5-alpine3.21 || true
-
-echo "manifest: ${dockername}:14-3.5.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.5.4-alpine3.21 \
-    --target ${dockername}:14-3.5.4-alpine3.21 || true
 
 # ----- 14-3.5-alpine3.22 -----
 
@@ -239,25 +61,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.5.4-alpine3.22 \
     --target ${dockername}:14-3.5.4-alpine3.22 || true
 
+# ----- 14-3.5-alpine3.23 -----
+
+echo "manifest: ${dockername}:14-3.5-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.5-alpine3.23 \
+    --target ${dockername}:14-3.5-alpine3.23 || true
+
+echo "manifest: ${dockername}:14-3.5.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.5.4-alpine3.23 \
+    --target ${dockername}:14-3.5.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:14-3.5-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:14-3.5-alpine \
     --target ${dockername}:14-3.5-alpine || true
-
-# ----- 14-3.6-alpine3.21 -----
-
-echo "manifest: ${dockername}:14-3.6-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.6-alpine3.21 \
-    --target ${dockername}:14-3.6-alpine3.21 || true
-
-echo "manifest: ${dockername}:14-3.6.1-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-3.6.1-alpine3.21 \
-    --target ${dockername}:14-3.6.1-alpine3.21 || true
 
 # ----- 14-3.6-alpine3.22 -----
 
@@ -272,6 +94,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:14-3.6.1-alpine3.22 \
     --target ${dockername}:14-3.6.1-alpine3.22 || true
+
+# ----- 14-3.6-alpine3.23 -----
+
+echo "manifest: ${dockername}:14-3.6-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.6-alpine3.23 \
+    --target ${dockername}:14-3.6-alpine3.23 || true
+
+echo "manifest: ${dockername}:14-3.6.1-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:14-3.6.1-alpine3.23 \
+    --target ${dockername}:14-3.6.1-alpine3.23 || true
 
 echo "manifest: ${dockername}:14-3.6-alpine"
 manifest-tool push from-args \
@@ -313,47 +149,19 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:14-3.6 \
     --target ${dockername}:14-3.6 || true
 
-# ----- 14-l3.1.9gcp-bookworm -----
+# ----- 14-l3.1.12gcp-bookworm -----
 
-echo "manifest: ${dockername}:14-l3.1.9gcp-bookworm"
+echo "manifest: ${dockername}:14-l3.1.12gcp-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-l3.1.9gcp-bookworm \
-    --target ${dockername}:14-l3.1.9gcp-bookworm || true
+    --template ${dockername}-ARCHVARIANT:14-l3.1.12gcp-bookworm \
+    --target ${dockername}:14-l3.1.12gcp-bookworm || true
 
-echo "manifest: ${dockername}:14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm"
+echo "manifest: ${dockername}:14-l3.1.12gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm \
-    --target ${dockername}:14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm || true
-
-# ----- 15-3.3-alpine3.21 -----
-
-echo "manifest: ${dockername}:15-3.3-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.3-alpine3.21 \
-    --target ${dockername}:15-3.3-alpine3.21 || true
-
-echo "manifest: ${dockername}:15-3.3.8-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.3.8-alpine3.21 \
-    --target ${dockername}:15-3.3.8-alpine3.21 || true
-
-# ----- 15-3.4-alpine3.21 -----
-
-echo "manifest: ${dockername}:15-3.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.4-alpine3.21 \
-    --target ${dockername}:15-3.4-alpine3.21 || true
-
-echo "manifest: ${dockername}:15-3.4.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.4.4-alpine3.21 \
-    --target ${dockername}:15-3.4.4-alpine3.21 || true
+    --template ${dockername}-ARCHVARIANT:14-l3.1.12gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm \
+    --target ${dockername}:14-l3.1.12gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm || true
 
 # ----- 15-3.4-alpine3.22 -----
 
@@ -369,25 +177,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.4.4-alpine3.22 \
     --target ${dockername}:15-3.4.4-alpine3.22 || true
 
+# ----- 15-3.4-alpine3.23 -----
+
+echo "manifest: ${dockername}:15-3.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.4-alpine3.23 \
+    --target ${dockername}:15-3.4-alpine3.23 || true
+
+echo "manifest: ${dockername}:15-3.4.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.4.4-alpine3.23 \
+    --target ${dockername}:15-3.4.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:15-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-3.4-alpine \
     --target ${dockername}:15-3.4-alpine || true
-
-# ----- 15-3.5-alpine3.21 -----
-
-echo "manifest: ${dockername}:15-3.5-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5-alpine3.21 \
-    --target ${dockername}:15-3.5-alpine3.21 || true
-
-echo "manifest: ${dockername}:15-3.5.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.5.4-alpine3.21 \
-    --target ${dockername}:15-3.5.4-alpine3.21 || true
 
 # ----- 15-3.5-alpine3.22 -----
 
@@ -403,25 +211,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.5.4-alpine3.22 \
     --target ${dockername}:15-3.5.4-alpine3.22 || true
 
+# ----- 15-3.5-alpine3.23 -----
+
+echo "manifest: ${dockername}:15-3.5-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.5-alpine3.23 \
+    --target ${dockername}:15-3.5-alpine3.23 || true
+
+echo "manifest: ${dockername}:15-3.5.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.5.4-alpine3.23 \
+    --target ${dockername}:15-3.5.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:15-3.5-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-3.5-alpine \
     --target ${dockername}:15-3.5-alpine || true
-
-# ----- 15-3.6-alpine3.21 -----
-
-echo "manifest: ${dockername}:15-3.6-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.6-alpine3.21 \
-    --target ${dockername}:15-3.6-alpine3.21 || true
-
-echo "manifest: ${dockername}:15-3.6.1-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:15-3.6.1-alpine3.21 \
-    --target ${dockername}:15-3.6.1-alpine3.21 || true
 
 # ----- 15-3.6-alpine3.22 -----
 
@@ -436,6 +244,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:15-3.6.1-alpine3.22 \
     --target ${dockername}:15-3.6.1-alpine3.22 || true
+
+# ----- 15-3.6-alpine3.23 -----
+
+echo "manifest: ${dockername}:15-3.6-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.6-alpine3.23 \
+    --target ${dockername}:15-3.6-alpine3.23 || true
+
+echo "manifest: ${dockername}:15-3.6.1-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:15-3.6.1-alpine3.23 \
+    --target ${dockername}:15-3.6.1-alpine3.23 || true
 
 echo "manifest: ${dockername}:15-3.6-alpine"
 manifest-tool push from-args \
@@ -477,34 +299,6 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:15-3.6 \
     --target ${dockername}:15-3.6 || true
 
-# ----- 16-3.3-alpine3.21 -----
-
-echo "manifest: ${dockername}:16-3.3-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.3-alpine3.21 \
-    --target ${dockername}:16-3.3-alpine3.21 || true
-
-echo "manifest: ${dockername}:16-3.3.8-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.3.8-alpine3.21 \
-    --target ${dockername}:16-3.3.8-alpine3.21 || true
-
-# ----- 16-3.4-alpine3.21 -----
-
-echo "manifest: ${dockername}:16-3.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.4-alpine3.21 \
-    --target ${dockername}:16-3.4-alpine3.21 || true
-
-echo "manifest: ${dockername}:16-3.4.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.4.4-alpine3.21 \
-    --target ${dockername}:16-3.4.4-alpine3.21 || true
-
 # ----- 16-3.4-alpine3.22 -----
 
 echo "manifest: ${dockername}:16-3.4-alpine3.22"
@@ -519,25 +313,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.4.4-alpine3.22 \
     --target ${dockername}:16-3.4.4-alpine3.22 || true
 
+# ----- 16-3.4-alpine3.23 -----
+
+echo "manifest: ${dockername}:16-3.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-3.4-alpine3.23 \
+    --target ${dockername}:16-3.4-alpine3.23 || true
+
+echo "manifest: ${dockername}:16-3.4.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-3.4.4-alpine3.23 \
+    --target ${dockername}:16-3.4.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:16-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:16-3.4-alpine \
     --target ${dockername}:16-3.4-alpine || true
-
-# ----- 16-3.6-alpine3.21 -----
-
-echo "manifest: ${dockername}:16-3.6-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.6-alpine3.21 \
-    --target ${dockername}:16-3.6-alpine3.21 || true
-
-echo "manifest: ${dockername}:16-3.6.1-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:16-3.6.1-alpine3.21 \
-    --target ${dockername}:16-3.6.1-alpine3.21 || true
 
 # ----- 16-3.6-alpine3.22 -----
 
@@ -552,6 +346,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:16-3.6.1-alpine3.22 \
     --target ${dockername}:16-3.6.1-alpine3.22 || true
+
+# ----- 16-3.6-alpine3.23 -----
+
+echo "manifest: ${dockername}:16-3.6-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-3.6-alpine3.23 \
+    --target ${dockername}:16-3.6-alpine3.23 || true
+
+echo "manifest: ${dockername}:16-3.6.1-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:16-3.6.1-alpine3.23 \
+    --target ${dockername}:16-3.6.1-alpine3.23 || true
 
 echo "manifest: ${dockername}:16-3.6-alpine"
 manifest-tool push from-args \
@@ -593,20 +401,6 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:16-3.6 \
     --target ${dockername}:16-3.6 || true
 
-# ----- 17-3.4-alpine3.21 -----
-
-echo "manifest: ${dockername}:17-3.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.4-alpine3.21 \
-    --target ${dockername}:17-3.4-alpine3.21 || true
-
-echo "manifest: ${dockername}:17-3.4.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.4.4-alpine3.21 \
-    --target ${dockername}:17-3.4.4-alpine3.21 || true
-
 # ----- 17-3.4-alpine3.22 -----
 
 echo "manifest: ${dockername}:17-3.4-alpine3.22"
@@ -621,25 +415,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:17-3.4.4-alpine3.22 \
     --target ${dockername}:17-3.4.4-alpine3.22 || true
 
+# ----- 17-3.4-alpine3.23 -----
+
+echo "manifest: ${dockername}:17-3.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:17-3.4-alpine3.23 \
+    --target ${dockername}:17-3.4-alpine3.23 || true
+
+echo "manifest: ${dockername}:17-3.4.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:17-3.4.4-alpine3.23 \
+    --target ${dockername}:17-3.4.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:17-3.4-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:17-3.4-alpine \
     --target ${dockername}:17-3.4-alpine || true
-
-# ----- 17-3.5-alpine3.21 -----
-
-echo "manifest: ${dockername}:17-3.5-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5-alpine3.21 \
-    --target ${dockername}:17-3.5-alpine3.21 || true
-
-echo "manifest: ${dockername}:17-3.5.4-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.5.4-alpine3.21 \
-    --target ${dockername}:17-3.5.4-alpine3.21 || true
 
 # ----- 17-3.5-alpine3.22 -----
 
@@ -655,25 +449,25 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:17-3.5.4-alpine3.22 \
     --target ${dockername}:17-3.5.4-alpine3.22 || true
 
+# ----- 17-3.5-alpine3.23 -----
+
+echo "manifest: ${dockername}:17-3.5-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:17-3.5-alpine3.23 \
+    --target ${dockername}:17-3.5-alpine3.23 || true
+
+echo "manifest: ${dockername}:17-3.5.4-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:17-3.5.4-alpine3.23 \
+    --target ${dockername}:17-3.5.4-alpine3.23 || true
+
 echo "manifest: ${dockername}:17-3.5-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:17-3.5-alpine \
     --target ${dockername}:17-3.5-alpine || true
-
-# ----- 17-3.6-alpine3.21 -----
-
-echo "manifest: ${dockername}:17-3.6-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.6-alpine3.21 \
-    --target ${dockername}:17-3.6-alpine3.21 || true
-
-echo "manifest: ${dockername}:17-3.6.1-alpine3.21"
-manifest-tool push from-args \
-    --platforms linux/amd64,linux/arm64 \
-    --template ${dockername}-ARCHVARIANT:17-3.6.1-alpine3.21 \
-    --target ${dockername}:17-3.6.1-alpine3.21 || true
 
 # ----- 17-3.6-alpine3.22 -----
 
@@ -688,6 +482,20 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:17-3.6.1-alpine3.22 \
     --target ${dockername}:17-3.6.1-alpine3.22 || true
+
+# ----- 17-3.6-alpine3.23 -----
+
+echo "manifest: ${dockername}:17-3.6-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:17-3.6-alpine3.23 \
+    --target ${dockername}:17-3.6-alpine3.23 || true
+
+echo "manifest: ${dockername}:17-3.6.1-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:17-3.6.1-alpine3.23 \
+    --target ${dockername}:17-3.6.1-alpine3.23 || true
 
 echo "manifest: ${dockername}:17-3.6-alpine"
 manifest-tool push from-args \
@@ -785,6 +593,20 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:18-3.6.1-alpine3.22 \
     --target ${dockername}:18-3.6.1-alpine3.22 || true
 
+# ----- 18-3.6-alpine3.23 -----
+
+echo "manifest: ${dockername}:18-3.6-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-3.6-alpine3.23 \
+    --target ${dockername}:18-3.6-alpine3.23 || true
+
+echo "manifest: ${dockername}:18-3.6.1-alpine3.23"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-3.6.1-alpine3.23 \
+    --target ${dockername}:18-3.6.1-alpine3.23 || true
+
 echo "manifest: ${dockername}:18-3.6-alpine"
 manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
@@ -845,6 +667,20 @@ manifest-tool push from-args \
     --template ${dockername}-ARCHVARIANT:18-master-bookworm \
     --target ${dockername}:18-master-bookworm || true
 
+# ----- 18-master-trixie -----
+
+echo "manifest: ${dockername}:18-master-trixie"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-master-trixie \
+    --target ${dockername}:18-master-trixie || true
+
+echo "manifest: ${dockername}:18-master"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-master \
+    --target ${dockername}:18-master || true
+
 # ----- 18-recent-bookworm -----
 
 echo "manifest: ${dockername}:18-recent-bookworm"
@@ -864,3 +700,35 @@ manifest-tool push from-args \
     --platforms linux/amd64,linux/arm64 \
     --template ${dockername}-ARCHVARIANT:18-recent-postgis3.6-geos3.14-proj9.7-gdal3.12-cgal6.1-sfcgal2.2-bookworm \
     --target ${dockername}:18-recent-postgis3.6-geos3.14-proj9.7-gdal3.12-cgal6.1-sfcgal2.2-bookworm || true
+
+# ----- 18-recent-trixie -----
+
+echo "manifest: ${dockername}:18-recent-trixie"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-recent-trixie \
+    --target ${dockername}:18-recent-trixie || true
+
+echo "manifest: ${dockername}:18-recent-postgis3.6.1-geos3.14.1-proj9.7.1-gdal3.12.1-cgal6.1-sfcgal2.2.0-trixie"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-recent-postgis3.6.1-geos3.14.1-proj9.7.1-gdal3.12.1-cgal6.1-sfcgal2.2.0-trixie \
+    --target ${dockername}:18-recent-postgis3.6.1-geos3.14.1-proj9.7.1-gdal3.12.1-cgal6.1-sfcgal2.2.0-trixie || true
+
+echo "manifest: ${dockername}:18-recent-postgis3.6-geos3.14-proj9.7-gdal3.12-cgal6.1-sfcgal2.2-trixie"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-recent-postgis3.6-geos3.14-proj9.7-gdal3.12-cgal6.1-sfcgal2.2-trixie \
+    --target ${dockername}:18-recent-postgis3.6-geos3.14-proj9.7-gdal3.12-cgal6.1-sfcgal2.2-trixie || true
+
+echo "manifest: ${dockername}:18-recent"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:18-recent \
+    --target ${dockername}:18-recent || true
+
+echo "manifest: ${dockername}:recent"
+manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm64 \
+    --template ${dockername}-ARCHVARIANT:recent \
+    --target ${dockername}:recent || true

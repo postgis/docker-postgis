@@ -41,7 +41,7 @@ ARG PGIS1_GDAL_BUILD={{ .[env.variant].GDAL_BUILD }}
 # Minimal GDAL build ; no arrow, no parquet, no extra dependencies
 {{ ) end -}}
 
-FROM ${PGIS1_BASE_IMAGE} as builder
+FROM ${PGIS1_BASE_IMAGE} AS builder
 
 WORKDIR /
 
@@ -101,7 +101,7 @@ RUN set -eux \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
-      libpcre3-dev \
+      libpcre2-dev \
       libpq-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
@@ -123,19 +123,38 @@ RUN set -eux \
 ARG PGIS1_CMAKE_BUILD_TYPE
 ENV PGIS1_CMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE}
 
-FROM builder as cgal-sfcgal-builder
+FROM builder AS cgal-sfcgal-builder
+
+# nlohmann/json - header-only library for SFCGAL (with CMake support)
+RUN set -ex \
+    && mkdir -p /usr/src \
+    && cd /usr/src \
+    # Get the latest release version dynamically
+    && NLOHMANN_JSON_VERSION=$(curl -s https://api.github.com/repos/nlohmann/json/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/') \
+    && echo "Installing nlohmann/json version: ${NLOHMANN_JSON_VERSION}" \
+    # Download and extract the full source with CMake support
+    && curl -L "https://github.com/nlohmann/json/archive/refs/tags/v${NLOHMANN_JSON_VERSION}.tar.gz" -o nlohmann-json.tar.gz \
+    && tar -xzf nlohmann-json.tar.gz \
+    && cd "json-${NLOHMANN_JSON_VERSION}" \
+    && mkdir build \
+    && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=${PGIS1_CMAKE_BUILD_TYPE} -DJSON_BuildTests=OFF \
+    && make install \
+    && cd /usr/src \
+    && rm -rf "json-${NLOHMANN_JSON_VERSION}" nlohmann-json.tar.gz \
+    && echo "nlohmann/json ${NLOHMANN_JSON_VERSION} installed with CMake support" > /_pgis_nlohmann_json_last_version.txt
 
 # cgal & sfcgal
 ARG PGIS1_SFCGAL_REPOSITORY
-ENV PGIS1_SFCGAL_REPOSITORY ${PGIS1_SFCGAL_REPOSITORY}
+ENV PGIS1_SFCGAL_REPOSITORY=${PGIS1_SFCGAL_REPOSITORY}
 ARG PGIS1_SFCGAL_CHECKOUT
-ENV PGIS1_SFCGAL_CHECKOUT ${PGIS1_SFCGAL_CHECKOUT}
+ENV PGIS1_SFCGAL_CHECKOUT=${PGIS1_SFCGAL_CHECKOUT}
 ARG PGIS1_SFCGAL_CHECKOUT_SHA1
 
 ARG PGIS1_CGAL_REPOSITORY
-ENV PGIS1_CGAL_REPOSITORY ${PGIS1_CGAL_REPOSITORY}
+ENV PGIS1_CGAL_REPOSITORY=${PGIS1_CGAL_REPOSITORY}
 ARG PGIS1_CGAL_CHECKOUT
-ENV PGIS1_CGAL_CHECKOUT ${PGIS1_CGAL_CHECKOUT}
+ENV PGIS1_CGAL_CHECKOUT=${PGIS1_CGAL_CHECKOUT}
 ARG PGIS1_CGAL_CHECKOUT_SHA1
 
 RUN set -eux \
@@ -193,13 +212,13 @@ RUN set -eux \
     && rm -fr /usr/src/cgal
 
 
-FROM builder as proj-builder
+FROM builder AS proj-builder
 
 # proj
 ARG PGIS1_PROJ_REPOSITORY
-ENV PGIS1_PROJ_REPOSITORY ${PGIS1_PROJ_REPOSITORY}
+ENV PGIS1_PROJ_REPOSITORY=${PGIS1_PROJ_REPOSITORY}
 ARG PGIS1_PROJ_CHECKOUT
-ENV PGIS1_PROJ_CHECKOUT ${PGIS1_PROJ_CHECKOUT}
+ENV PGIS1_PROJ_CHECKOUT=${PGIS1_PROJ_CHECKOUT}
 ARG PGIS1_PROJ_CHECKOUT_SHA1
 
 RUN set -eux \
@@ -245,13 +264,13 @@ RUN set -eux \
     && rm -fr /usr/src/PROJ
 
 
-FROM builder as geos-builder
+FROM builder AS geos-builder
 
 # geos
 ARG PGIS1_GEOS_REPOSITORY
-ENV PGIS1_GEOS_REPOSITORY ${PGIS1_GEOS_REPOSITORY}
+ENV PGIS1_GEOS_REPOSITORY=${PGIS1_GEOS_REPOSITORY}
 ARG PGIS1_GEOS_CHECKOUT
-ENV PGIS1_GEOS_CHECKOUT ${PGIS1_GEOS_CHECKOUT}
+ENV PGIS1_GEOS_CHECKOUT=${PGIS1_GEOS_CHECKOUT}
 ARG PGIS1_GEOS_CHECKOUT_SHA1
 
 RUN set -eux \
@@ -283,7 +302,7 @@ RUN set -eux \
     && rm -fr /usr/src/geos
 
 
-FROM builder as stage0-builder
+FROM builder AS stage0-builder
 
 COPY --from=cgal-sfcgal-builder /_pgis*.* /
 COPY --from=cgal-sfcgal-builder /usr/local /usr/local
@@ -295,9 +314,9 @@ COPY --from=geos-builder /_pgis*.* /
 COPY --from=geos-builder /usr/local /usr/local
 # gdal
 ARG PGIS1_GDAL_REPOSITORY
-ENV PGIS1_GDAL_REPOSITORY ${PGIS1_GDAL_REPOSITORY}
+ENV PGIS1_GDAL_REPOSITORY=${PGIS1_GDAL_REPOSITORY}
 ARG PGIS1_GDAL_CHECKOUT
-ENV PGIS1_GDAL_CHECKOUT ${PGIS1_GDAL_CHECKOUT}
+ENV PGIS1_GDAL_CHECKOUT=${PGIS1_GDAL_CHECKOUT}
 ARG PGIS1_GDAL_CHECKOUT_SHA1
 
 
@@ -457,7 +476,7 @@ RUN set -eux \
     && ogr2ogr --version \
     && proj \
     && sfcgal-config --version \
-    && pcre-config  --version
+    && pcre2-config  --version
 
 # -------------------------------------------
 # final stage
@@ -467,6 +486,12 @@ FROM ${PGIS1_BASE_IMAGE}
 ARG PGIS1_SOURCE_REPO
 ARG PGIS1_MAINTAINER
 ARG PGIS1_BASE_IMAGE
+ARG PGIS1_POSTGIS_REPOSITORY
+ARG PGIS1_GEOS_REPOSITORY
+ARG PGIS1_GDAL_REPOSITORY
+ARG PGIS1_PROJ_REPOSITORY
+ARG PGIS1_SFCGAL_REPOSITORY
+ARG PGIS1_CGAL_REPOSITORY
 
 LABEL maintainer="${PGIS1_MAINTAINER}" \
       org.opencontainers.image.description="PostGIS - {{ env.version }} spatial database extension with PostgreSQL {{ .[env.variant].PG_MAJOR }} {{ env.variant }}" \
@@ -515,9 +540,9 @@ RUN set -eux \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
+      libgomp1 \
       libjson-c5 \
       libmpfr6 \
-      libpcre3 \
       libprotobuf-c1 \
 {{ if env.variant != "bullseye" then ( -}}
       libtiff6 \
@@ -558,17 +583,23 @@ RUN set -eux \
       libcrypto++8 \
       libfreexl1 \
       libfyba0 \
-      libhdf5-103-1 \
       libheif1 \
       libkmlbase1 \
       libkmldom1 \
       libkmlengine1 \
-      libnetcdf19 \
       libopenjp2-7 \
       libpng16-16 \
       libqhull-r8.0 \
       librasterlite2-1 \
+{{ if env.variant != "trixie" then ( -}}
+      libhdf5-103-1 \
+      libnetcdf19 \
       libspatialite7 \
+{{ ) else ( -}}
+      libhdf5-cpp-310 \
+      libnetcdf22 \
+      libspatialite8t64 \
+{{ ) end -}}
       netcdf-bin \
 {{ if env.variant != "bullseye" then ( -}}
       libcfitsio10 \
@@ -628,8 +659,8 @@ RUN set -eux \
 
 # Specify GDAL_CONFIG and LD_LIBRARY_PATH for PostGIS build;
 # The arm64 build is very senitive.
-ENV GDAL_CONFIG /usr/local/bin/gdal-config
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+# Note: ldconfig is called multiple times in RUN steps to update the library cache
+ENV GDAL_CONFIG=/usr/local/bin/gdal-config
 
 # temporary workaround for : nitdb: invalid locale settings; check LANG and LC_* environment variables
 #   https://github.com/docker-library/postgres/issues/1112#issuecomment-1746076388
@@ -656,7 +687,7 @@ RUN set -eux \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
-      libpcre3-dev \
+      libpcre2-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -713,14 +744,27 @@ RUN set -eux \
     && cd regress \
     && make -j$(nproc) check RUNTESTFLAGS=--extension PGUSER=postgres \
     \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
+    # Test extensions - only create if control file exists
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; -- needed for postgis_tiger_geocoder"' \
+    && if [ -f "/usr/share/postgresql/$PG_MAJOR/extension/address_standardizer.control" ]; then \
+         su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"'; \
+       else \
+         echo "NOTICE: address_standardizer.control not found, skipping extension creation"; \
+       fi \
+    && if [ -f "/usr/share/postgresql/$PG_MAJOR/extension/address_standardizer_data_us.control" ]; then \
+         su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"'; \
+       else \
+         echo "NOTICE: address_standardizer_data_us.control not found, skipping extension creation"; \
+       fi \
+    && if [ -f "/usr/share/postgresql/$PG_MAJOR/extension/postgis_tiger_geocoder.control" ]; then \
+         su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"'; \
+       else \
+         echo "NOTICE: postgis_tiger_geocoder.control not found, skipping extension creation"; \
+       fi \
+    && su postgres -c 'psql -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \
@@ -754,7 +798,7 @@ RUN set -eux \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
-      libpcre3-dev \
+      libpcre2-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \

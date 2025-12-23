@@ -27,57 +27,48 @@ jobs:
 #       hence they must be generated within the bundle JOB.
 #
 #matrix-include-start
-           - { version: "13-3.3", variant: "alpine3.21" }
-           - { version: "13-3.4", variant: "alpine3.21" }
-           - { version: "13-3.4", variant: "alpine3.22" }
-           - { version: "13-3.5", variant: "alpine3.21" }
-           - { version: "13-3.5", variant: "alpine3.22" }
-           - { version: "13-3.6", variant: "alpine3.21" }
-           - { version: "13-3.6", variant: "alpine3.22" }
-           - { version: "13-3.6", variant: "bookworm" }
-           - { version: "13-3.6", variant: "trixie" }
-           - { version: "14-3.3", variant: "alpine3.21" }
-           - { version: "14-3.4", variant: "alpine3.21" }
            - { version: "14-3.4", variant: "alpine3.22" }
-           - { version: "14-3.5", variant: "alpine3.21" }
+           - { version: "14-3.4", variant: "alpine3.23" }
            - { version: "14-3.5", variant: "alpine3.22" }
-           - { version: "14-3.6", variant: "alpine3.21" }
+           - { version: "14-3.5", variant: "alpine3.23" }
            - { version: "14-3.6", variant: "alpine3.22" }
+           - { version: "14-3.6", variant: "alpine3.23" }
            - { version: "14-3.6", variant: "bookworm" }
            - { version: "14-3.6", variant: "trixie" }
-           - { version: "14-l3.1.9gcp", variant: "bookworm" }
-           - { version: "15-3.3", variant: "alpine3.21" }
-           - { version: "15-3.4", variant: "alpine3.21" }
+           - { version: "14-l3.1.12gcp", variant: "bookworm" }
            - { version: "15-3.4", variant: "alpine3.22" }
-           - { version: "15-3.5", variant: "alpine3.21" }
+           - { version: "15-3.4", variant: "alpine3.23" }
            - { version: "15-3.5", variant: "alpine3.22" }
-           - { version: "15-3.6", variant: "alpine3.21" }
+           - { version: "15-3.5", variant: "alpine3.23" }
            - { version: "15-3.6", variant: "alpine3.22" }
+           - { version: "15-3.6", variant: "alpine3.23" }
            - { version: "15-3.6", variant: "bookworm" }
            - { version: "15-3.6", variant: "trixie" }
-           - { version: "16-3.3", variant: "alpine3.21" }
-           - { version: "16-3.4", variant: "alpine3.21" }
            - { version: "16-3.4", variant: "alpine3.22" }
-           - { version: "16-3.6", variant: "alpine3.21" }
+           - { version: "16-3.4", variant: "alpine3.23" }
            - { version: "16-3.6", variant: "alpine3.22" }
+           - { version: "16-3.6", variant: "alpine3.23" }
            - { version: "16-3.6", variant: "bookworm" }
            - { version: "16-3.6", variant: "trixie" }
-           - { version: "17-3.4", variant: "alpine3.21" }
            - { version: "17-3.4", variant: "alpine3.22" }
-           - { version: "17-3.5", variant: "alpine3.21" }
+           - { version: "17-3.4", variant: "alpine3.23" }
            - { version: "17-3.5", variant: "alpine3.22" }
-           - { version: "17-3.6", variant: "alpine3.21" }
+           - { version: "17-3.5", variant: "alpine3.23" }
            - { version: "17-3.6", variant: "alpine3.22" }
+           - { version: "17-3.6", variant: "alpine3.23" }
 # --skip-- - { version: "17-3.6", variant: "bookworm" } -->  generated with the related bundle job!
            - { version: "17-3.6", variant: "trixie" }
            - { version: "17-3.6-bundle0", variant: "bookworm" }
            - { version: "17-master", variant: "bookworm" }
            - { version: "17-recent", variant: "bookworm" }
            - { version: "18-3.6", variant: "alpine3.22" }
+           - { version: "18-3.6", variant: "alpine3.23" }
            - { version: "18-3.6", variant: "bookworm" }
            - { version: "18-3.6", variant: "trixie" }
            - { version: "18-master", variant: "bookworm" }
+           - { version: "18-master", variant: "trixie" }
            - { version: "18-recent", variant: "bookworm" }
+           - { version: "18-recent", variant: "trixie" }
 #matrix-include-end
 
     name: "${{ matrix.version }}-${{ matrix.variant }} docker image"

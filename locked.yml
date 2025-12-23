@@ -1,25 +1,25 @@
 
 
 # unique locked versions we want to build
-# initialize directory with : touch 14-l3.1.9gcp/bookworm/Dockerfile
+# initialize directory with : touch 14-l3.1.12gcp/bookworm/Dockerfile
 # this file will be append to 'version.json'
 
 # - edited by manually, for locking/creating special versions.
 # - this can be used for testing new debian based posgis versions - created from recent(master) template
 
-'14-l3.1.9gcp':
+'14-l3.1.12gcp':
   'bookworm':
     _comment: "source: ./locked.yml"
-    tags: '14-l3.1.9gcp-bookworm 14-l3.1.9gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm'
-    postgis: 'l3.1.9gcp'
+    tags: '14-l3.1.12gcp-bookworm 14-l3.1.12gcp-postgis3.1.9-geos3.6.6-proj6.3.1-bookworm'
+    postgis: 'l3.1.12gcp'
     readme_group: 'locked'
     PG_MAJOR: '14'
     PG_DOCKER: '14'
     arch: 'amd64 arm64'
     template: 'Dockerfile.master.template'
     initfile: 'initdb-postgis.sh'
-    POSTGIS_CHECKOUT: 'tags/3.1.9'
-    POSTGIS_CHECKOUT_SHA1: '95a641b1747721d7004c5f0133b918d034035319'
+    POSTGIS_CHECKOUT: 'tags/3.1.12'
+    POSTGIS_CHECKOUT_SHA1: '84044c10e8a0b1c950b5d9d42df97ac91ef5a661'
     PROJ_CHECKOUT: 'tags/6.3.1'
     PROJ_CHECKOUT_SHA1: '0e993d9744ecaa2f146bf62c43aecc61809a43ef'
     GDAL_BUILD: 'minimal'

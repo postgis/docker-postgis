@@ -19,11 +19,11 @@ source tools/cache_helper.sh
 api_preference="github"
 #api_preference="osgeo"  -- not working yet
 
-alpine_variants=" alpine3.21 alpine3.22 "
+alpine_variants=" alpine3.22 alpine3.23 "
 debian_variants=" bookworm trixie"
 
 debian_latest="trixie"
-alpine_latest="alpine3.22"
+alpine_latest="alpine3.23"
 postgis_latest="3.6"
 postgres_latest="18"
 postgis_versions="3.0 3.1 3.2 3.3 3.4 3.5 3.6"
@@ -60,8 +60,8 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 declare -A boostVersion=(
     ["bookworm"]="1.74.0" # 1.81.0 is not yet optimal. The current bookworm packages mixed use of 1.74.0 and 1.81.0
     ["trixie"]="1.83.0"
-    ["alpine3.21"]="1.82.0"
     ["alpine3.22"]="1.84.0"
+    ["alpine3.23"]="1.84.0"
 )
 
 

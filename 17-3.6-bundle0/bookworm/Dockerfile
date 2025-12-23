@@ -68,7 +68,7 @@ RUN set -eux \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-FROM builder as builder-gzip
+FROM builder AS builder-gzip
 
 ARG PGIS1_PGSQL_GZIP_REPOSITORY
 ARG PGIS1_PGSQL_GZIP_CHECKOUT
@@ -88,7 +88,7 @@ RUN set -eux \
     && make install
 
 
-FROM builder as builder-pgxn
+FROM builder AS builder-pgxn
 
 RUN pgxn install --verbose byteamagic
 RUN pgxn install --verbose ddlx
@@ -112,7 +112,7 @@ RUN pgxn install --verbose pgsql_tweaks
 #RUN pgxman install pgvectorscale
 #RUN pgxman install pg_quack
 
-FROM builder as builder-other
+FROM builder AS builder-other
 
 ARG PGIS1_PG_HINT_PLAN_REPOSITORY
 ARG PGIS1_PG_HINT_PLAN_CHECKOUT
@@ -144,6 +144,7 @@ RUN set -eux \
 
 FROM ${REGISTRY}/${REPO_NAME}/${IMAGE_NAME}:17-3.6-bookworm
 
+ARG PGIS1_BASE_IMAGE
 ARG PGIS1_OPTIMIZATION_FLAGS
 ARG PGIS1_SOURCE_REPO
 ARG PGIS1_MAINTAINER
