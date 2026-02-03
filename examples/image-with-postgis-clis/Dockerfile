@@ -1,4 +1,4 @@
-FROM postgis/postgis:13-3.1
+FROM docker.io/postgis/postgis:13-3.1
 
 RUN apt-get update -y
 RUN apt-get install postgis -y
