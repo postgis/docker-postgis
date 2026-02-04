@@ -68,7 +68,7 @@ build: $(foreach version,$(VERSIONS),build-$(version))
 all: update build test
 
 update:
-	$(DOCKER) run --rm -v $$(pwd):/work -w /work buildpack-deps ./update.sh
+	$(DOCKER) run --rm -v $$(pwd):/work -w /work docker.io/buildpack-deps ./update.sh
 
 
 ### RULES FOR BUILDING ###
