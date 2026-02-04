@@ -304,6 +304,7 @@ RUN set -ex \
       libcfitsio9 \
       libfreexl1 \
       libfyba0 \
+      libgomp1 \
       libhdf5-103-1 \
       libkmlbase1 \
       libkmldom1 \
