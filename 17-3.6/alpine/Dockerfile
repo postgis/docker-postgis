@@ -4,6 +4,9 @@
 ARG BASE_IMAGE=postgres:17-alpine3.22
 FROM ${BASE_IMAGE}
 
+ARG NPROC
+ENV NPROC=${NPROC}
+
 LABEL maintainer="PostGIS Project - https://postgis.net" \
       org.opencontainers.image.description="PostGIS 3.6.1 spatial database extension with PostgreSQL 17 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
@@ -62,7 +65,7 @@ RUN set -eux \
     && ./autogen.sh \
     && ./configure \
         --enable-lto \
-    && make -j$(nproc) \
+    && make -j${NPROC:=$(nproc)} \
     && make install \
     \
 # This section is for refreshing the proj data for the regression tests.
@@ -78,7 +81,7 @@ RUN set -eux \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && cd regress \
-    && make -j$(nproc) check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
+    && make -j${NPROC:=$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
