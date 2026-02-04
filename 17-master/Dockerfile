@@ -105,7 +105,7 @@ RUN set -ex \
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=51b5eaa7c5ee0abc3b96a60ad9733f85ab06cc2c
+ENV CGAL_GIT_HASH=9b728c437c096113ba711a4186817ac90c97aae3
 ENV SFCGAL_GIT_HASH=0adcd006a4300a8de09c623b5d9c0e0d8bacfd1a
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -185,7 +185,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH=16df635c529b940e26b04009385113a00d133a59
+ENV GDAL_GIT_HASH=0a76107e6e821bd098e4ff412958bf161c90153e
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -304,6 +304,7 @@ RUN set -ex \
       libcfitsio9 \
       libfreexl1 \
       libfyba0 \
+      libgomp1 \
       libhdf5-103-1 \
       libkmlbase1 \
       libkmldom1 \
@@ -318,11 +319,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=51b5eaa7c5ee0abc3b96a60ad9733f85ab06cc2c
+ENV CGAL_GIT_HASH=9b728c437c096113ba711a4186817ac90c97aae3
 ENV SFCGAL_GIT_HASH=0adcd006a4300a8de09c623b5d9c0e0d8bacfd1a
 ENV PROJ_GIT_HASH=b03fb3177baa2775bd476b3a1845f16ba61958fc
 ENV GEOS_GIT_HASH=c7ca3dd29bf379c43ae6f97fbc1bdfa10dcf630e
-ENV GDAL_GIT_HASH=16df635c529b940e26b04009385113a00d133a59
+ENV GDAL_GIT_HASH=0a76107e6e821bd098e4ff412958bf161c90153e
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -341,7 +342,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH=875ba8eb1c2782c80ae157e3490790d87470d447
+ENV POSTGIS_GIT_HASH=bf36aef0ca85b254b8576f0936d377612a4668c0
 
 RUN set -ex \
     && apt-get update \
