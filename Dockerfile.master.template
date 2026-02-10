@@ -7,10 +7,10 @@
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG CGAL_GIT_BRANCH=main
+ARG NPROC=
 FROM docker.io/postgres:%%PG_MAJOR%%-%%DEBIAN_VERSION%% as builder
 
 ARG NPROC
-ENV NPROC=${NPROC}
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
       org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL %%PG_MAJOR%% %%DEBIAN_VERSION%%" \
@@ -131,7 +131,7 @@ RUN set -ex \
        -DSFCGAL_BUILD_EXAMPLES=OFF \
        -DSFCGAL_BUILD_TESTS=OFF \
        -DSFCGAL_WITH_OSG=OFF \
-    && make -j${NPROC:=$(nproc)} \
+    && make -j${NPROC:-$(nproc)} \
     && make install \
     #
     ## testing with -DSFCGAL_BUILD_TESTS=ON
@@ -155,7 +155,7 @@ RUN set -ex \
         && echo "autotools version: 'autogen.sh' exists! Older version!"  \
         && ./autogen.sh \
         && ./configure --disable-static \
-        && make -j${NPROC:=$(nproc)} \
+        && make -j${NPROC:-$(nproc)} \
         && make install \
         ; \
     else \
@@ -164,7 +164,7 @@ RUN set -ex \
         && mkdir build \
         && cd build \
         && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
-        && make -j${NPROC:=$(nproc)} \
+        && make -j${NPROC:-$(nproc)} \
         && make install \
         ; \
     fi \
@@ -182,7 +182,7 @@ RUN set -ex \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
-    && make -j${NPROC:=$(nproc)} \
+    && make -j${NPROC:-$(nproc)} \
     && make install \
     && cd / \
     && rm -fr /usr/src/geos
@@ -252,7 +252,7 @@ RUN set -ex \
         ; \
     fi \
     \
-    && make -j${NPROC:=$(nproc)} \
+    && make -j${NPROC:-$(nproc)} \
     && make install \
     && cd / \
     && rm -fr /usr/src/gdal
@@ -392,7 +392,7 @@ RUN set -ex \
 # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
         --enable-lto \
-    && make -j${NPROC:=$(nproc)} \
+    && make -j${NPROC:-$(nproc)} \
     && make install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
@@ -406,7 +406,7 @@ RUN set -ex \
     && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && ldconfig \
     && cd regress \
-    && make -j${NPROC:=$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
+    && make -j${NPROC:-$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
