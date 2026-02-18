@@ -7,11 +7,11 @@ FROM ${BASE_IMAGE}
 ARG NPROC=
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.6.1 spatial database extension with PostgreSQL 18 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.6.2 spatial database extension with PostgreSQL 18 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION=3.6.1
-ENV POSTGIS_SHA256=849391e75488a749663fbc8d63b846d063d387d286c04dea062820476f84c8f6
+ENV POSTGIS_VERSION=3.6.2
+ENV POSTGIS_SHA256=607a4d21c017e5283e15d2d977c9b7f575ddfc672afdee81fc84a2d823db4ba5
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
