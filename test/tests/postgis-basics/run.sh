@@ -40,12 +40,36 @@ echo 'SELECT PostGIS_Version()' | psql
 
 
 ## test address_standardizer extension
-echo 'CREATE EXTENSION address_standardizer;' | psql
-response=$(echo $'SELECT zip FROM parse_address(\'1 Devonshire Place, Boston, MA 02109-1234\') AS a;' | psql)
-if [ $response  = 02109 ]; then 
-	echo "address_standardizer extension installed and works!"
-else 
-	echo "address_standardizer extension test failed, returned response is $response"
-	exit 1
-fi
+# PostGIS versions before 3.7 are expected to provide address_standardizer.
+# For PostGIS 3.7 and later, test it only when the separately packaged
+# extension is available in the image.
+test_address_standardizer="$(
+	psql <<-'EOSQL'
+	SELECT CASE
+		WHEN postgis_major < 3 OR (postgis_major = 3 AND postgis_minor < 7) THEN 'required'
+		WHEN EXISTS (
+			SELECT 1
+			FROM pg_available_extensions
+			WHERE name = 'address_standardizer'
+		) THEN 'available'
+		ELSE 'skip'
+	END
+	FROM (
+		SELECT substring(postgis_lib_version() from '^([0-9]+)')::integer AS postgis_major,
+		       substring(postgis_lib_version() from '^[0-9]+\.([0-9]+)')::integer AS postgis_minor
+	) AS postgis_version;
+	EOSQL
+)"
 
+if [ "$test_address_standardizer" = required ] || [ "$test_address_standardizer" = available ]; then
+	echo 'CREATE EXTENSION IF NOT EXISTS address_standardizer;' | psql
+	response=$(echo $'SELECT zip FROM parse_address(\'1 Devonshire Place, Boston, MA 02109-1234\') AS a;' | psql)
+	if [ "$response" = 02109 ]; then
+		echo "address_standardizer extension installed and works!"
+	else
+		echo "address_standardizer extension test failed, returned response is $response"
+		exit 1
+	fi
+else
+	echo "PostGIS 3.7 or later detected without address_standardizer, skipping address_standardizer test"
+fi
