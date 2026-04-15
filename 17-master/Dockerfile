@@ -6,14 +6,14 @@
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
-ARG CGAL_GIT_BRANCH=main
+ARG CGAL_GIT_BRANCH=6.1.x-branch
 ARG NPROC=
-FROM docker.io/postgres:17-bullseye as builder
+FROM docker.io/postgres:17-trixie AS builder
 
 ARG NPROC
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 17 bullseye" \
+      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 17 trixie" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
@@ -23,24 +23,27 @@ RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic1.74.0 \
-      libboost-chrono1.74.0 \
-      libboost-date-time1.74.0 \
-      libboost-filesystem1.74.0 \
-      libboost-program-options1.74.0 \
-      libboost-serialization1.74.0 \
-      libboost-system1.74.0 \
-      libboost-test1.74.0 \
-      libboost-thread1.74.0 \
-      libboost-timer1.74.0 \
-      libcurl3-gnutls \
+      # In Trixie, the libboost-all-dev metapackage currently pulls Boost 1.83
+      # development packages, so the runtime Boost packages must come from the
+      # same series.
+      libboost-atomic1.83.0 \
+      libboost-chrono1.83.0t64 \
+      libboost-date-time1.83.0 \
+      libboost-filesystem1.83.0 \
+      libboost-program-options1.83.0 \
+      libboost-serialization1.83.0 \
+      libboost-system1.83.0 \
+      libboost-test1.83.0 \
+      libboost-thread1.83.0 \
+      libboost-timer1.83.0 \
+      libcurl3t64-gnutls \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
       libjson-c5 \
       libmpfr6 \
       libprotobuf-c1 \
-      libtiff5 \
+      libtiff6 \
       libxml2 \
       sqlite3 \
       # build dependency
@@ -58,7 +61,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
-      libpcre3-dev \
+      libpcre2-dev \
       libpq-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
@@ -108,8 +111,8 @@ RUN set -ex \
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=d4633ca2ab4ed8ffe57c9a5dc12d5588af95c5bd
-ENV SFCGAL_GIT_HASH=78a0496bc3f57a698f2d30affbd544be60b44fde
+ENV CGAL_GIT_HASH=56da4e64f0eff354437d791da648243af60fb254
+ENV SFCGAL_GIT_HASH=7ebc17553814b2195ab9da9c9dba013203dd5884
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -142,7 +145,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH=55707ca0862d5f2995759a3a1cd8bfec1f6a2ce9
+ENV PROJ_GIT_HASH=75d455c663b41179d9dc02e528d59c107d7ee45e
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -172,7 +175,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH=a180ae12ad185da32746e665ee068b63b1ac4644
+ENV GEOS_GIT_HASH=243b13831a5e8ddc6c3b80822b09452e22c51243
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -188,7 +191,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH=859a85835430e594c99d3800ea99cb22eaabc4e9
+ENV GDAL_GIT_HASH=9010a481db4447a160e680067875c31d87ec4cd8
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -267,12 +270,12 @@ RUN set -ex \
     && ogr2ogr --version \
     && proj \
     && sfcgal-config --version \
-    && pcre-config  --version
+    && pcre2-config --version
 
 # -------------------------------------------
 # STAGE  final
 # -------------------------------------------
-FROM docker.io/postgres:17-bullseye
+FROM docker.io/postgres:17-trixie
 
 ARG NPROC
 ARG DOCKER_CMAKE_BUILD_TYPE
@@ -282,37 +285,41 @@ RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       curl \
-      libboost-atomic1.74.0 \
-      libboost-chrono1.74.0 \
-      libboost-date-time1.74.0 \
-      libboost-filesystem1.74.0 \
-      libboost-program-options1.74.0 \
-      libboost-serialization1.74.0 \
-      libboost-system1.74.0 \
-      libboost-test1.74.0 \
-      libboost-thread1.74.0 \
-      libboost-timer1.74.0 \
-      libcurl3-gnutls \
+      # In Trixie, the libboost-all-dev metapackage currently pulls Boost 1.83
+      # development packages, so the runtime Boost packages must come from the
+      # same series.
+      libboost-atomic1.83.0 \
+      libboost-chrono1.83.0t64 \
+      libboost-date-time1.83.0 \
+      libboost-filesystem1.83.0 \
+      libboost-program-options1.83.0 \
+      libboost-serialization1.83.0 \
+      libboost-system1.83.0 \
+      libboost-test1.83.0 \
+      libboost-thread1.83.0 \
+      libboost-timer1.83.0 \
+      libcurl3t64-gnutls \
       libexpat1 \
       libgmp10 \
       libgmpxx4ldbl \
       libjson-c5 \
       libmpfr6 \
-      libpcre3 \
+      libpcre2-8-0 \
+      libpcre2-posix3 \
       libprotobuf-c1 \
-      libtiff5 \
+      libtiff6 \
       libxml2 \
       sqlite3 \
       # gdal+
       libblosc1 \
-      libcfitsio9 \
+      libcfitsio10t64 \
       libfreexl1 \
-      libfyba0 \
+      libfyba0t64 \
       libgomp1 \
-      libhdf5-103-1 \
-      libkmlbase1 \
-      libkmldom1 \
-      libkmlengine1 \
+      libhdf5-310 \
+      libkmlbase1t64 \
+      libkmldom1t64 \
+      libkmlengine1t64 \
       libopenjp2-7 \
       libqhull-r8.0 \
     && apt-get clean \
@@ -323,11 +330,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=d4633ca2ab4ed8ffe57c9a5dc12d5588af95c5bd
-ENV SFCGAL_GIT_HASH=78a0496bc3f57a698f2d30affbd544be60b44fde
-ENV PROJ_GIT_HASH=55707ca0862d5f2995759a3a1cd8bfec1f6a2ce9
-ENV GEOS_GIT_HASH=a180ae12ad185da32746e665ee068b63b1ac4644
-ENV GDAL_GIT_HASH=859a85835430e594c99d3800ea99cb22eaabc4e9
+ENV CGAL_GIT_HASH=56da4e64f0eff354437d791da648243af60fb254
+ENV SFCGAL_GIT_HASH=7ebc17553814b2195ab9da9c9dba013203dd5884
+ENV PROJ_GIT_HASH=75d455c663b41179d9dc02e528d59c107d7ee45e
+ENV GEOS_GIT_HASH=243b13831a5e8ddc6c3b80822b09452e22c51243
+ENV GDAL_GIT_HASH=9010a481db4447a160e680067875c31d87ec4cd8
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -346,7 +353,9 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH=6d729904766367e513963cbb330b58400d12025c
+ENV POSTGIS_GIT_HASH=e1524ad9145af2dedf45391a581a8f48436817b7
+ENV H3_PG_GIT_HASH=e5e46ebcd6e07177a35befd45751d52d42d28655
+ENV ADDRESS_STANDARDIZER_GIT_HASH=a26f8ef47219a414c8d4e8b8908b09c24b60deeb
 
 RUN set -ex \
     && apt-get update \
@@ -368,7 +377,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
-      libpcre3-dev \
+      libpcre2-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
@@ -394,6 +403,29 @@ RUN set -ex \
         --enable-lto \
     && make -j${NPROC:-$(nproc)} \
     && make install \
+    # h3-pg from the latest main branch revision.
+    && cd /usr/src/ \
+    && git clone https://github.com/postgis/h3-pg.git \
+    && cd h3-pg \
+    && git checkout ${H3_PG_GIT_HASH} \
+    && git log -1 > /_pgis_h3_pg_last_commit.txt \
+    && cmake -B build -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=ON \
+    && cmake --build build -j${NPROC:-$(nproc)} \
+    && cmake --install build --component h3-pg \
+    && chown -R postgres:postgres build \
+    # Skip the full h3_postgis_regress suite because tile_coverage is slow and flaky
+    && if ! su postgres -c "ctest --test-dir /usr/src/h3-pg/build --output-on-failure -R '^(h3_regress|h3_inlined|h3_postgis_regress_fast)$'"; then \
+        find /usr/src/h3-pg/build \( -path '*/test/log/*' -o -name 'regression.diffs' -o -name 'regression.out' -o -name 'regression.log' -o -name 'LastTest.log' \) -type f -print -exec sh -c 'echo "===== $1 ====="; cat "$1"' sh {} \; ; \
+        exit 1; \
+    fi \
+    # address_standardizer from the latest main branch revision.
+    && cd /usr/src/ \
+    && git clone https://github.com/postgis/address_standardizer.git \
+    && cd address_standardizer \
+    && git checkout ${ADDRESS_STANDARDIZER_GIT_HASH} \
+    && git log -1 > /_pgis_address_standardizer_last_commit.txt \
+    && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no \
+    && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no install \
 # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
     && projsync --system-directory --file us_noaa_eshpgn \
@@ -405,17 +437,24 @@ RUN set -ex \
     && su postgres -c 'pg_ctl -D /tempdb init' \
     && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
     && ldconfig \
-    && cd regress \
+    && cd /usr/src/address_standardizer \
+    && if ! PGUSER=postgres make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config installcheck; then \
+        if [ -f test/regression.diffs ]; then cat test/regression.diffs; fi; \
+        exit 1; \
+    fi \
+    && cd /usr/src/postgis/regress \
     && make -j${NPROC:-$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
+    # Some optional extensions may be absent from current PostGIS master builds.
+    # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
+    && su postgres -c "psql -v ON_ERROR_STOP=1 -c \"DO \\\$\\\$ DECLARE extension_name text; BEGIN FOREACH extension_name IN ARRAY ARRAY['address_standardizer', 'address_standardizer_data_us', 'postgis_tiger_geocoder'] LOOP IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = extension_name) THEN EXECUTE format('CREATE EXTENSION IF NOT EXISTS %I', extension_name); ELSE RAISE NOTICE 'Extension % is not available, skipping', extension_name; END IF; END LOOP; END \\\$\\\$;\"" \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3_postgis;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \
@@ -427,6 +466,8 @@ RUN set -ex \
 # clean
     && cd / \
     && rm -rf /usr/src/postgis \
+    && rm -rf /usr/src/h3-pg \
+    && rm -rf /usr/src/address_standardizer \
     && apt-get purge -y --autoremove \
       autoconf \
       automake \
@@ -443,7 +484,7 @@ RUN set -ex \
       libgmp-dev \
       libjson-c-dev \
       libmpfr-dev \
-      libpcre3-dev \
+      libpcre2-dev \
       libprotobuf-c-dev \
       libsqlite3-dev \
       libtiff-dev \
