@@ -20,12 +20,10 @@ defaults:
 permissions:
   contents: read
 
-# Discover buildable Dockerfiles, skipping placeholders.
-# Build/test each image independently on matching native platforms with per-platform cache scopes.
-# Build Debian master dependencies once per native platform and reuse them across PostgreSQL majors.
-# Prime the native BuildKit image once per architecture; matrix jobs restore it instead of pulling Docker Hub.
-# Build and test each platform natively, then verify the emitted OCI evidence before publishing.
-# Verify the published Docker Hub tag after the push; fork and production runs use the same pre-publish check.
+# Rebuild tags when their inputs change or their PostgreSQL base is newer.
+# If update.sh or Docker Hub metadata fails, rebuild all eligible tags.
+# Skip changes to blank lines, comments, and documentation.
+# Build and test each architecture on a matching runner, then check both results.
 jobs:
   versions:
     name: Discover Docker image versions
@@ -34,51 +32,380 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       images: ${{ steps.matrix.outputs.images }}
       latest_version: ${{ steps.matrix.outputs.latest_version }}
+      has_images: ${{ steps.matrix.outputs.has_images }}
+      has_master_images: ${{ steps.matrix.outputs.has_master_images }}
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Run local regression tests
+        run: |
+          nice -n 10 bash test/update-warnings.sh
+          nice -n 10 bash test/make-image.sh
+          nice -n 10 python3 test/image-contracts.py
+          nice -n 10 python3 test/workflow-selection.py
+      - if: github.event_name == 'schedule'
+        id: update
+        name: Regenerate Dockerfiles for scheduled selection
+        continue-on-error: true
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update.success"
+          : > "$patch"
+          printf 'false\n' > "$success"
+          if ! ./update.sh; then
+            git restore --source=HEAD --worktree --staged .
+            git clean -fd
+            exit 1
+          fi
+          git add -N .
+          git diff --binary HEAD -- > "$patch"
+          printf 'true\n' > "$success"
+      - if: always() && github.event_name == 'schedule'
+        name: Share generated Dockerfile updates
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/dockerfiles-update.patch
+            ${{ runner.temp }}/dockerfiles-update.success
+          if-no-files-found: error
+          retention-days: 1
       - id: matrix
-        name: Build image matrix from Dockerfiles
+        name: Select affected Docker images
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          UPDATE_SCRIPT_OUTCOME: ${{ steps.update.outcome }}
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json
+          import os
           import re
+          import subprocess
+          import sys
+          import time
+          from concurrent.futures import ThreadPoolExecutor
+          from datetime import datetime
           from pathlib import Path
+          from pathlib import PurePosixPath
+          from urllib.error import HTTPError
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
 
-          include = []
-          images = []
+          dockerfiles = {path.parent.name: path for path in Path(".").glob("*/Dockerfile")}
+          selected = set()
           platforms = ("linux/amd64", "linux/arm64")
           runners = {"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}
 
-          def is_buildable(dockerfile):
-              return dockerfile.is_file() and "placeholder Dockerfile" not in dockerfile.read_text()
+          def is_source_built(dockerfile):
+              if not dockerfile.is_file():
+                  return False
+              contents = dockerfile.read_text()
+              return "AS postgis-build" in contents or "POSTGIS_SOURCE_VERSION=" in contents
 
-          for dockerfile in sorted(Path(".").glob("*/Dockerfile")):
-              version = dockerfile.parent.name
-              if is_buildable(dockerfile):
-                  images.append({"version": version, "variant": "default"})
-                  for platform in platforms:
-                      scope = f"postgis-{version}-default-{platform.replace('/', '-')}"
-                      include.append({"version": version, "variant": "default", "platform": platform, "runner": runners[platform], "cache_scope": scope, "master_deps_cache_scope": f"postgis-master-deps-{platform.replace('/', '-')}"})
-              if is_buildable(dockerfile.parent / "alpine" / "Dockerfile"):
-                  images.append({"version": version, "variant": "alpine"})
-                  for platform in platforms:
-                      scope = f"postgis-{version}-alpine-{platform.replace('/', '-')}"
-                      include.append({"version": version, "variant": "alpine", "platform": platform, "runner": runners[platform], "cache_scope": scope, "master_deps_cache_scope": f"postgis-master-deps-{platform.replace('/', '-')}"})
+          def is_experimental(version, dockerfile):
+              postgis_versions = re.findall(r"(?m)^(?:ARG|ENV) POSTGIS_(?:SOURCE_)?VERSION=([^\s]+)", dockerfile.read_text())
+              return any(re.search(r"alpha|beta|rc|master", value, re.I) for value in (version, *postgis_versions))
+
+          def add_target(version, variant):
+              dockerfile = dockerfiles.get(version)
+              if dockerfile is None:
+                  return
+              if variant == "alpine":
+                  dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
+              if dockerfile.is_file():
+                  selected.add((version, variant))
+
+          def add_version_file_target(changed_path):
+              parts = PurePosixPath(changed_path).parts
+              if parts and parts[0] in dockerfiles:
+                  variant = "alpine" if len(parts) > 1 and parts[1] == "alpine" else "default"
+                  add_target(parts[0], variant)
+                  return parts[0], variant
+              return None
+
+          event_name = os.environ["EVENT_NAME"]
+          ref = os.environ["REF"]
+          all_targets = {
+              (version, variant)
+              for version, dockerfile in dockerfiles.items()
+              for variant, candidate in (
+                  ("default", dockerfile),
+                  ("alpine", dockerfile.parent / "alpine" / "Dockerfile"),
+              )
+              if candidate.is_file()
+          }
+
+          def postgres_base_tags(dockerfile):
+              contents = dockerfile.read_text()
+              tags = set(re.findall(
+                  r"(?m)^\s*(?:FROM\s+(?:docker\.io/)?postgres:|ARG\s+BASE_IMAGE=(?:docker\.io/)?postgres:)([^\s]+)",
+                  contents,
+              ))
+              if not tags:
+                  raise RuntimeError(f"cannot find a Postgres base tag in {dockerfile}")
+              return tags
+
+          def dockerhub_last_updated(namespace, repository, tag):
+              url = (
+                  "https://hub.docker.com/v2/repositories/"
+                  f"{namespace}/{repository}/tags/{quote(tag, safe='')}/"
+              )
+              request = Request(url, headers={"User-Agent": "docker-postgis-ci"})
+              for attempt in range(3):
+                  try:
+                      with urlopen(request, timeout=20) as response:
+                          metadata = json.load(response)
+                      value = metadata.get("tag_last_pushed") or metadata.get("last_updated")
+                      if not value:
+                          if namespace == "postgis":
+                              return None
+                          raise RuntimeError(f"Docker Hub returned no last_updated for {repository}:{tag}")
+                      return datetime.fromisoformat(value.replace("Z", "+00:00"))
+                  except HTTPError as error:
+                      if error.code == 404 and namespace == "postgis":
+                          return None
+                      if attempt == 2:
+                          raise RuntimeError(f"Docker Hub metadata lookup failed for {repository}:{tag}: {error}") from error
+                  except Exception as error:
+                      if attempt == 2:
+                          raise RuntimeError(f"Docker Hub metadata lookup failed for {repository}:{tag}: {error}") from error
+                  time.sleep((attempt + 1) * 2)
+
+          def meaningful_diff(diff):
+              for line in diff.splitlines():
+                  if line.startswith(("new file mode ", "deleted file mode ", "old mode ", "new mode ")):
+                      return True
+                  if not line.startswith(("+", "-")) or line.startswith(("+++", "---")):
+                      continue
+                  content = line[1:].strip()
+                  if not content:
+                      continue
+                  if content.startswith(("#!", "# syntax=", "# escape=")):
+                      return True
+                  if content.startswith(("#", "//", "/*", "*/", "* ")):
+                      continue
+                  return True
+              return False
+
+          def meaningful_worktree_change(path):
+              if PurePosixPath(path).suffix.lower() in {".md", ".rst", ".adoc"}:
+                  return False
+              diff = subprocess.check_output(
+                  [
+                      "git", "diff", "--no-ext-diff",
+                      "--ignore-blank-lines", "--unified=0", "HEAD", "--", path,
+                  ],
+                  text=True,
+              )
+              return meaningful_diff(diff)
+
+          def meaningful_commit_after(paths, timestamp):
+              commits = subprocess.check_output(
+                  ["git", "log", "--first-parent", "--full-history", "--format=%H%x09%ct", "HEAD", "--", *paths],
+                  text=True,
+              ).splitlines()
+              for record in commits:
+                  commit, committed_at = record.split("\t", 1)
+                  if int(committed_at) <= timestamp:
+                      continue
+                  try:
+                      parent = subprocess.check_output(
+                          ["git", "rev-parse", f"{commit}^1"], text=True, stderr=subprocess.DEVNULL
+                      ).strip()
+                  except subprocess.CalledProcessError:
+                      parent = subprocess.check_output(
+                          ["git", "hash-object", "-t", "tree", "-w", "/dev/null"], text=True
+                      ).strip()
+                  diff = subprocess.check_output(
+                      [
+                          "git", "diff", "--no-ext-diff", "--no-renames",
+                          "--ignore-blank-lines", "--unified=0",
+                          parent, commit, "--", *paths,
+                      ],
+                      text=True,
+                  )
+                  if meaningful_diff(diff):
+                      return True
+              return False
+
+          shared_build_inputs = (
+              ".dockerignore",
+              "Dockerfile.alpine.template",
+              "Dockerfile.master.template",
+              "Dockerfile.source.template",
+              "Dockerfile.template",
+              "docker-bake.hcl",
+              "initdb-postgis.sh",
+              "update-postgis.sh",
+          )
+
+          def target_build_inputs(target):
+              version, variant = target
+              version_dir = dockerfiles[version].parent
+              if variant == "alpine":
+                  return [str(version_dir / "alpine" / "Dockerfile"), str(version_dir / "alpine" / "pgrouting-version.txt")]
+              return [str(dockerfiles[version])]
+
+          def stale_targets_from_base_updates(targets):
+              image_tags = {}
+              bases = {}
+              lookups = set()
+              for version, variant in targets:
+                  dockerfile = dockerfiles[version]
+                  if variant == "alpine":
+                      dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
+                  image_tag = version + ("-alpine" if variant == "alpine" else "")
+                  image_tags[(version, variant)] = image_tag
+                  bases[(version, variant)] = postgres_base_tags(dockerfile)
+                  lookups.update(("library", "postgres", tag) for tag in bases[(version, variant)])
+                  lookups.add(("postgis", "postgis", image_tag))
+
+              keys = sorted(lookups)
+              with ThreadPoolExecutor(max_workers=12) as executor:
+                  timestamps = dict(zip(keys, executor.map(lambda key: dockerhub_last_updated(*key), keys)))
+
+              stale = set()
+              for target, image_tag in image_tags.items():
+                  image_updated = timestamps[("postgis", "postgis", image_tag)]
+                  base_is_newer = any(
+                      timestamps[("library", "postgres", base_tag)] > image_updated
+                      for base_tag in bases[target]
+                  ) if image_updated is not None else False
+                  if image_updated is None:
+                      stale.add(target)
+                      print(f"Scheduled rebuild: {image_tag} is missing or has no push time", file=sys.stderr)
+                  elif base_is_newer:
+                      stale.add(target)
+                      print(f"Scheduled rebuild: Postgres base for {image_tag} was pushed later", file=sys.stderr)
+                  elif meaningful_commit_after(target_build_inputs(target), image_updated.timestamp()):
+                      stale.add(target)
+                      print(f"Scheduled rebuild: build inputs for {image_tag} changed after its last push", file=sys.stderr)
+
+              published_times = [
+                  timestamps[("postgis", "postgis", image_tag)].timestamp()
+                  for image_tag in image_tags.values()
+                  if timestamps[("postgis", "postgis", image_tag)] is not None
+              ]
+              if published_times and meaningful_commit_after(shared_build_inputs, min(published_times)):
+                  stale.update(targets)
+                  print("Scheduled rebuild: shared build inputs changed; rebuilding all eligible tags", file=sys.stderr)
+              return stale
+
+          if event_name == "push" and ref == "refs/heads/master":
+              for version in dockerfiles:
+                  if version.endswith("-master"):
+                      add_target(version, "default")
+                      add_target(version, "alpine")
+          elif event_name == "schedule":
+              if os.environ.get("UPDATE_SCRIPT_OUTCOME") != "success":
+                  print("WARNING: update.sh failed; rebuilding all eligible images", file=sys.stderr)
+                  selected.update(all_targets)
+              else:
+                  generated_changes = subprocess.check_output(
+                      ["git", "diff", "--name-only", "--no-renames", "HEAD"],
+                      text=True,
+                  ).splitlines()
+                  for changed_path in generated_changes:
+                      if not meaningful_worktree_change(changed_path):
+                          continue
+                      target = add_version_file_target(changed_path)
+                      if target is not None and target in selected:
+                          version, variant = target
+                          image_tag = version + ("-alpine" if variant == "alpine" else "")
+                          print(f"Scheduled rebuild: generated inputs changed for {image_tag}", file=sys.stderr)
+                  try:
+                      selected.update(stale_targets_from_base_updates(all_targets))
+                  except Exception as error:
+                      print(f"WARNING: cannot compare Docker Hub tag dates ({error}); rebuilding all eligible images", file=sys.stderr)
+                      selected.update(all_targets)
+          elif event_name == "workflow_dispatch":
+              selected.update(all_targets)
+          elif event_name == "pull_request":
+              base_sha = os.environ.get("PR_BASE_SHA", "")
+              if not base_sha:
+                  raise SystemExit("pull request base SHA is unavailable")
+              changed = subprocess.check_output(
+                  ["git", "diff", "--name-only", "--no-renames", f"{base_sha}...HEAD"],
+                  text=True,
+              ).splitlines()
+              for changed_path in changed:
+                  if PurePosixPath(changed_path).suffix.lower() in {".md", ".rst", ".adoc"}:
+                      continue
+                  diff = subprocess.check_output(
+                      [
+                          "git", "diff", "--no-ext-diff", "--no-renames",
+                          "--ignore-blank-lines", "--unified=0",
+                          f"{base_sha}...HEAD", "--", changed_path,
+                      ],
+                      text=True,
+                  )
+                  if not meaningful_diff(diff):
+                      continue
+                  parts = PurePosixPath(changed_path).parts
+                  if add_version_file_target(changed_path) is not None:
+                      continue
+                  elif changed_path in {"docker-bake.hcl", ".dockerignore", "initdb-postgis.sh", "update-postgis.sh"}:
+                      selected.update(all_targets)
+                  elif changed_path == "Dockerfile.template":
+                      selected.update(
+                          target for target in all_targets
+                          if target[1] == "default" and not target[0].endswith("-master")
+                          and not is_source_built(dockerfiles[target[0]])
+                      )
+                  elif changed_path == "Dockerfile.source.template":
+                      selected.update(
+                          target for target in all_targets
+                          if target[1] == "default" and not target[0].endswith("-master")
+                          and is_source_built(dockerfiles[target[0]])
+                      )
+                  elif changed_path == "Dockerfile.alpine.template":
+                      selected.update(target for target in all_targets if target[1] == "alpine")
+                  elif changed_path == "Dockerfile.master.template":
+                      selected.update(target for target in all_targets if target[1] == "default" and target[0].endswith("-master"))
+                  elif not parts or parts[0] not in {
+                      ".circleci", ".github", "examples", "test",
+                  } and changed_path not in {
+                      ".coderabbit.yaml", "AUTHORS", "LICENSE", "Makefile", "README.md",
+                      "apply-readme.sh", "update.sh",
+                  }:
+                      selected.update(all_targets)
 
           latest_match = re.search(r"(?m)^LATEST_VERSION\s*=\s*(\S+)\s*$", Path("Makefile").read_text())
           if not latest_match:
               raise SystemExit("Makefile does not define LATEST_VERSION")
           latest_version = latest_match.group(1)
-          if not is_buildable(Path(latest_version) / "Dockerfile"):
+          if (latest_version, "default") not in all_targets:
               raise SystemExit(f"latest image {latest_version} is not buildable")
+          images = []
+          include = []
+          for version, variant in sorted(selected):
+              dockerfile = dockerfiles[version]
+              if variant == "alpine":
+                  dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
+              image = {"version": version, "variant": variant, "experimental": is_experimental(version, dockerfile)}
+              images.append(image)
+              for platform in platforms:
+                  scope = f"postgis-{version}-{variant}-{platform.replace('/', '-')}"
+                  include.append({**image, "platform": platform, "runner": runners[platform], "cache_scope": scope, "master_deps_cache_scope": f"postgis-master-deps-{platform.replace('/', '-')}"})
+          if event_name == "schedule":
+              for image in images:
+                  image_tag = image["version"] + ("-alpine" if image["variant"] == "alpine" else "")
+                  print(f"Selected image tag: postgis/postgis:{image_tag}", file=sys.stderr)
           print("matrix=" + json.dumps({"include": include}, separators=(",", ":")))
           print("images=" + json.dumps({"include": images}, separators=(",", ":")))
           print("latest_version=" + latest_version)
+          print("has_images=" + str(bool(images)).lower())
+          print("has_master_images=" + str(any(image["version"].endswith("-master") for image in images)).lower())
           PY
 
   buildkit-cache:
     name: Cache BuildKit ${{ matrix.platform }}
+    needs: [versions]
+    if: ${{ needs.versions.outputs.has_images == 'true' }}
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
@@ -121,9 +448,12 @@ jobs:
 
   master-deps:
     name: Cache Debian master dependencies ${{ matrix.platform }}
-    needs: [buildkit-cache]
+    needs: [versions, buildkit-cache]
+    if: ${{ needs.versions.outputs.has_master_images == 'true' && (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/master')) }}
     runs-on: ${{ matrix.runner }}
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: linux/amd64
@@ -142,6 +472,22 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: github.event_name == 'schedule'
+        name: Download generated Dockerfile updates
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dockerfiles-update
+
+      - if: github.event_name == 'schedule'
+        name: Apply generated Dockerfile updates
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.success"
+          if [[ "$(cat "$success")" == "true" && -s "$patch" ]]; then
+            git apply "$patch"
+          fi
 
       - name: Restore cached BuildKit image
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -182,7 +528,9 @@ jobs:
   build:
     name: ${{ matrix.version }}-${{ matrix.variant }} ${{ matrix.platform }}
     needs: [versions, buildkit-cache, master-deps]
+    if: ${{ always() && needs.versions.outputs.has_images == 'true' && needs.buildkit-cache.result == 'success' }}
     runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.versions.outputs.matrix) }}
@@ -200,6 +548,22 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: github.event_name == 'schedule'
+        name: Download generated Dockerfile updates
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dockerfiles-update
+
+      - if: github.event_name == 'schedule'
+        name: Apply generated Dockerfile updates
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.success"
+          if [[ "$(cat "$success")" == "true" && -s "$patch" ]]; then
+            git apply "$patch"
+          fi
 
       - name: Restore cached BuildKit image
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -347,69 +711,76 @@ jobs:
           retention-days: 1
 
   verify-build:
-    name: Verify ${{ matrix.version }}-${{ matrix.variant }} native evidence
+    name: Verify native image evidence
     needs: [versions, build]
-    if: ${{ needs.build.result == 'success' }}
+    if: ${{ !cancelled() && needs.versions.outputs.has_images == 'true' }}
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.versions.outputs.images) }}
-    env:
-      EXPECTED_TAG: postgis/postgis:${{ matrix.version }}${{ matrix.variant == 'alpine' && '-alpine' || '' }}
+    outputs:
+      images: ${{ steps.verify.outputs.images }}
+      has_images: ${{ steps.verify.outputs.has_images }}
     steps:
-      - name: Checkout source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Restore cached BuildKit image
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: /tmp/buildkit.tar
-          key: docker-buildkit-buildx-stable-1-linux/amd64
-
-      - name: Load cached BuildKit image
-        run: docker load --input /tmp/buildkit.tar
-
       - name: Download native OCI evidence
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          pattern: postgis-evidence-${{ matrix.version }}-${{ matrix.variant }}-*
+          pattern: postgis-evidence-*
           path: evidence
 
-      - name: Check exact native platform set
+      - name: Check native platform evidence
+        id: verify
+        env:
+          IMAGES: ${{ needs.versions.outputs.images }}
         run: |
-          python3 - "$EXPECTED_TAG" evidence <<'PY'
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json
+          import os
           import pathlib
           import sys
 
-          expected_tag, evidence_root = sys.argv[1:]
-          evidence = [json.loads(path.read_text()) for path in pathlib.Path(evidence_root).rglob("*.json")]
-          expected = {("linux", "amd64"), ("linux", "arm64")}
-          actual = {tuple(item["platform"]) for item in evidence}
-          if len(evidence) != 2 or actual != expected:
-              raise SystemExit(f"unexpected native platforms: {sorted(actual)}")
-          if {item["tag"] for item in evidence} != {expected_tag}:
-              raise SystemExit("native evidence has inconsistent image tags")
-          for item in evidence:
-              if not item["manifest"].get("digest", "").startswith("sha256:"):
-                  raise SystemExit("native manifest has no digest")
-              if not item["config"].get("digest", "").startswith("sha256:"):
-                  raise SystemExit("native config has no digest")
-              if not item["layers"]:
-                  raise SystemExit("native image has no layers")
-              print(f"{item['platform'][1]}: manifest={item['manifest']['digest']} layers={len(item['layers'])}")
+          def verify(image):
+              version, variant = image["version"], image["variant"]
+              expected_tag = f"postgis/postgis:{version}" + ("-alpine" if variant == "alpine" else "")
+              paths = pathlib.Path("evidence").glob(f"postgis-evidence-{version}-{variant}-*/*.json")
+              evidence = [json.loads(path.read_text()) for path in paths]
+              expected = {("linux", "amd64"), ("linux", "arm64")}
+              actual = {tuple(item["platform"]) for item in evidence}
+              if len(evidence) != 2 or actual != expected:
+                  raise ValueError(f"unexpected native platforms: {sorted(actual)}")
+              if {item["tag"] for item in evidence} != {expected_tag}:
+                  raise ValueError("native evidence has inconsistent image tags")
+              for item in evidence:
+                  if not item["manifest"].get("digest", "").startswith("sha256:"):
+                      raise ValueError("native manifest has no digest")
+                  if not item["config"].get("digest", "").startswith("sha256:"):
+                      raise ValueError("native config has no digest")
+                  if not item["layers"]:
+                      raise ValueError("native image has no layers")
+
+          verified = []
+          for image in json.loads(os.environ["IMAGES"])["include"]:
+              try:
+                  verify(image)
+              except (ValueError, KeyError, TypeError, OSError) as error:
+                  if not image["experimental"]:
+                      raise
+                  print(f"::warning::Skipping experimental {image['version']}-{image['variant']}: {error}", file=sys.stderr)
+              else:
+                  verified.append(image)
+          print("images=" + json.dumps({"include": verified}, separators=(",", ":")))
+          print("has_images=" + str(bool(verified)).lower())
           PY
 
   publish:
     name: Publish ${{ matrix.version }}-${{ matrix.variant }}
-    needs: [versions, build, verify-build]
+    needs: [versions, verify-build]
     permissions:
       contents: read
       id-token: write
-    if: ${{ github.repository == 'postgis/docker-postgis' && github.ref == 'refs/heads/master' && github.event_name != 'pull_request' }}
+    if: ${{ needs.verify-build.outputs.has_images == 'true' && github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/master')) }}
     runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
-      matrix: ${{ fromJSON(needs.versions.outputs.images) }}
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.verify-build.outputs.images) }}
     env:
       VERSION: ${{ matrix.version }}
       VARIANT: ${{ matrix.variant }}
@@ -421,6 +792,22 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: github.event_name == 'schedule'
+        name: Download generated Dockerfile updates
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dockerfiles-update
+
+      - if: github.event_name == 'schedule'
+        name: Apply generated Dockerfile updates
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.success"
+          if [[ "$(cat "$success")" == "true" && -s "$patch" ]]; then
+            git apply "$patch"
+          fi
 
       - name: Restore cached BuildKit image
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -493,12 +880,13 @@ jobs:
 
   verify-published:
     name: Verify published ${{ matrix.version }}-${{ matrix.variant }}
-    needs: [versions, publish]
-    if: ${{ needs.publish.result == 'success' }}
+    needs: [verify-build, publish]
+    if: ${{ !cancelled() && needs.verify-build.outputs.has_images == 'true' && (needs.publish.result == 'success' || needs.publish.result == 'failure') }}
     runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.versions.outputs.images) }}
+      matrix: ${{ fromJSON(needs.verify-build.outputs.images) }}
     env:
       EXPECTED_TAG: postgis/postgis:${{ matrix.version }}${{ matrix.variant == 'alpine' && '-alpine' || '' }}
     steps:
