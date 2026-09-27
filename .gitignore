@@ -1,4 +1,5 @@
 _*
+/*.oci.tar
 
 # Generated Docker build-context copies.
 /*/initdb-postgis.sh

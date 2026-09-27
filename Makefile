@@ -78,11 +78,16 @@ OFFIMG_REPO_URL=https://github.com/docker-library/official-images.git
 build: copy-scripts $(foreach version,$(VERSIONS),build-$(version))
 
 # Build one tag with: make image 18 3.6 alpine (omit the variant for Debian).
+# Append multi to export both platforms as a local OCI archive.
 ifneq ($(filter image,$(MAKECMDGOALS)),)
   IMAGE_GOALS := $(filter-out image,$(MAKECMDGOALS))
+  IMAGE_MULTI := $(filter multi,$(lastword $(IMAGE_GOALS)))
+  ifneq ($(IMAGE_MULTI),)
+    IMAGE_GOALS := $(filter-out multi,$(IMAGE_GOALS))
+  endif
   ifneq ($(words $(IMAGE_GOALS)),2)
     ifneq ($(words $(IMAGE_GOALS)),3)
-      $(error usage: make image <postgres-version> <postgis-version> [default|debian|alpine])
+      $(error usage: make image <postgres-version> <postgis-version> [default|debian|alpine] [multi])
     endif
   endif
   IMAGE_VERSION := $(word 1,$(IMAGE_GOALS))-$(word 2,$(IMAGE_GOALS))
@@ -101,13 +106,18 @@ ifneq ($(filter image,$(MAKECMDGOALS)),)
       $(error no Alpine Dockerfile for $(IMAGE_VERSION))
     endif
   endif
-  .PHONY: $(IMAGE_GOALS)
-  $(IMAGE_GOALS):
+  IMAGE_SUFFIX := $(if $(filter alpine,$(IMAGE_VARIANT)),-alpine,)
+  .PHONY: $(IMAGE_GOALS) $(IMAGE_MULTI)
+  $(IMAGE_GOALS) $(IMAGE_MULTI):
 	@:
 endif
 
 image:
+ifneq ($(IMAGE_MULTI),)
+	VERSION=$(IMAGE_VERSION) VARIANT=$(IMAGE_VARIANT) $(DOCKER) buildx bake --file docker-bake.hcl --pull --set image.output=type=oci,dest=postgis-$(IMAGE_VERSION)$(IMAGE_SUFFIX).oci.tar image
+else
 	+$(MAKE) VERSION=$(IMAGE_VERSION) VARIANT=$(IMAGE_VARIANT) build-$(IMAGE_VERSION)
+endif
 
 copy-scripts:
 	@for directory in $(COPY_SCRIPT_DIRS); do \
