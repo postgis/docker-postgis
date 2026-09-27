@@ -1,6 +1,9 @@
-FROM docker.io/postgis/postgis:13-3.1
+FROM docker.io/postgis/postgis:18-3.6
 
-RUN apt-get update -y
-RUN apt-get install postgis -y
-RUN apt-get clean
-RUN rm -rf /var/cache/apt/lists
+USER root
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgis \
+    && rm -rf /var/lib/apt/lists/*
+
+USER postgres
