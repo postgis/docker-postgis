@@ -26,16 +26,13 @@ githubrepolink="https://github.com/postgis/docker-postgis/blob/master"
 IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
 defaultAlpinenSuite='3.24'
-defaultDebianSuite='bullseye-slim'
+defaultDebianSuite='trixie-slim'
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
-    [11]='bullseye-slim'
-    [12]='bullseye-slim'
-    [13]='bullseye-slim'
-    [14]='bullseye-slim'
-    [15]='bullseye-slim'
-    [16]='bullseye-slim'
-    [17]='bullseye-slim'
+    [14]='trixie-slim'
+    [15]='trixie-slim'
+    [16]='trixie-slim'
+    [17]='trixie-slim'
     [18]='trixie-slim'
     [19]='trixie-slim'
 )
@@ -168,10 +165,7 @@ for version in "${versions[@]}"; do
     versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${packagesBase}/${suite}-pgdg/${postgresVersionMain}/binary-amd64/Packages.bz2" | bunzip2)"
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersionMain"'" { print $2; exit }' || true)"
 
-    if [ "$suite" = "bullseye" ]; then
-        boostVersion="1.74.0"
-        boostChronoVersion="1.74.0"
-    elif [ "$suite" = "trixie" ]; then
+    if [ "$suite" = "trixie" ]; then
         boostVersion="1.83.0"
         boostChronoVersion="1.83.0t64"
     else
