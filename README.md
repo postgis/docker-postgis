@@ -9,7 +9,7 @@ Because of the glibc/ICU change, existing clusters may need `REINDEX` and `ALTER
 **⚠️ Breaking change (PostgreSQL 18+):**
 Default `VOLUME` path changed to `/var/lib/postgresql`
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides Debian and Alpine variants for PostGIS 3.6.x, compatible with PostgreSQL 14, 15, 16, 17 and 18. Test images are also provided for PostgreSQL 19 beta, PostGIS 3.7 release candidates, and builds from the PostGIS/GEOS/PROJ/GDAL master branches (`*-master`).
+The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides Debian and Alpine variants for PostGIS 3.6.x, compatible with PostgreSQL 14, 15, 16, 17 and 18. Test images are also provided for PostgreSQL 19 pre-releases, PostGIS 3.7 release candidates, and builds from the PostGIS/GEOS/PROJ/GDAL master branches (`*-master`).
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -27,7 +27,7 @@ For PostGIS 3.6 images, `address_standardizer` and `address_standardizer_data_us
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-## Versions (2026-10-11)
+## Versions (2026-10-17)
 
 Supported architecture: `amd64` (x86-64)
 
@@ -40,7 +40,7 @@ Recommended version for new users:
 
 * This Docker-PostGIS image has a cautious release cycle to guarantee high stability.
   * By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
-* We use PostGIS, geos, proj, gdal, and sfcgal packages from the Debian repository.
+* We use the PostGIS packages from the [PostgreSQL Apt Repository (PGDG)](https://wiki.postgresql.org/wiki/Apt), and the geos, proj, gdal, and sfcgal packages from the Debian repository.
   * In the Debian Trixie repository (for all PostgreSQL versions), the versions are:
     * geos=3.13
     * gdal=3.10
@@ -96,10 +96,10 @@ Recommended version for new users:
 | [postgis/postgis:17-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-master/Dockerfile) | debian:trixie | 17 | development: postgis, geos, proj, gdal |
 | [postgis/postgis:18-3.7.0rc2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18-3.7.0rc2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18-3.7.0rc2/alpine/Dockerfile) | alpine:3.24 | 18 | 3.7.0rc2 |
 | [postgis/postgis:18-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18-master/Dockerfile) | debian:trixie | 18 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:19beta4-3.6](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19beta4-3.6) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19beta4-3.6/Dockerfile) | debian:trixie | 19beta4 | 3.6.4 |
-| [postgis/postgis:19beta4-3.6-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19beta4-3.6-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19beta4-3.6/alpine/Dockerfile) | alpine:3.24 | 19beta4 | 3.6.4 |
-| [postgis/postgis:19beta4-3.7.0rc2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19beta4-3.7.0rc2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19beta4-3.7.0rc2/alpine/Dockerfile) | alpine:3.24 | 19beta4 | 3.7.0rc2 |
-| [postgis/postgis:19beta4-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19beta4-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19beta4-master/Dockerfile) | debian:trixie | 19beta4 | development: postgis, geos, proj, gdal |
+| [postgis/postgis:19rc1-3.6](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-3.6) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-3.6/Dockerfile) | debian:trixie | 19rc1 | 3.6.4 |
+| [postgis/postgis:19rc1-3.6-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-3.6-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-3.6/alpine/Dockerfile) | alpine:3.24 | 19rc1 | 3.6.4 |
+| [postgis/postgis:19rc1-3.7.0rc2-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-3.7.0rc2-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-3.7.0rc2/alpine/Dockerfile) | alpine:3.24 | 19rc1 | 3.7.0rc2 |
+| [postgis/postgis:19rc1-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-master/Dockerfile) | debian:trixie | 19rc1 | development: postgis, geos, proj, gdal |
 <!-- test_autogenerated_end  -->
 
 ## Usage
@@ -212,7 +212,7 @@ If you wish to experiment with this feature, please do so **at your own risk**, 
 
 * You can add options for using SSL ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
   * `-c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key`
-* Or you can use [SSH Tunnels](https://www.postgresql.org/docs/15/ssh-tunnels.html) with `-p 127.0.0.1:5432:5432`
+* Or you can use [SSH Tunnels](https://www.postgresql.org/docs/current/ssh-tunnels.html) with `-p 127.0.0.1:5432:5432`
 
 ### Security scanner information
 

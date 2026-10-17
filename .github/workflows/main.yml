@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         runner-platform: ['ubuntu-24.04', 'ubuntu-24.04-arm']
-        postgres: [14, 15, 16, 17, 18, 19beta4]
+        postgres: [14, 15, 16, 17, 18, 19rc1]
         postgis: ['3.6']
         variant: [default, alpine]
         include:
@@ -32,7 +32,7 @@ jobs:
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04'
-          - postgres: 19beta4
+          - postgres: 19rc1
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04'
@@ -48,15 +48,15 @@ jobs:
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 19beta4
+          - postgres: 19rc1
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 19beta4
+          - postgres: 19rc1
             postgis: '3.7.0rc2'
             variant: alpine
             runner-platform: 'ubuntu-24.04'
-          - postgres: 19beta4
+          - postgres: 19rc1
             postgis: '3.7.0rc2'
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
@@ -72,7 +72,13 @@ jobs:
 
     name: ${{ matrix.postgres }}-${{ matrix.postgis }}-${{ matrix.variant }} ${{ matrix.runner-platform }} - Build Docker image
     runs-on: ${{ matrix.runner-platform }}
-    continue-on-error: ${{ matrix.postgis == 'master' }}
+    # Non-stable builds (PostGIS master, any alpha/beta/rc of PostgreSQL or PostGIS) must not fail the workflow.
+    # Note: env is not available here, and contains() is a case-insensitive substring match.
+    continue-on-error: >-
+      ${{ matrix.postgis == 'master'
+          || contains(format('{0}-{1}', matrix.postgres, matrix.postgis), 'alpha')
+          || contains(format('{0}-{1}', matrix.postgres, matrix.postgis), 'beta')
+          || contains(format('{0}-{1}', matrix.postgres, matrix.postgis), 'rc') }}
     env:
       VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
       VARIANT: ${{ matrix.variant }}
