@@ -1,13 +1,13 @@
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG BASE_IMAGE=postgres:19beta1-alpine3.24
+ARG BASE_IMAGE=postgres:16-alpine3.24
 FROM ${BASE_IMAGE}
 
 ARG NPROC=
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.6.4 spatial database extension with PostgreSQL 19beta1 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.6.4 spatial database extension with PostgreSQL 16 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_VERSION=3.6.4
@@ -33,6 +33,7 @@ RUN set -eux \
         \
         gdal-dev \
         geos-dev \
+        gmp-dev \
         proj-dev \
         proj-util \
         sfcgal-dev \
@@ -86,10 +87,29 @@ RUN set -eux \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
+    # Optional extensions: create them only if they are available.
+    # Since PostGIS 3.7.0rc, some builds may not include them.
+    # PostGIS 3.6.x still includes them.
+    # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
+    && su postgres -c "psql -v ON_ERROR_STOP=1 -c \" \
+        DO \\\$\\\$ \
+        DECLARE \
+            extension_name text; \
+        BEGIN \
+            FOREACH extension_name IN ARRAY ARRAY[ \
+                'address_standardizer', \
+                'address_standardizer_data_us', \
+                'postgis_tiger_geocoder' \
+            ] LOOP \
+                IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = extension_name) THEN \
+                    EXECUTE format('CREATE EXTENSION IF NOT EXISTS %I', extension_name); \
+                ELSE \
+                    RAISE NOTICE 'Extension % is not available, skipping', extension_name; \
+                END IF; \
+            END LOOP; \
+        END \
+        \\\$\\\$;\"" \
     && su postgres -c 'psql -t -c "SELECT version();"'              >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "SELECT PostGIS_Full_Version();"' >> /_pgis_full_version.txt \
     && su postgres -c 'psql -t -c "\dx"' >> /_pgis_full_version.txt \
@@ -103,6 +123,7 @@ RUN set -eux \
         \
         gdal \
         geos \
+        gmp \
         proj \
         sfcgal \
         \

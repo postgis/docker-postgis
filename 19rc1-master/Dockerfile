@@ -9,13 +9,13 @@ ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG DOCKER_ENABLE_IPO=OFF
 ARG CGAL_GIT_BRANCH=6.2.x-branch
 ARG NPROC=
-FROM docker.io/postgres:19beta1-trixie AS builder
+FROM docker.io/postgres:19rc1-trixie AS builder
 
 ARG NPROC
 ARG DOCKER_ENABLE_IPO
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 19beta1 trixie" \
+      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 19rc1 trixie" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
@@ -76,6 +76,7 @@ RUN set -ex \
       # GDAL optional driver dependencies
       libblosc-dev \
       libcfitsio-dev \
+      libeigen3-dev \
       libfreexl-dev \
       libfyba-dev \
       libhdf5-dev \
@@ -113,8 +114,8 @@ RUN set -ex \
 # CGAL and SFCGAL.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=3e5b9fcc0e8bda3ebc8f1cca615faf46a84b49c5
-ENV SFCGAL_GIT_HASH=eb9a03daaa5eb018f97da82105121487b2c22564
+ENV CGAL_GIT_HASH=9e1e8cd9c5772aae06a90aa920c1c1463426e3dc
+ENV SFCGAL_GIT_HASH=a3fdde21f0e48fc163c4825326a95877d98d7e00
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -148,7 +149,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # PROJ.
-ENV PROJ_GIT_HASH=4c7ea9dd514069314417c3db2dde89ba5b8127a8
+ENV PROJ_GIT_HASH=83f5dd6279629fc09d662bd1d6eb1bdd98642cde
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -181,7 +182,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # GEOS.
-ENV GEOS_GIT_HASH=4226b5a034d249e64385d3dac7e69774ff30d6f3
+ENV GEOS_GIT_HASH=75c538dc1841a905f0cc771230ce67e405343fb9
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -197,7 +198,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # GDAL.
-ENV GDAL_GIT_HASH=882a6a38a119b77f56dcdab308720498cf69d72d
+ENV GDAL_GIT_HASH=1ad27e9bc4e6d6e9b69224b52929dd6481d25667
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -288,7 +289,7 @@ RUN set -ex \
 # -------------------------------------------
 # STAGE  final
 # -------------------------------------------
-FROM docker.io/postgres:19beta1-trixie
+FROM docker.io/postgres:19rc1-trixie
 
 ARG NPROC
 ARG DOCKER_CMAKE_BUILD_TYPE
@@ -344,11 +345,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=3e5b9fcc0e8bda3ebc8f1cca615faf46a84b49c5
-ENV SFCGAL_GIT_HASH=eb9a03daaa5eb018f97da82105121487b2c22564
-ENV PROJ_GIT_HASH=4c7ea9dd514069314417c3db2dde89ba5b8127a8
-ENV GEOS_GIT_HASH=4226b5a034d249e64385d3dac7e69774ff30d6f3
-ENV GDAL_GIT_HASH=882a6a38a119b77f56dcdab308720498cf69d72d
+ENV CGAL_GIT_HASH=9e1e8cd9c5772aae06a90aa920c1c1463426e3dc
+ENV SFCGAL_GIT_HASH=a3fdde21f0e48fc163c4825326a95877d98d7e00
+ENV PROJ_GIT_HASH=83f5dd6279629fc09d662bd1d6eb1bdd98642cde
+ENV GEOS_GIT_HASH=75c538dc1841a905f0cc771230ce67e405343fb9
+ENV GDAL_GIT_HASH=1ad27e9bc4e6d6e9b69224b52929dd6481d25667
 
 # Minimal command-line smoke test (fail fast).
 RUN set -ex \
@@ -367,9 +368,9 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # Install PostGIS and companion development extensions.
-ENV POSTGIS_GIT_HASH=b8c7b014233d32d61b75dee622fc76c215949427
-ENV H3_PG_GIT_HASH=9d70e9c37e3772b35f4f9c6ec7a307027bc2c130
-ENV ADDRESS_STANDARDIZER_GIT_HASH=84ed4c45b1208fb2f5ea80512cc421ea40549869
+ENV POSTGIS_GIT_HASH=0c16c2c95ebe32c51a4efff9aa9f7a484c9d8a7c
+ENV H3_PG_GIT_HASH=f960a574eab6aebd186dedff6204711c21742f12
+ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
 
 RUN set -ex \
     && apt-get update \
@@ -464,10 +465,29 @@ RUN set -ex \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
-    # Some optional extensions may be absent from current PostGIS master builds.
-    # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
-    && su postgres -c "psql -v ON_ERROR_STOP=1 -c \"DO \\\$\\\$ DECLARE extension_name text; BEGIN FOREACH extension_name IN ARRAY ARRAY['address_standardizer', 'address_standardizer_data_us', 'postgis_tiger_geocoder'] LOOP IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = extension_name) THEN EXECUTE format('CREATE EXTENSION IF NOT EXISTS %I', extension_name); ELSE RAISE NOTICE 'Extension % is not available, skipping', extension_name; END IF; END LOOP; END \\\$\\\$;\"" \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
+    # Optional extensions: create them only if they are available.
+    # Since PostGIS 3.7.0rc, some builds may not include them.
+    # PostGIS 3.6.x still includes them.
+    # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
+    && su postgres -c "psql -v ON_ERROR_STOP=1 -c \" \
+        DO \\\$\\\$ \
+        DECLARE \
+            extension_name text; \
+        BEGIN \
+            FOREACH extension_name IN ARRAY ARRAY[ \
+                'address_standardizer', \
+                'address_standardizer_data_us', \
+                'postgis_tiger_geocoder' \
+            ] LOOP \
+                IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = extension_name) THEN \
+                    EXECUTE format('CREATE EXTENSION IF NOT EXISTS %I', extension_name); \
+                ELSE \
+                    RAISE NOTICE 'Extension % is not available, skipping', extension_name; \
+                END IF; \
+            END LOOP; \
+        END \
+        \\\$\\\$;\"" \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3_postgis;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
