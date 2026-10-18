@@ -4,8 +4,10 @@ set -Eeuo pipefail
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
+fullMatrixUpdate=false
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
+	fullMatrixUpdate=true
 	versions=( */Dockerfile )
 fi
 versions=( "${versions[@]%/Dockerfile}" )
@@ -27,6 +29,7 @@ IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -V) ); unset IFS
 
 defaultAlpinenSuite='3.24'
 defaultDebianSuite='bullseye-slim'
+latestVersion="${LATEST_VERSION:-17-3.5}"
 declare -A debianSuite=(
     # https://github.com/docker-library/postgres/issues/582
     [11]='bullseye-slim'
@@ -53,6 +56,69 @@ declare -A postgisDebPkgNameVersionSuffixes=(
 )
 
 packagesBase='http://apt.postgresql.org/pub/repos/apt/dists/'
+# Suites whose Debian and PGDG packages upstream moved to the archive mirrors
+# after EOL; images generated for them must resolve apt from the archive hosts.
+declare -A archivedSuitePdgDists=(
+    [bullseye]='https://apt-archive.postgresql.org/pub/repos/apt/dists/'
+)
+archivedSuiteAptFix="$(cat <<'ARCHIVED_APT_FIX_EOF'
+# Archived suite: deb.debian.org and apt.postgresql.org no longer serve it.
+RUN set -eux; \
+      mv /etc/apt/sources.list.d/pgdg.list /tmp/pgdg.list.disabled; \
+      sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list; \
+      apt-get update; \
+      apt-get install -y --no-install-recommends ca-certificates; \
+      sed 's|http://apt.postgresql.org/pub/repos/apt/|https://apt-archive.postgresql.org/pub/repos/apt/|' /tmp/pgdg.list.disabled > /etc/apt/sources.list.d/pgdg.list; \
+      rm -f /tmp/pgdg.list.disabled; \
+      rm -rf /var/lib/apt/lists/*
+ARCHIVED_APT_FIX_EOF
+)"
+matrixFile="matrix.yml"
+matrixEntries=()
+matrixSkipped=()
+
+function matrix_quote() {
+    printf "%s" "$1" | sed "s/'/''/g"
+}
+
+function add_matrix_entry() {
+    local postgres="$1"
+    local postgis="$2"
+    local variant="$3"
+    local tags="$4"
+
+    matrixEntries+=("  - { postgres: '$(matrix_quote "$postgres")', postgis: '$(matrix_quote "$postgis")', variant: '$(matrix_quote "$variant")', tags: '$(matrix_quote "$tags")' }")
+}
+
+function build_matrix_tags() {
+    local version="$1"
+    local variant="$2"
+    local osLabel="$3"
+    local patchVersion="$4"
+    local postgresMajor
+    local tags=()
+
+    postgresMajor="${version%%-*}"
+    if [ "$variant" = "alpine" ]; then
+        tags+=("${version}-alpine" "${version}-${osLabel}")
+    else
+        tags+=("${version}" "${version}-${osLabel}")
+    fi
+
+    if [[ "$patchVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        tags+=("${postgresMajor}-${patchVersion}-${osLabel}")
+    fi
+
+    if [ "$version" = "$latestVersion" ] && [[ "$patchVersion" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        if [ "$variant" = "alpine" ]; then
+            tags+=("alpine")
+        else
+            tags+=("latest")
+        fi
+    fi
+
+    printf '%s ' "${tags[@]}" | sed 's/[[:space:]]$//'
+}
 
 cgalGitBranch='6.2.x-branch'
 cgalGitHash="$(git ls-remote https://github.com/CGAL/cgal.git "heads/${cgalGitBranch}" | awk '{ print $1}')"
@@ -157,15 +223,16 @@ for version in "${versions[@]}"; do
         tag="${debianSuite[$postgresVersionMain]:-$defaultDebianSuite}"
     fi
     suite="${tag%%-slim}"
+    pdgDists="${archivedSuitePdgDists[$suite]:-$packagesBase}"
 
     if [ -z "${suitePackageList["$suite"]:+isset}" ]; then
-        suitePackageList["$suite"]="$(curl -fsSL "${packagesBase}/${suite}-pgdg/main/binary-amd64/Packages.bz2" | bunzip2)"
+        suitePackageList["$suite"]="$(curl -fsSL "${pdgDists%/}/${suite}-pgdg/main/binary-amd64/Packages.bz2" | bunzip2)"
     fi
     if [ -z "${suiteArches["$suite"]:+isset}" ]; then
-        suiteArches["$suite"]="$(curl -fsSL "${packagesBase}/${suite}-pgdg/Release" | awk -F ':[[:space:]]+' '$1 == "Architectures" { gsub(/[[:space:]]+/, "|", $2); print $2 }')"
+        suiteArches["$suite"]="$(curl -fsSL "${pdgDists%/}/${suite}-pgdg/Release" | awk -F ':[[:space:]]+' '$1 == "Architectures" { gsub(/[[:space:]]+/, "|", $2); print $2 }')"
     fi
 
-    versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${packagesBase}/${suite}-pgdg/${postgresVersionMain}/binary-amd64/Packages.bz2" | bunzip2)"
+    versionList="$(echo "${suitePackageList["$suite"]}"; curl -fsSL "${pdgDists%/}/${suite}-pgdg/${postgresVersionMain}/binary-amd64/Packages.bz2" | bunzip2)"
     fullVersion="$(echo "$versionList" | awk -F ': ' '$1 == "Package" { pkg = $2 } $1 == "Version" && pkg == "postgresql-'"$postgresVersionMain"'" { print $2; exit }' || true)"
 
     if [ "$suite" = "bullseye" ]; then
@@ -221,6 +288,7 @@ for version in "${versions[@]}"; do
     if [ -z "$postgisFullVersion" ]
     then
         echo "SKIP debian version";
+        matrixSkipped+=("postgres: ${postgresVersion}, postgis: ${postgisVersion}, variant: default - Reason: placeholder (Debian package not available)")
         # debain version not found;
         echo " # placeholder Dockerfile"                                         > "$version/Dockerfile"
         echo " # Debian version of postgis $postgisFullVersion is not detected!">> "$version/Dockerfile"
@@ -249,8 +317,21 @@ for version in "${versions[@]}"; do
             fi
             sed -i 's/%%TXT_AUTOGENERATED%%/'"$autogenerated"'/g; s/%%PG_MAJOR%%/'$postgresVersion'/g; s/%%POSTGIS_MAJOR%%/'$postgisMajor'/g; s/%%POSTGIS_VERSION%%/'$postgisFullVersion'/g; s/%%CGAL_GIT_BRANCH%%/'"$cgalGitBranch"'/g; s/%%POSTGIS_GIT_HASH%%/'$postgisGitHash'/g; s/%%H3_PG_GIT_HASH%%/'$h3PgGitHash'/g; s/%%ADDRESS_STANDARDIZER_GIT_HASH%%/'$addressStandardizerGitHash'/g; s/%%CGAL_GIT_HASH%%/'$cgalGitHash'/g; s/%%SFCGAL_GIT_HASH%%/'$sfcgalGitHash'/g; s/%%PROJ_GIT_HASH%%/'$projGitHash'/g; s/%%GDAL_GIT_HASH%%/'$gdalGitHash'/g; s/%%GEOS_GIT_HASH%%/'$geosGitHash'/g; s/%%BOOST_VERSION%%/'"$boostVersion"'/g; s/%%BOOST_CHRONO_VERSION%%/'"$boostChronoVersion"'/g; s/%%DEBIAN_VERSION%%/'"$suite"'/g;' "$version/Dockerfile"
 
+            if [ -n "${archivedSuitePdgDists[$suite]:-}" ]; then
+                PGDG_APT_FIX="$archivedSuiteAptFix" awk 'BEGIN { fix = ENVIRON["PGDG_APT_FIX"] } $0 == "%%PGDG_APT_FIX%%" { print fix; next } { print }' "$version/Dockerfile" > "$version/Dockerfile.tmp"
+                mv "$version/Dockerfile.tmp" "$version/Dockerfile"
+            else
+                sed -i '/%%PGDG_APT_FIX%%/d' "$version/Dockerfile"
+            fi
+
             echo "| [postgis/postgis:${version}](${dockerhublink}${version}) | [Dockerfile](${githubrepolink}/${version}/Dockerfile) | debian:${suite} | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
         )
+        if [ "master" == "$postgisVersion" ]; then
+            matrixSkipped+=("postgres: ${postgresVersion}, postgis: ${postgisVersion}, variant: default - Reason: development branch (not a required release test target)")
+        else
+            debianTags="$(build_matrix_tags "$version" "default" "$suite" "${postgisFullVersion%%+*}")"
+            add_matrix_entry "$postgresVersion" "$postgisVersion" "default" "$debianTags"
+        fi
     fi
 
     if [ "master" == "$postgisVersion" ]; then
@@ -299,8 +380,31 @@ for version in "${versions[@]}"; do
 
             echo "| [postgis/postgis:${version}-${variant}](${dockerhublink}${version}-${variant}) | [Dockerfile](${githubrepolink}/${version}/${variant}/Dockerfile) | alpine:${defaultAlpinenSuite} | ${postgresVersion} | ${postgisDocSrc} |" >> _dockerlists_${optimized}.md
         )
+        alpineTags="$(build_matrix_tags "$version" "$variant" "alpine${defaultAlpinenSuite}" "$srcVersion")"
+        add_matrix_entry "$postgresVersion" "$postgisVersion" "$variant" "$alpineTags"
     done
 done
+
+if [ "$fullMatrixUpdate" = true ]; then
+    {
+        echo "# ============================================================================="
+        echo "# WARNING: AUTOMATICALLY GENERATED by ./update.sh - DO NOT EDIT MANUALLY!"
+        echo "# Used by: .github/workflows/test.yml"
+        echo "# ============================================================================="
+        echo
+        if [ "${#matrixSkipped[@]}" -gt 0 ]; then
+            echo "# --- Placeholder/skipped combinations (NOT included in build target list) ---"
+            for skipped in "${matrixSkipped[@]}"; do
+                echo "# - ${skipped}"
+            done
+            echo
+        fi
+        echo "build_targets:"
+        printf '%s\n' "${matrixEntries[@]}"
+    } > "$matrixFile"
+else
+    echo "Preserving ${matrixFile}; run ./update.sh with no version arguments to regenerate the full CI matrix."
+fi
 
 echo "|-------------------------|"
 echo "|-   Generated images    -|"
