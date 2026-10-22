@@ -1,0 +1,925 @@
+name: Docker PostGIS Bake CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: '15 5 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: docker-postgis-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+# Rebuild tags when their inputs change or their PostgreSQL base is newer.
+# If update.sh or Docker Hub metadata fails, rebuild all eligible tags.
+# Skip changes to blank lines, comments, and documentation.
+# Build and test each architecture on a matching runner, then check both results.
+jobs:
+  versions:
+    name: Discover Docker image versions
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      images: ${{ steps.matrix.outputs.images }}
+      latest_version: ${{ steps.matrix.outputs.latest_version }}
+      has_images: ${{ steps.matrix.outputs.has_images }}
+      has_master_images: ${{ steps.matrix.outputs.has_master_images }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Run local regression tests
+        run: |
+          nice -n 10 bash test/update-warnings.sh
+          nice -n 10 bash test/make-image.sh
+          nice -n 10 python3 test/image-contracts.py
+          nice -n 10 python3 test/workflow-selection.py
+      - if: github.event_name == 'schedule'
+        id: update
+        name: Regenerate Dockerfiles for scheduled selection
+        continue-on-error: true
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update.success"
+          : > "$patch"
+          printf 'false\n' > "$success"
+          if ! ./update.sh; then
+            git restore --source=HEAD --worktree --staged .
+            git clean -fd
+            exit 1
+          fi
+          git add -N .
+          git diff --binary HEAD -- > "$patch"
+          printf 'true\n' > "$success"
+      - if: always() && github.event_name == 'schedule'
+        name: Share generated Dockerfile updates
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/dockerfiles-update.patch
+            ${{ runner.temp }}/dockerfiles-update.success
+          if-no-files-found: error
+          retention-days: 1
+      - id: matrix
+        name: Select affected Docker images
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          UPDATE_SCRIPT_OUTCOME: ${{ steps.update.outcome }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          import re
+          import subprocess
+          import sys
+          import time
+          from concurrent.futures import ThreadPoolExecutor
+          from datetime import datetime
+          from pathlib import Path
+          from pathlib import PurePosixPath
+          from urllib.error import HTTPError
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
+
+          dockerfiles = {path.parent.name: path for path in Path(".").glob("*/Dockerfile")}
+          selected = set()
+          platforms = ("linux/amd64", "linux/arm64")
+          runners = {"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}
+
+          def is_source_built(dockerfile):
+              if not dockerfile.is_file():
+                  return False
+              contents = dockerfile.read_text()
+              return "AS postgis-build" in contents or "POSTGIS_SOURCE_VERSION=" in contents
+
+          def is_experimental(version, dockerfile):
+              postgis_versions = re.findall(r"(?m)^(?:ARG|ENV) POSTGIS_(?:SOURCE_)?VERSION=([^\s]+)", dockerfile.read_text())
+              return any(re.search(r"alpha|beta|rc|master", value, re.I) for value in (version, *postgis_versions))
+
+          def add_target(version, variant):
+              dockerfile = dockerfiles.get(version)
+              if dockerfile is None:
+                  return
+              if variant == "alpine":
+                  dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
+              if dockerfile.is_file():
+                  selected.add((version, variant))
+
+          def add_version_file_target(changed_path):
+              parts = PurePosixPath(changed_path).parts
+              if parts and parts[0] in dockerfiles:
+                  variant = "alpine" if len(parts) > 1 and parts[1] == "alpine" else "default"
+                  add_target(parts[0], variant)
+                  return parts[0], variant
+              return None
+
+          event_name = os.environ["EVENT_NAME"]
+          ref = os.environ["REF"]
+          all_targets = {
+              (version, variant)
+              for version, dockerfile in dockerfiles.items()
+              for variant, candidate in (
+                  ("default", dockerfile),
+                  ("alpine", dockerfile.parent / "alpine" / "Dockerfile"),
+              )
+              if candidate.is_file()
+          }
+
+          def postgres_base_tags(dockerfile):
+              contents = dockerfile.read_text()
+              tags = set(re.findall(
+                  r"(?m)^\s*(?:FROM\s+(?:docker\.io/)?postgres:|ARG\s+BASE_IMAGE=(?:docker\.io/)?postgres:)([^\s]+)",
+                  contents,
+              ))
+              if not tags:
+                  raise RuntimeError(f"cannot find a Postgres base tag in {dockerfile}")
+              return tags
+
+          def dockerhub_last_updated(namespace, repository, tag):
+              url = (
+                  "https://hub.docker.com/v2/repositories/"
+                  f"{namespace}/{repository}/tags/{quote(tag, safe='')}/"
+              )
+              request = Request(url, headers={"User-Agent": "docker-postgis-ci"})
+              for attempt in range(3):
+                  try:
+                      with urlopen(request, timeout=20) as response:
+                          metadata = json.load(response)
+                      value = metadata.get("tag_last_pushed") or metadata.get("last_updated")
+                      if not value:
+                          if namespace == "postgis":
+                              return None
+                          raise RuntimeError(f"Docker Hub returned no last_updated for {repository}:{tag}")
+                      return datetime.fromisoformat(value.replace("Z", "+00:00"))
+                  except HTTPError as error:
+                      if error.code == 404 and namespace == "postgis":
+                          return None
+                      if attempt == 2:
+                          raise RuntimeError(f"Docker Hub metadata lookup failed for {repository}:{tag}: {error}") from error
+                  except Exception as error:
+                      if attempt == 2:
+                          raise RuntimeError(f"Docker Hub metadata lookup failed for {repository}:{tag}: {error}") from error
+                  time.sleep((attempt + 1) * 2)
+
+          def meaningful_diff(diff):
+              for line in diff.splitlines():
+                  if line.startswith(("new file mode ", "deleted file mode ", "old mode ", "new mode ")):
+                      return True
+                  if not line.startswith(("+", "-")) or line.startswith(("+++", "---")):
+                      continue
+                  content = line[1:].strip()
+                  if not content:
+                      continue
+                  if content.startswith(("#!", "# syntax=", "# escape=")):
+                      return True
+                  if content.startswith(("#", "//", "/*", "*/", "* ")):
+                      continue
+                  return True
+              return False
+
+          def meaningful_worktree_change(path):
+              if PurePosixPath(path).suffix.lower() in {".md", ".rst", ".adoc"}:
+                  return False
+              diff = subprocess.check_output(
+                  [
+                      "git", "diff", "--no-ext-diff",
+                      "--ignore-blank-lines", "--unified=0", "HEAD", "--", path,
+                  ],
+                  text=True,
+              )
+              return meaningful_diff(diff)
+
+          def meaningful_commit_after(paths, timestamp):
+              commits = subprocess.check_output(
+                  ["git", "log", "--first-parent", "--full-history", "--format=%H%x09%ct", "HEAD", "--", *paths],
+                  text=True,
+              ).splitlines()
+              for record in commits:
+                  commit, committed_at = record.split("\t", 1)
+                  if int(committed_at) <= timestamp:
+                      continue
+                  try:
+                      parent = subprocess.check_output(
+                          ["git", "rev-parse", f"{commit}^1"], text=True, stderr=subprocess.DEVNULL
+                      ).strip()
+                  except subprocess.CalledProcessError:
+                      parent = subprocess.check_output(
+                          ["git", "hash-object", "-t", "tree", "-w", "/dev/null"], text=True
+                      ).strip()
+                  diff = subprocess.check_output(
+                      [
+                          "git", "diff", "--no-ext-diff", "--no-renames",
+                          "--ignore-blank-lines", "--unified=0",
+                          parent, commit, "--", *paths,
+                      ],
+                      text=True,
+                  )
+                  if meaningful_diff(diff):
+                      return True
+              return False
+
+          shared_build_inputs = (
+              ".dockerignore",
+              "Dockerfile.alpine.template",
+              "Dockerfile.master.template",
+              "Dockerfile.source.template",
+              "Dockerfile.template",
+              "docker-bake.hcl",
+              "initdb-postgis.sh",
+              "update-postgis.sh",
+          )
+
+          def target_build_inputs(target):
+              version, variant = target
+              version_dir = dockerfiles[version].parent
+              if variant == "alpine":
+                  return [str(version_dir / "alpine" / "Dockerfile"), str(version_dir / "alpine" / "pgrouting-version.txt")]
+              return [str(dockerfiles[version])]
+
+          def stale_targets_from_base_updates(targets):
+              image_tags = {}
+              bases = {}
+              lookups = set()
+              for version, variant in targets:
+                  dockerfile = dockerfiles[version]
+                  if variant == "alpine":
+                      dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
+                  image_tag = version + ("-alpine" if variant == "alpine" else "")
+                  image_tags[(version, variant)] = image_tag
+                  bases[(version, variant)] = postgres_base_tags(dockerfile)
+                  lookups.update(("library", "postgres", tag) for tag in bases[(version, variant)])
+                  lookups.add(("postgis", "postgis", image_tag))
+
+              keys = sorted(lookups)
+              with ThreadPoolExecutor(max_workers=12) as executor:
+                  timestamps = dict(zip(keys, executor.map(lambda key: dockerhub_last_updated(*key), keys)))
+
+              stale = set()
+              for target, image_tag in image_tags.items():
+                  image_updated = timestamps[("postgis", "postgis", image_tag)]
+                  base_is_newer = any(
+                      timestamps[("library", "postgres", base_tag)] > image_updated
+                      for base_tag in bases[target]
+                  ) if image_updated is not None else False
+                  if image_updated is None:
+                      stale.add(target)
+                      print(f"Scheduled rebuild: {image_tag} is missing or has no push time", file=sys.stderr)
+                  elif base_is_newer:
+                      stale.add(target)
+                      print(f"Scheduled rebuild: Postgres base for {image_tag} was pushed later", file=sys.stderr)
+                  elif meaningful_commit_after(target_build_inputs(target), image_updated.timestamp()):
+                      stale.add(target)
+                      print(f"Scheduled rebuild: build inputs for {image_tag} changed after its last push", file=sys.stderr)
+
+              published_times = [
+                  timestamps[("postgis", "postgis", image_tag)].timestamp()
+                  for image_tag in image_tags.values()
+                  if timestamps[("postgis", "postgis", image_tag)] is not None
+              ]
+              if published_times and meaningful_commit_after(shared_build_inputs, min(published_times)):
+                  stale.update(targets)
+                  print("Scheduled rebuild: shared build inputs changed; rebuilding all eligible tags", file=sys.stderr)
+              return stale
+
+          if event_name == "push" and ref == "refs/heads/master":
+              for version in dockerfiles:
+                  if version.endswith("-master"):
+                      add_target(version, "default")
+                      add_target(version, "alpine")
+          elif event_name == "schedule":
+              if os.environ.get("UPDATE_SCRIPT_OUTCOME") != "success":
+                  print("WARNING: update.sh failed; rebuilding all eligible images", file=sys.stderr)
+                  selected.update(all_targets)
+              else:
+                  generated_changes = subprocess.check_output(
+                      ["git", "diff", "--name-only", "--no-renames", "HEAD"],
+                      text=True,
+                  ).splitlines()
+                  for changed_path in generated_changes:
+                      if not meaningful_worktree_change(changed_path):
+                          continue
+                      target = add_version_file_target(changed_path)
+                      if target is not None and target in selected:
+                          version, variant = target
+                          image_tag = version + ("-alpine" if variant == "alpine" else "")
+                          print(f"Scheduled rebuild: generated inputs changed for {image_tag}", file=sys.stderr)
+                  try:
+                      selected.update(stale_targets_from_base_updates(all_targets))
+                  except Exception as error:
+                      print(f"WARNING: cannot compare Docker Hub tag dates ({error}); rebuilding all eligible images", file=sys.stderr)
+                      selected.update(all_targets)
+          elif event_name == "workflow_dispatch":
+              selected.update(all_targets)
+          elif event_name == "pull_request":
+              base_sha = os.environ.get("PR_BASE_SHA", "")
+              if not base_sha:
+                  raise SystemExit("pull request base SHA is unavailable")
+              changed = subprocess.check_output(
+                  ["git", "diff", "--name-only", "--no-renames", f"{base_sha}...HEAD"],
+                  text=True,
+              ).splitlines()
+              for changed_path in changed:
+                  if PurePosixPath(changed_path).suffix.lower() in {".md", ".rst", ".adoc"}:
+                      continue
+                  diff = subprocess.check_output(
+                      [
+                          "git", "diff", "--no-ext-diff", "--no-renames",
+                          "--ignore-blank-lines", "--unified=0",
+                          f"{base_sha}...HEAD", "--", changed_path,
+                      ],
+                      text=True,
+                  )
+                  if not meaningful_diff(diff):
+                      continue
+                  parts = PurePosixPath(changed_path).parts
+                  if add_version_file_target(changed_path) is not None:
+                      continue
+                  elif changed_path in {"docker-bake.hcl", ".dockerignore", "initdb-postgis.sh", "update-postgis.sh"}:
+                      selected.update(all_targets)
+                  elif changed_path == "Dockerfile.template":
+                      selected.update(
+                          target for target in all_targets
+                          if target[1] == "default" and not target[0].endswith("-master")
+                          and not is_source_built(dockerfiles[target[0]])
+                      )
+                  elif changed_path == "Dockerfile.source.template":
+                      selected.update(
+                          target for target in all_targets
+                          if target[1] == "default" and not target[0].endswith("-master")
+                          and is_source_built(dockerfiles[target[0]])
+                      )
+                  elif changed_path == "Dockerfile.alpine.template":
+                      selected.update(target for target in all_targets if target[1] == "alpine")
+                  elif changed_path == "Dockerfile.master.template":
+                      selected.update(target for target in all_targets if target[1] == "default" and target[0].endswith("-master"))
+                  elif not parts or parts[0] not in {
+                      ".circleci", ".github", "examples", "test",
+                  } and changed_path not in {
+                      ".coderabbit.yaml", "AUTHORS", "LICENSE", "Makefile", "README.md",
+                      "apply-readme.sh", "update.sh",
+                  }:
+                      selected.update(all_targets)
+
+          latest_match = re.search(r"(?m)^LATEST_VERSION\s*=\s*(\S+)\s*$", Path("Makefile").read_text())
+          if not latest_match:
+              raise SystemExit("Makefile does not define LATEST_VERSION")
+          latest_version = latest_match.group(1)
+          if (latest_version, "default") not in all_targets:
+              raise SystemExit(f"latest image {latest_version} is not buildable")
+          images = []
+          include = []
+          for version, variant in sorted(selected):
+              dockerfile = dockerfiles[version]
+              if variant == "alpine":
+                  dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
+              image = {"version": version, "variant": variant, "experimental": is_experimental(version, dockerfile)}
+              images.append(image)
+              for platform in platforms:
+                  scope = f"postgis-{version}-{variant}-{platform.replace('/', '-')}"
+                  include.append({**image, "platform": platform, "runner": runners[platform], "cache_scope": scope, "master_deps_cache_scope": f"postgis-master-deps-{platform.replace('/', '-')}"})
+          if event_name == "schedule":
+              for image in images:
+                  image_tag = image["version"] + ("-alpine" if image["variant"] == "alpine" else "")
+                  print(f"Selected image tag: postgis/postgis:{image_tag}", file=sys.stderr)
+          print("matrix=" + json.dumps({"include": include}, separators=(",", ":")))
+          print("images=" + json.dumps({"include": images}, separators=(",", ":")))
+          print("latest_version=" + latest_version)
+          print("has_images=" + str(bool(images)).lower())
+          print("has_master_images=" + str(any(image["version"].endswith("-master") for image in images)).lower())
+          PY
+
+  buildkit-cache:
+    name: Cache BuildKit ${{ matrix.platform }}
+    needs: [versions]
+    if: ${{ needs.versions.outputs.has_images == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - id: cache
+        name: Restore BuildKit image cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/buildkit.tar
+          key: docker-buildkit-buildx-stable-1-${{ matrix.platform }}
+
+      - if: steps.cache.outputs.cache-hit != 'true'
+        name: Pull BuildKit image once
+        run: |
+          for attempt in 1 2 3; do
+            if docker pull --quiet moby/buildkit:buildx-stable-1; then
+              docker save moby/buildkit:buildx-stable-1 --output /tmp/buildkit.tar
+              exit 0
+            fi
+            echo "BuildKit image pull failed (attempt ${attempt}/3)" >&2
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+      - if: steps.cache.outputs.cache-hit == 'true'
+        name: Load cached BuildKit image
+        run: docker load --input /tmp/buildkit.tar
+
+      - if: steps.cache.outputs.cache-hit != 'true'
+        name: Save BuildKit image cache
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/buildkit.tar
+          key: docker-buildkit-buildx-stable-1-${{ matrix.platform }}
+
+  master-deps:
+    name: Cache Debian master dependencies ${{ matrix.platform }}
+    needs: [versions, buildkit-cache]
+    if: ${{ needs.versions.outputs.has_master_images == 'true' && (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/master')) }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            cache_scope: postgis-master-deps-linux-amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            cache_scope: postgis-master-deps-linux-arm64
+    env:
+      VERSION: 16-master
+      VARIANT: default
+      PLATFORMS: ${{ matrix.platform }}
+      GHA_CACHE: "true"
+      CACHE_FROM_SCOPES: ${{ matrix.cache_scope }}
+      CACHE_TO_SCOPE: ${{ matrix.cache_scope }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: github.event_name == 'schedule'
+        name: Download generated Dockerfile updates
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dockerfiles-update
+
+      - if: github.event_name == 'schedule'
+        name: Apply generated Dockerfile updates
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.success"
+          if [[ "$(cat "$success")" == "true" && -s "$patch" ]]; then
+            git apply "$patch"
+          fi
+
+      - name: Restore cached BuildKit image
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/buildkit.tar
+          key: docker-buildkit-buildx-stable-1-${{ matrix.platform }}
+
+      - name: Load cached BuildKit image
+        run: docker load --input /tmp/buildkit.tar
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+        with:
+          driver-opts: image=moby/buildkit:buildx-stable-1
+
+      - name: Build shared master dependency stage
+        id: bake
+        continue-on-error: true
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        with:
+          source: .
+          files: docker-bake.hcl
+          targets: master-deps
+          pull: true
+
+      - if: steps.bake.outcome == 'failure'
+        name: Retry shared master dependency stage
+        run: |
+          for attempt in 1 2 3; do
+            if docker buildx bake --allow fs=* --file docker-bake.hcl --pull master-deps; then
+              exit 0
+            fi
+            echo "Bake failed (attempt ${attempt}/3); retrying" >&2
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+  build:
+    name: ${{ matrix.version }}-${{ matrix.variant }} ${{ matrix.platform }}
+    needs: [versions, buildkit-cache, master-deps]
+    if: ${{ always() && needs.versions.outputs.has_images == 'true' && needs.buildkit-cache.result == 'success' }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.versions.outputs.matrix) }}
+    env:
+      VERSION: ${{ matrix.version }}
+      VARIANT: ${{ matrix.variant }}
+      LATEST_VERSION: ${{ needs.versions.outputs.latest_version }}
+      EXPECTED_TAG: postgis/postgis:${{ matrix.version }}${{ matrix.variant == 'alpine' && '-alpine' || '' }}
+      PLATFORM_SLUG: ${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}
+      OCI_LAYOUT: /tmp/postgis-${{ matrix.version }}-${{ matrix.variant }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}.oci.tar
+      EVIDENCE: /tmp/postgis-${{ matrix.version }}-${{ matrix.variant }}-${{ matrix.platform == 'linux/amd64' && 'amd64' || 'arm64' }}.json
+      GHA_CACHE: "true"
+      CACHE_FROM_SCOPES: ${{ matrix.cache_scope }},postgis-${{ matrix.version }}-${{ matrix.variant }}-multi,${{ matrix.master_deps_cache_scope }}
+      CACHE_TO_SCOPE: ${{ matrix.cache_scope }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: github.event_name == 'schedule'
+        name: Download generated Dockerfile updates
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dockerfiles-update
+
+      - if: github.event_name == 'schedule'
+        name: Apply generated Dockerfile updates
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.success"
+          if [[ "$(cat "$success")" == "true" && -s "$patch" ]]; then
+            git apply "$patch"
+          fi
+
+      - name: Restore cached BuildKit image
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/buildkit.tar
+          key: docker-buildkit-buildx-stable-1-${{ matrix.platform }}
+
+      - name: Load cached BuildKit image
+        run: docker load --input /tmp/buildkit.tar
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+        with:
+          driver-opts: image=moby/buildkit:buildx-stable-1
+
+      - name: Build test image
+        id: bake
+        continue-on-error: true
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        with:
+          source: .
+          files: docker-bake.hcl
+          targets: image
+          load: true
+          pull: true
+          set: |
+            image.platform=${{ matrix.platform }}
+
+      - if: steps.bake.outcome == 'failure'
+        name: Retry test image build
+        run: |
+          for attempt in 1 2 3; do
+            if docker buildx bake --allow fs=* --file docker-bake.hcl --set image.platform=${{ matrix.platform }} --pull --load image; then
+              exit 0
+            fi
+            echo "Bake failed (attempt ${attempt}/3); retrying" >&2
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+      - name: Run official-images tests
+        run: |
+          if [[ ! -d "$HOME/official-images" ]]; then
+            for attempt in 1 2 3; do
+              if git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet --depth 1 https://github.com/docker-library/official-images.git "$HOME/official-images"; then
+                break
+              fi
+              rm -rf "$HOME/official-images"
+              echo "official-images clone failed (attempt ${attempt}/3); retrying" >&2
+              sleep $((attempt * 5))
+            done
+          fi
+          if [[ ! -x "$HOME/official-images/test/run.sh" ]]; then
+            echo "official-images clone did not produce test/run.sh" >&2
+            exit 1
+          fi
+          "$HOME/official-images/test/run.sh" \
+            -c "$HOME/official-images/test/config.sh" \
+            -c test/postgis-config.sh \
+            "$EXPECTED_TAG"
+
+      - name: Export native OCI evidence
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        env:
+          GHA_CACHE: "false"
+        with:
+          source: .
+          files: docker-bake.hcl
+          targets: image
+          pull: false
+          set: |
+            image.output=type=oci,dest=${{ env.OCI_LAYOUT }}
+            image.platform=${{ matrix.platform }}
+
+      - name: Extract native OCI evidence
+        run: |
+          python3 - "$OCI_LAYOUT" "$EVIDENCE" "$EXPECTED_TAG" "$PLATFORM_SLUG" <<'PY'
+          import json
+          import sys
+          import tarfile
+
+          layout_path, evidence_path, expected_tag, expected_architecture = sys.argv[1:]
+          expected_ref = expected_tag.split(":", 1)[1]
+          expected_platform = ("linux", expected_architecture)
+
+          with tarfile.open(layout_path, "r:*") as layout:
+              def read_json(name):
+                  with layout.extractfile(name) as stream:
+                      return json.load(stream)
+
+              def check_size(descriptor):
+                  name = "blobs/" + descriptor["digest"].replace(":", "/")
+                  if layout.getmember(name).size != descriptor["size"]:
+                      raise SystemExit(f"size mismatch for {name}")
+
+              def image_manifests(descriptors):
+                  for descriptor in descriptors:
+                      if descriptor.get("annotations", {}).get("vnd.docker.reference.type") == "attestation-manifest":
+                          continue
+                      blob = read_json("blobs/" + descriptor["digest"].replace(":", "/"))
+                      if "manifests" in blob:
+                          yield from image_manifests(blob["manifests"])
+                      elif "config" in blob and "layers" in blob:
+                          yield descriptor, blob
+
+              index = read_json("index.json")
+              tag_descriptors = [
+                  descriptor for descriptor in index["manifests"]
+                  if descriptor.get("annotations", {}).get("org.opencontainers.image.ref.name") == expected_ref
+              ]
+              if not tag_descriptors:
+                  raise SystemExit(f"missing OCI tag reference: {expected_ref}")
+
+              selected = []
+              for descriptor, manifest in image_manifests(tag_descriptors):
+                  config_descriptor = manifest["config"]
+                  config = read_json("blobs/" + config_descriptor["digest"].replace(":", "/"))
+                  if (config["os"], config["architecture"]) == expected_platform:
+                      selected.append((descriptor, config_descriptor, manifest))
+
+              if len(selected) != 1:
+                  raise SystemExit(f"expected one {expected_architecture} manifest, found {len(selected)}")
+              descriptor, config_descriptor, manifest = selected[0]
+              for item in (descriptor, config_descriptor, *manifest["layers"]):
+                  check_size(item)
+              if not manifest["layers"]:
+                  raise SystemExit("image manifest has no layers")
+
+              with open(evidence_path, "w") as stream:
+                  json.dump({
+                      "tag": expected_tag,
+                      "platform": list(expected_platform),
+                      "manifest": descriptor,
+                      "config": config_descriptor,
+                      "layers": manifest["layers"],
+                  }, stream, separators=(",", ":"))
+          PY
+
+      - name: Upload native OCI evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: postgis-evidence-${{ matrix.version }}-${{ matrix.variant }}-${{ env.PLATFORM_SLUG }}
+          path: ${{ env.EVIDENCE }}
+          if-no-files-found: error
+          retention-days: 1
+
+  verify-build:
+    name: Verify native image evidence
+    needs: [versions, build]
+    if: ${{ !cancelled() && needs.versions.outputs.has_images == 'true' }}
+    runs-on: ubuntu-24.04
+    outputs:
+      images: ${{ steps.verify.outputs.images }}
+      has_images: ${{ steps.verify.outputs.has_images }}
+    steps:
+      - name: Download native OCI evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: postgis-evidence-*
+          path: evidence
+
+      - name: Check native platform evidence
+        id: verify
+        env:
+          IMAGES: ${{ needs.versions.outputs.images }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          import pathlib
+          import sys
+
+          def verify(image):
+              version, variant = image["version"], image["variant"]
+              expected_tag = f"postgis/postgis:{version}" + ("-alpine" if variant == "alpine" else "")
+              paths = pathlib.Path("evidence").glob(f"postgis-evidence-{version}-{variant}-*/*.json")
+              evidence = [json.loads(path.read_text()) for path in paths]
+              expected = {("linux", "amd64"), ("linux", "arm64")}
+              actual = {tuple(item["platform"]) for item in evidence}
+              if len(evidence) != 2 or actual != expected:
+                  raise ValueError(f"unexpected native platforms: {sorted(actual)}")
+              if {item["tag"] for item in evidence} != {expected_tag}:
+                  raise ValueError("native evidence has inconsistent image tags")
+              for item in evidence:
+                  if not item["manifest"].get("digest", "").startswith("sha256:"):
+                      raise ValueError("native manifest has no digest")
+                  if not item["config"].get("digest", "").startswith("sha256:"):
+                      raise ValueError("native config has no digest")
+                  if not item["layers"]:
+                      raise ValueError("native image has no layers")
+
+          verified = []
+          for image in json.loads(os.environ["IMAGES"])["include"]:
+              try:
+                  verify(image)
+              except (ValueError, KeyError, TypeError, OSError) as error:
+                  if not image["experimental"]:
+                      raise
+                  print(f"::warning::Skipping experimental {image['version']}-{image['variant']}: {error}", file=sys.stderr)
+              else:
+                  verified.append(image)
+          print("images=" + json.dumps({"include": verified}, separators=(",", ":")))
+          print("has_images=" + str(bool(verified)).lower())
+          PY
+
+  publish:
+    name: Publish ${{ matrix.version }}-${{ matrix.variant }}
+    needs: [versions, verify-build]
+    permissions:
+      contents: read
+      id-token: write
+    if: ${{ needs.verify-build.outputs.has_images == 'true' && github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/master')) }}
+    runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.verify-build.outputs.images) }}
+    env:
+      VERSION: ${{ matrix.version }}
+      VARIANT: ${{ matrix.variant }}
+      DOCKERHUB_REPOSITORY: postgis/postgis
+      LATEST_VERSION: ${{ needs.versions.outputs.latest_version }}
+      GHA_CACHE: "true"
+      CACHE_FROM_SCOPES: postgis-${{ matrix.version }}-${{ matrix.variant }}-multi,postgis-${{ matrix.version }}-${{ matrix.variant }}-linux-amd64,postgis-${{ matrix.version }}-${{ matrix.variant }}-linux-arm64,postgis-master-deps-linux-amd64,postgis-master-deps-linux-arm64
+      CACHE_TO_SCOPE: postgis-${{ matrix.version }}-${{ matrix.variant }}-multi
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: github.event_name == 'schedule'
+        name: Download generated Dockerfile updates
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dockerfiles-update
+
+      - if: github.event_name == 'schedule'
+        name: Apply generated Dockerfile updates
+        run: |
+          patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
+          success="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.success"
+          if [[ "$(cat "$success")" == "true" && -s "$patch" ]]; then
+            git apply "$patch"
+          fi
+
+      - name: Restore cached BuildKit image
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/buildkit.tar
+          key: docker-buildkit-buildx-stable-1-linux/amd64
+
+      - name: Load cached BuildKit image
+        run: docker load --input /tmp/buildkit.tar
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+        with:
+          driver-opts: image=moby/buildkit:buildx-stable-1
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          username: postgis
+        env:
+          DOCKERHUB_OIDC_CONNECTIONID: ${{ vars.DOCKERHUB_OIDC_CONNECTIONID }}
+
+      - id: bake
+        name: Build and push multi-platform image
+        continue-on-error: true
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        with:
+          source: .
+          files: docker-bake.hcl
+          targets: image
+          push: true
+          pull: true
+          provenance: mode=max
+          sbom: true
+
+      - if: steps.bake.outcome == 'failure'
+        name: Retry multi-platform image push
+        run: |
+          for attempt in 1 2 3; do
+            if docker buildx bake --allow fs=* --file docker-bake.hcl --pull --push --provenance=mode=max --sbom=true image; then
+              exit 0
+            fi
+            echo "Bake push failed (attempt ${attempt}/3); retrying" >&2
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+      - name: Update Docker Hub description
+        if: ${{ matrix.version == env.LATEST_VERSION && matrix.variant == 'default' }}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+        run: |
+          for attempt in 1 2 3; do
+            if docker run --rm -v "$GITHUB_WORKSPACE":/workspace \
+              -e DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME" \
+              -e DOCKERHUB_PASSWORD="$DOCKERHUB_ACCESS_TOKEN" \
+              -e DOCKERHUB_REPOSITORY="$DOCKERHUB_REPOSITORY" \
+              -e README_FILEPATH=/workspace/README.md \
+              docker.io/peterevans/dockerhub-description:5; then
+              exit 0
+            fi
+            echo "Docker Hub description update failed (attempt ${attempt}/3); retrying" >&2
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+  verify-published:
+    name: Verify published ${{ matrix.version }}-${{ matrix.variant }}
+    needs: [verify-build, publish]
+    if: ${{ !cancelled() && needs.verify-build.outputs.has_images == 'true' && (needs.publish.result == 'success' || needs.publish.result == 'failure') }}
+    runs-on: ubuntu-24.04
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.verify-build.outputs.images) }}
+    env:
+      EXPECTED_TAG: postgis/postgis:${{ matrix.version }}${{ matrix.variant == 'alpine' && '-alpine' || '' }}
+    steps:
+      - name: Verify Docker Hub manifest
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if raw="$(docker buildx imagetools inspect --raw "$EXPECTED_TAG" 2>/dev/null)" && [[ -n "$raw" ]]; then
+              RAW_JSON="$raw" python3 - "$EXPECTED_TAG" <<'PY'
+          import json
+          import os
+          import sys
+
+          expected_tag = sys.argv[1]
+          index = json.loads(os.environ["RAW_JSON"])
+          expected = {("linux", "amd64"), ("linux", "arm64")}
+          manifests = [
+              descriptor for descriptor in index.get("manifests", [])
+              if descriptor.get("annotations", {}).get("vnd.docker.reference.type") != "attestation-manifest"
+          ]
+          platforms = [
+              (descriptor.get("platform", {}).get("os"), descriptor.get("platform", {}).get("architecture"))
+              for descriptor in manifests
+          ]
+          if len(manifests) != 2 or set(platforms) != expected:
+              raise SystemExit(f"unexpected published platforms for {expected_tag}: {platforms}")
+          for descriptor in manifests:
+              if not descriptor.get("digest", "").startswith("sha256:") or descriptor.get("size", 0) <= 0:
+                  raise SystemExit("published manifest descriptor is incomplete")
+          print(f"{expected_tag}: linux/amd64, linux/arm64")
+          PY
+              exit 0
+            fi
+            echo "Docker Hub manifest not ready (attempt ${attempt}/5)" >&2
+            sleep $((attempt * 10))
+          done
+          exit 1

@@ -1,3 +1,5 @@
-Dockerfile
-.git
-_*
+# Only the helper scripts are copied from this build context.
+**
+
+!initdb-postgis.sh
+!update-postgis.sh

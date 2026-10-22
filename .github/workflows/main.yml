@@ -1,10 +1,7 @@
 name: Docker PostGIS CI
 
 on:
-  push:
-  pull_request:
-  schedule:
-    - cron: '15 5 * * 1'
+  workflow_dispatch:
 
 defaults:
   run:
@@ -54,19 +51,23 @@ jobs:
             runner-platform: 'ubuntu-24.04-arm'
           - postgres: 19rc1
             postgis: '3.7.0rc3'
+            version: 19rc1-3.7
             variant: alpine
             runner-platform: 'ubuntu-24.04'
           - postgres: 19rc1
             postgis: '3.7.0rc3'
+            version: 19rc1-3.7
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
 
           - postgres: 18
             postgis: '3.7.0rc3'
+            version: 18-3.7
             variant: alpine
             runner-platform: 'ubuntu-24.04'
           - postgres: 18
             postgis: '3.7.0rc3'
+            version: 18-3.7
             variant: alpine
             runner-platform: 'ubuntu-24.04-arm'
 
@@ -80,7 +81,7 @@ jobs:
           || contains(format('{0}-{1}', matrix.postgres, matrix.postgis), 'beta')
           || contains(format('{0}-{1}', matrix.postgres, matrix.postgis), 'rc') }}
     env:
-      VERSION: ${{ matrix.postgres }}-${{ matrix.postgis }}
+      VERSION: ${{ matrix.version || format('{0}-{1}', matrix.postgres, matrix.postgis) }}
       VARIANT: ${{ matrix.variant }}
       DOCKER_APT_PKG_VER: '5:29.8.2-1~ubuntu.24.04~noble'
 
@@ -93,7 +94,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
-        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-connrefused https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
         sudo chmod a+r /etc/apt/keyrings/docker.asc
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
@@ -130,13 +131,13 @@ jobs:
         docker images --tree
 
     - name: Checkout source
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
       run: make test
 
     - name: Login to dockerhub
-      uses: docker/login-action@v4
+      uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
       if: ${{ (github.repository == 'postgis/docker-postgis') && (github.ref == 'refs/heads/master') && (github.event_name != 'pull_request') }}
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
