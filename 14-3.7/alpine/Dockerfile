@@ -7,11 +7,11 @@ FROM ${BASE_IMAGE}
 ARG NPROC=
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.6.4 spatial database extension with PostgreSQL 14 Alpine" \
+      org.opencontainers.image.description="PostGIS 3.7.0 spatial database extension with PostgreSQL 14 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION=3.6.4
-ENV POSTGIS_SHA256=4f80e1a4d227f088ae818f79180debd5894c075615823e0f556f73479cf1f200
+ENV POSTGIS_VERSION=3.7.0
+ENV POSTGIS_SHA256=306d68a115b88c59d9ffbd134b28fd1b0eccb7b0dabcbb5df2dc0b009d9de848
 
 RUN set -eux \
     && apk add --no-cache --virtual .fetch-deps \
@@ -89,7 +89,7 @@ RUN set -eux \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     # Optional extensions: create them only if they are available.
-    # Since PostGIS 3.7.0rc, some builds may not include them.
+    # Since PostGIS 3.7, some builds may not include them.
     # PostGIS 3.6.x still includes them.
     # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
     && su postgres -c "psql -v ON_ERROR_STOP=1 -c \" \
