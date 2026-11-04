@@ -26,7 +26,7 @@ Starting with PostGIS 3.7, `address_standardizer` and `postgis_tiger_geocoder` a
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-## Versions (2026-10-31)
+## Versions (2026-11-05)
 
 Supported architecture: `amd64` (x86-64)
 

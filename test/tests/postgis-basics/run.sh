@@ -20,6 +20,7 @@ psql() {
 		--host postgis \
 		--username "$POSTGRES_USER" \
 		--dbname "$POSTGRES_DB" \
+		-v ON_ERROR_STOP=1 \
 		--quiet --no-align --tuples-only \
 		"$@"
 }

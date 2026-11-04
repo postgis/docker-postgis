@@ -114,7 +114,7 @@ RUN set -ex \
 # CGAL and SFCGAL.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=653712bb5c1507b24a65677c931eda50c1f9b726
+ENV CGAL_GIT_HASH=ffd0b3a7d7dcc53ed260d513df01a9f7b7c2ae33
 ENV SFCGAL_GIT_HASH=ac4942f2ef2ea201533586e4efe47b04afc64f77
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -149,7 +149,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # PROJ.
-ENV PROJ_GIT_HASH=5fa31c29f0a806568ed7bc76c1a557604db4a804
+ENV PROJ_GIT_HASH=294069aa3e068036e30c6d0346949084db5d48d3
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -182,7 +182,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # GEOS.
-ENV GEOS_GIT_HASH=2289bad7aac673a1bffcbbdd96944fcc57405a9c
+ENV GEOS_GIT_HASH=8bace6161f6593643e45875d7972247699357720
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -198,7 +198,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # GDAL.
-ENV GDAL_GIT_HASH=5d190fda3d58bee3e39176693b1deed7ec6238d4
+ENV GDAL_GIT_HASH=fa1fc3c77e75787c614e12a2ba5ac366db833e1f
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -345,11 +345,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=653712bb5c1507b24a65677c931eda50c1f9b726
+ENV CGAL_GIT_HASH=ffd0b3a7d7dcc53ed260d513df01a9f7b7c2ae33
 ENV SFCGAL_GIT_HASH=ac4942f2ef2ea201533586e4efe47b04afc64f77
-ENV PROJ_GIT_HASH=5fa31c29f0a806568ed7bc76c1a557604db4a804
-ENV GEOS_GIT_HASH=2289bad7aac673a1bffcbbdd96944fcc57405a9c
-ENV GDAL_GIT_HASH=5d190fda3d58bee3e39176693b1deed7ec6238d4
+ENV PROJ_GIT_HASH=294069aa3e068036e30c6d0346949084db5d48d3
+ENV GEOS_GIT_HASH=8bace6161f6593643e45875d7972247699357720
+ENV GDAL_GIT_HASH=fa1fc3c77e75787c614e12a2ba5ac366db833e1f
 
 # Minimal command-line smoke test (fail fast).
 RUN set -ex \
@@ -368,7 +368,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # Install PostGIS and companion development extensions.
-ENV POSTGIS_GIT_HASH=358ee965988ba72ecd47601205c99b9e91cc037e
+ENV POSTGIS_GIT_HASH=625d3e52118717383edff7b3b94026e706ae4e98
 ENV H3_PG_GIT_HASH=f960a574eab6aebd186dedff6204711c21742f12
 ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
 
