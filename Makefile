@@ -2,7 +2,7 @@
 # When processing the rules for tagging and pushing container images with the
 # "latest" tag, the following variable will be the version that is considered
 # to be the latest.
-LATEST_VERSION=18-3.6
+LATEST_VERSION=18-3.7
 
 # The following flags are set based on VERSION and VARIANT environment variables
 # that may have been specified, and are used by rules to determine which
