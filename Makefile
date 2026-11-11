@@ -116,6 +116,7 @@ $(foreach version,$(VERSIONS),$(eval $(call test-version,$(version))))
 
 tag-latest: $(BUILD_LATEST_DEP)
 	$(DOCKER) image tag $(REPO_NAME)/$(IMAGE_NAME):$(LATEST_VERSION) $(REPO_NAME)/$(IMAGE_NAME):latest
+	$(DOCKER) image tag $(REPO_NAME)/$(IMAGE_NAME):$(LATEST_VERSION)-alpine $(REPO_NAME)/$(IMAGE_NAME):alpine
 
 
 ### RULES FOR PUSHING ###
@@ -137,6 +138,7 @@ $(foreach version,$(VERSIONS),$(eval $(call push-version,$(version))))
 
 push-latest: tag-latest $(PUSH_LATEST_DEP)
 	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):latest
+	$(DOCKER) image push $(REPO_NAME)/$(IMAGE_NAME):alpine
 	@$(DOCKER) run -v "$(PWD)":/workspace \
                       -e DOCKERHUB_USERNAME='$(DOCKERHUB_USERNAME)' \
                       -e DOCKERHUB_PASSWORD='$(DOCKERHUB_ACCESS_TOKEN)' \
