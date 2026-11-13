@@ -91,6 +91,23 @@ response=$(echo $'SELECT zip FROM parse_address(\'1 Devonshire Place, Boston, MA
 [ "$(echo 'SELECT count(*) > 0 FROM us_gaz;' | psql)" = t ]
 echo "address_standardizer extensions installed and work!"
 
+# Invalid rule types must be rejected instead of corrupting memory.
+psql <<-'EOSQL'
+	CREATE TEMP TABLE bad_rule (id serial, rule text);
+	INSERT INTO bad_rule (rule) VALUES ('1 -1 5 -1 5 0');
+	DO $$
+	DECLARE rejected boolean := false;
+	BEGIN
+		BEGIN
+			PERFORM standardize_address('us_lex', 'us_gaz', 'bad_rule', '1 Main St', 'Boston, MA');
+		EXCEPTION WHEN OTHERS THEN
+			rejected := true;
+		END;
+		IF NOT rejected THEN RAISE EXCEPTION 'invalid rule type was accepted'; END IF;
+	END
+	$$;
+EOSQL
+
 [ "$(echo "SELECT levenshtein('kitten', 'sitting')" | psql)" = 3 ]
 [ "$(echo 'SELECT ST_Width(ST_MakeEmptyRaster(2, 3, 0, 0, 1, -1, 0, 0, 0))' | psql)" = 2 ]
 [ "$(echo 'SELECT postgis_sfcgal_version() IS NOT NULL' | psql)" = t ]
