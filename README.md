@@ -49,7 +49,7 @@ Recommended versions for new users are:
 
 ### Debian based (recommended)
 
-* Debian images use Trixie and packages from Debian and the PostgreSQL Apt Repository (PGDG).
+* Debian images use Trixie and packages from Debian and the PostgreSQL Apt Repository (PGDG). Address Standardizer is built from source until the PGDG package includes the security fixes.
 * If a PostGIS package is unavailable, the image builds PostGIS from source.
 * Trixie: GEOS 3.13, GDAL 3.10, PROJ 9.6, SFCGAL2 2.0.
 
@@ -85,7 +85,7 @@ Recommended versions for new users are:
 
 * Alpha, beta, rc, and `master` tags are test images. Their dependencies update during scheduled rebuilds.
 * PostgreSQL prerelease images build PostGIS from source. Debian source builds pin development headers to the base image's exact PostgreSQL package version.
-* Source-built PostGIS 3.7 images use [`address_standardizer`](https://github.com/postgis/address_standardizer) `v3.7.0`. Tiger 2025.2 is included on PostgreSQL 16 or newer.
+* Images build [`address_standardizer`](https://github.com/postgis/address_standardizer) from a commit that fixes CVE-2026-73514 and CVE-2026-90775. Tiger 2025.2 is included on PostgreSQL 16 or newer.
 * Debian uses H3 packages or the latest stable [`h3-pg`](https://github.com/postgis/h3-pg) release for development builds. H3 is optional on Alpine.
 * Debian `master` images use stable CGAL, SFCGAL, PROJ, GEOS, GDAL, and companion extensions. Only PostGIS comes from its development branch.
 

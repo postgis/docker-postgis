@@ -9,7 +9,7 @@ ARG POSTGIS_VERSION=3.7.0
 ARG POSTGIS_SOURCE_VERSION=3.7.0
 ARG POSTGIS_SHA256=306d68a115b88c59d9ffbd134b28fd1b0eccb7b0dabcbb5df2dc0b009d9de848
 ARG POSTGIS_MINOR=7
-ARG ADDRESS_STANDARDIZER_GIT_HASH=fa11ff53eb49b863d9ffff37f6afd5ff9299c581
+ARG ADDRESS_STANDARDIZER_GIT_HASH=e987949e0fccff6a0e7a6d3f86814d5c7a01f481
 ARG TIGER_GEOCODER_VERSION=2025.2
 ARG TIGER_GEOCODER_SHA256=c33cfbfb40785db8754a36be66060e8d023773e7e1be8fb8a622bb3c48db9f54
 
@@ -63,7 +63,12 @@ RUN set -eux \
         && cd address_standardizer \
         && git checkout "$ADDRESS_STANDARDIZER_GIT_HASH" \
         && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no \
-        && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no install; \
+        && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no install \
+    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "e987949e0fccff6a0e7a6d3f86814d5c7a01f481" ]; then \
+        for ext in address_standardizer address_standardizer_data_us; do \
+            ln -s "${ext}--ANY--3.7.1dev.sql" "$(pg_config --sharedir)/extension/${ext}--3.7--3.7.1dev.sql"; \
+        done; \
+    fi; \
     fi \
     && if [ "$POSTGIS_MINOR" -ge 7 ] && [ "$PG_MAJOR" -ge 16 ]; then \
         cd /usr/src \

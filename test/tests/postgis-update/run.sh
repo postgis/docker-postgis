@@ -44,9 +44,20 @@ while ! echo 'SELECT 1' | psql &> /dev/null; do
 	sleep 2
 done
 
+# Exercise the security-fix upgrade when the old package scripts are present.
+old_address_available="$(echo "SELECT count(*) = 2 FROM pg_available_extension_versions WHERE name IN ('address_standardizer', 'address_standardizer_data_us') AND version = '3.7'" | psql)"
+if [ "$old_address_available" = t ]; then
+	echo "CREATE EXTENSION IF NOT EXISTS address_standardizer VERSION '3.7'; CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us VERSION '3.7'; INSERT INTO us_lex (seq, word, stdword, token) VALUES (1, 'CUSTOMTEST', 'CUSTOMTEST', 1);" | psql >/dev/null
+fi
+
 # Run twice: update-postgis.sh must be idempotent.
 docker exec "$cid" update-postgis.sh
 docker exec "$cid" update-postgis.sh
+
+if [ "$old_address_available" = t ]; then
+	[ "$(echo "SELECT count(*) = 2 FROM pg_available_extensions WHERE name IN ('address_standardizer', 'address_standardizer_data_us') AND installed_version = default_version" | psql)" = t ]
+	[ "$(echo "SELECT count(*) = 1 FROM us_lex WHERE word = 'CUSTOMTEST' AND is_custom" | psql)" = t ]
+fi
 
 ## test postgis extensions are at the version provided by the image
 outdated="$(
