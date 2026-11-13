@@ -15,6 +15,11 @@ import textwrap
 
 root = Path(__file__).resolve().parents[1]
 workflow = (root / ".github/workflows/docker.yml").read_text()
+publish = workflow.split("\n  publish:\n", 1)[1].split("\n  verify-published:\n", 1)[0]
+assert "github.repository == 'postgis/docker-postgis'" in publish
+assert "github.ref == 'refs/heads/master'" in publish
+assert "github.event_name == 'workflow_dispatch' && inputs.mode == 'release'" in publish
+assert "needs.verify-build.outputs.has_images == 'true'" in publish
 start = workflow.index("          python3 - <<'PY' >> \"$GITHUB_OUTPUT\"\n")
 script = workflow[start:].split("\n          PY\n", 1)[0].split("\n", 1)[1]
 script = textwrap.dedent(script)
@@ -44,6 +49,17 @@ assert push["latest_version"] == "18-3.7"
 assert targets and all(version.endswith("-master") for version, _ in targets)
 
 dispatch, targets = select("workflow_dispatch")
+_, one_target = select("workflow_dispatch", DISPATCH_IMAGE="18-3.7-alpine")
+assert one_target == {("18-3.7", "alpine")}
+invalid = subprocess.run([sys.executable, "-c", script], cwd=root, capture_output=True,
+                         env={**os.environ, "EVENT_NAME": "workflow_dispatch", "REF": "refs/heads/master", "DISPATCH_IMAGE": "missing"})
+assert invalid.returncode != 0
+failed_update = subprocess.run([sys.executable, "-c", script], cwd=root, capture_output=True,
+                               env={**os.environ, "EVENT_NAME": "workflow_dispatch", "REF": "refs/heads/master",
+                                    "DISPATCH_MODE": "release", "UPDATE_SCRIPT_OUTCOME": "failure"})
+assert failed_update.returncode != 0
+_, release_target = select("workflow_dispatch", DISPATCH_MODE="release", UPDATE_SCRIPT_OUTCOME="success", DISPATCH_IMAGE="18-3.7")
+assert release_target == {("18-3.7", "default")}
 assert {("19rc2-3.7", "default"), ("19rc2-3.7", "alpine")} <= targets
 experimental = {(item["version"], item["variant"]): item["experimental"] for item in json.loads(dispatch["images"])["include"]}
 assert not experimental["18-3.7", "default"] and not experimental["18-3.7", "alpine"]

@@ -8,6 +8,16 @@ on:
   schedule:
     - cron: '15 5 * * 1'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Test images or publish them after native tests pass
+        type: choice
+        options: [test, release]
+        default: test
+      image:
+        description: Optional image tag, such as 18-3.7 or 18-3.7-alpine
+        type: string
+        required: false
 
 concurrency:
   group: docker-postgis-${{ github.workflow }}-${{ github.ref }}
@@ -46,9 +56,9 @@ jobs:
           nice -n 10 python3 test/image-contracts.py
           nice -n 10 python3 test/workflow-selection.py
           nice -n 10 python3 test/oci-evidence.py
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         id: update
-        name: Regenerate Dockerfiles for scheduled selection
+        name: Regenerate Dockerfile inputs
         continue-on-error: true
         run: |
           patch="$RUNNER_TEMP/dockerfiles-update.patch"
@@ -63,7 +73,7 @@ jobs:
           git add -N .
           git diff --binary HEAD -- > "$patch"
           printf 'true\n' > "$success"
-      - if: always() && github.event_name == 'schedule'
+      - if: ${{ always() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release')) }}
         name: Share generated Dockerfile updates
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -80,6 +90,8 @@ jobs:
           REF: ${{ github.ref }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           UPDATE_SCRIPT_OUTCOME: ${{ steps.update.outcome }}
+          DISPATCH_IMAGE: ${{ inputs.image }}
+          DISPATCH_MODE: ${{ inputs.mode }}
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json
@@ -324,7 +336,16 @@ jobs:
                       print(f"WARNING: cannot compare Docker Hub tag dates ({error}); rebuilding all eligible images", file=sys.stderr)
                       selected.update(all_targets)
           elif event_name == "workflow_dispatch":
-              selected.update(all_targets)
+              if os.environ.get("DISPATCH_MODE") == "release" and os.environ.get("UPDATE_SCRIPT_OUTCOME") != "success":
+                  raise SystemExit("update.sh failed; manual release stopped")
+              image = os.environ.get("DISPATCH_IMAGE", "").strip()
+              if image:
+                  selected.update((version, variant) for version, variant in all_targets
+                                  if version + ("-alpine" if variant == "alpine" else "") == image)
+                  if not selected:
+                      raise SystemExit(f"unknown image tag: {image}")
+              else:
+                  selected.update(all_targets)
           elif event_name == "pull_request":
               base_sha = os.environ.get("PR_BASE_SHA", "")
               if not base_sha:
@@ -430,14 +451,14 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         name: Download generated Dockerfile updates
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/dockerfiles-update
 
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         name: Apply generated Dockerfile updates
         run: |
           patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
@@ -497,14 +518,14 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         name: Download generated Dockerfile updates
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/dockerfiles-update
 
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         name: Apply generated Dockerfile updates
         run: |
           patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
@@ -589,7 +610,7 @@ jobs:
           retention-days: 1
 
       - name: Upload tested OCI image
-        if: ${{ github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/master')) }}
+        if: ${{ github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.ref == 'refs/heads/master' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release')))) }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: postgis-image-${{ matrix.version }}-${{ matrix.variant }}-${{ env.PLATFORM_SLUG }}
@@ -665,7 +686,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: ${{ needs.verify-build.outputs.has_images == 'true' && github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/master')) }}
+    if: ${{ needs.verify-build.outputs.has_images == 'true' && github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.ref == 'refs/heads/master' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release')))) }}
     runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -680,14 +701,14 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         name: Download generated Dockerfile updates
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: scheduled-update-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/dockerfiles-update
 
-      - if: github.event_name == 'schedule'
+      - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         name: Apply generated Dockerfile updates
         run: |
           patch="$RUNNER_TEMP/dockerfiles-update/dockerfiles-update.patch"
