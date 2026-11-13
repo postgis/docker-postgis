@@ -73,6 +73,7 @@ DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:5
 GIT=git
 OFFIMG_LOCAL_CLONE=$(HOME)/official-images
 OFFIMG_REPO_URL=https://github.com/docker-library/official-images.git
+OFFIMG_REV=039b12a09e3e919d20ada5fe2791e9fad26b6780
 
 
 build: copy-scripts $(foreach version,$(VERSIONS),build-$(version))
@@ -156,11 +157,13 @@ $(foreach version,$(VERSIONS),$(eval $(call build-version,$(version))))
 test-prepare:
 ifeq ("$(wildcard $(OFFIMG_LOCAL_CLONE))","")
 	@for attempt in 1 2 3; do \
-		if $(GIT) -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet --depth 1 $(OFFIMG_REPO_URL) $(OFFIMG_LOCAL_CLONE); then \
+		if $(GIT) init --quiet "$(OFFIMG_LOCAL_CLONE)" && \
+		   $(GIT) -C "$(OFFIMG_LOCAL_CLONE)" -c http.maxRetries=5 -c http.retryDelay=2 fetch --quiet --depth 1 $(OFFIMG_REPO_URL) $(OFFIMG_REV) && \
+		   $(GIT) -C "$(OFFIMG_LOCAL_CLONE)" checkout --quiet --detach FETCH_HEAD; then \
 			exit 0; \
 		fi; \
 		rm -rf "$(OFFIMG_LOCAL_CLONE)"; \
-		echo "official-images clone failed (attempt $$attempt/3); retrying" >&2; \
+		echo "official-images checkout failed (attempt $$attempt/3); retrying" >&2; \
 		sleep $$((attempt * 5)); \
 	done; \
 	exit 1

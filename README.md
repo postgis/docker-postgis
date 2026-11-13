@@ -308,6 +308,11 @@ This Docker-PostGIS project [is part of the PostGIS group](https://postgis.net/d
 * After making changes to the templates, please run the `./update.sh` script.
 * The `README.md` must be written in plain and platform-compatible Markdown that renders correctly on both GitHub and [Docker Hub](https://hub.docker.com/r/postgis/postgis).
 
+### Release security settings
+
+- Protect `master` with a branch ruleset that requires code owner approval. Assign maintainers in `.github/CODEOWNERS` to `CODEOWNERS`, the workflows, CI scripts, Dockerfiles, templates, `Makefile`, and `update.sh`. [GitHub ruleset options](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
+- Enable **Require actions to be pinned to a full-length commit SHA** in the repository's Actions settings. Review Dependabot changes and check the tools and downloads that each action uses. Review changes to the Buildx version and helper image digests in `.github/workflows/docker.yml` and to the smoke test revision in `Makefile`. [GitHub Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
+
 ## Code of Conduct
 
 Link to [the code of conduct](https://postgis.net/community/conduct/)
