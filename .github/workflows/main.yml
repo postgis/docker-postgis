@@ -115,6 +115,16 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v7
 
+    - name: Check base image platform for ${{ env.VERSION }} ${{ env.VARIANT }}
+      # Docker silently falls back to a "compatible" platform (e.g. linux/arm/v7 on an arm64 host)
+      # when the base image has no manifest for the native platform. Fail early instead.
+      run: |
+        if [[ "$VARIANT" == "alpine" ]]; then
+          .github/scripts/check-base-image-platform.sh "$VERSION/alpine/Dockerfile"
+        else
+          .github/scripts/check-base-image-platform.sh "$VERSION/Dockerfile"
+        fi
+
     - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
       run: make test
 
