@@ -77,6 +77,48 @@ OFFIMG_REPO_URL=https://github.com/docker-library/official-images.git
 
 build: copy-scripts $(foreach version,$(VERSIONS),build-$(version))
 
+# Build one tag with: make image 18 3.7 alpine (omit the variant for Debian).
+# Append multi to export both platforms as a local OCI archive.
+ifneq ($(filter image,$(MAKECMDGOALS)),)
+  IMAGE_GOALS := $(filter-out image,$(MAKECMDGOALS))
+  IMAGE_MULTI := $(filter multi,$(lastword $(IMAGE_GOALS)))
+  ifneq ($(IMAGE_MULTI),)
+    IMAGE_GOALS := $(filter-out multi,$(IMAGE_GOALS))
+  endif
+  ifneq ($(words $(IMAGE_GOALS)),2)
+    ifneq ($(words $(IMAGE_GOALS)),3)
+      $(error usage: make image <postgres-version> <postgis-version> [default|debian|alpine] [multi])
+    endif
+  endif
+  IMAGE_VERSION := $(word 1,$(IMAGE_GOALS))-$(word 2,$(IMAGE_GOALS))
+  IMAGE_VARIANT := $(if $(word 3,$(IMAGE_GOALS)),$(word 3,$(IMAGE_GOALS)),default)
+  ifneq ($(filter default debian alpine,$(IMAGE_VARIANT)),$(IMAGE_VARIANT))
+    $(error image variant must be default, debian, or alpine)
+  endif
+  ifeq ($(IMAGE_VARIANT),debian)
+    IMAGE_VARIANT := default
+  endif
+  ifeq ($(wildcard $(IMAGE_VERSION)/Dockerfile),)
+    $(error no Dockerfile for $(IMAGE_VERSION))
+  endif
+  ifeq ($(IMAGE_VARIANT),alpine)
+    ifeq ($(wildcard $(IMAGE_VERSION)/alpine/Dockerfile),)
+      $(error no Alpine Dockerfile for $(IMAGE_VERSION))
+    endif
+  endif
+  IMAGE_SUFFIX := $(if $(filter alpine,$(IMAGE_VARIANT)),-alpine,)
+  .PHONY: $(IMAGE_GOALS) $(IMAGE_MULTI)
+  $(IMAGE_GOALS) $(IMAGE_MULTI):
+	@:
+endif
+
+image:
+ifneq ($(IMAGE_MULTI),)
+	VERSION=$(IMAGE_VERSION) VARIANT=$(IMAGE_VARIANT) $(DOCKER) buildx bake --file docker-bake.hcl --pull --set image.output=type=oci,dest=postgis-$(IMAGE_VERSION)$(IMAGE_SUFFIX).oci.tar image
+else
+	+$(MAKE) VERSION=$(IMAGE_VERSION) VARIANT=$(IMAGE_VARIANT) build-$(IMAGE_VERSION)
+endif
+
 copy-scripts:
 	@for directory in $(COPY_SCRIPT_DIRS); do \
 		if [ -d "$$directory" ]; then \
@@ -173,7 +215,7 @@ push-latest: tag-latest $(PUSH_LATEST_DEP)
                       -e README_FILEPATH='/workspace/README.md' $(DOCKERHUB_DESC_IMG)
 
 
-.PHONY: build all copy-scripts update test-prepare test tag-latest push push-latest \
+.PHONY: build image all copy-scripts update test-prepare test tag-latest push push-latest \
         $(foreach version,$(VERSIONS),build-$(version)) \
         $(foreach version,$(VERSIONS),test-$(version)) \
         $(foreach version,$(VERSIONS),push-$(version))
