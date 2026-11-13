@@ -113,6 +113,13 @@ RUN set -eux \
         && git checkout ${ADDRESS_STANDARDIZER_GIT_HASH} \
         && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no \
         && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no install \
+    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "ba9a26a013f23908657bb26574ae436b11d4b811" ]; then \
+        for ext in address_standardizer address_standardizer_data_us; do \
+            for from_version in 3.7 3.7.1dev; do \
+                ln -s "${ext}--ANY--4.0.0dev.sql" "$(pg_config --sharedir)/extension/${ext}--${from_version}--4.0.0dev.sql"; \
+            done; \
+        done; \
+    fi \
         && cd /usr/src/postgis; \
     fi \
     && if [ "$postgis_minor" -ge 7 ] && [ "$PG_MAJOR" -ge 16 ]; then \

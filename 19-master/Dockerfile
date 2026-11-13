@@ -378,7 +378,7 @@ RUN set -ex \
 # Install PostGIS and stable companion extensions.
 ENV POSTGIS_GIT_HASH=58fb58832c49c47cf5834f71eaec7e5dea49631f
 ENV H3_PG_GIT_HASH=ed9a09c834787abb5952318bccef1c4fee119f1d
-ENV ADDRESS_STANDARDIZER_GIT_HASH=fa11ff53eb49b863d9ffff37f6afd5ff9299c581
+ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
 ENV TIGER_GEOCODER_VERSION=2025.2
 ENV TIGER_GEOCODER_SHA256=c33cfbfb40785db8754a36be66060e8d023773e7e1be8fb8a622bb3c48db9f54
 
@@ -400,6 +400,7 @@ RUN set -ex \
       libcunit1-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
+      libicu-dev \
       libjson-c-dev \
       libmpfr-dev \
       libpcre2-dev \
@@ -443,7 +444,7 @@ RUN set -ex \
         find /usr/src/h3-pg/build \( -path '*/test/log/*' -o -name 'regression.diffs' -o -name 'regression.out' -o -name 'regression.log' -o -name 'LastTest.log' \) -type f -print -exec sh -c 'echo "===== $1 ====="; cat "$1"' sh {} \; ; \
         exit 1; \
     fi \
-    # address_standardizer from the latest stable release.
+    # address_standardizer from the selected release or security fix.
     && cd /usr/src/ \
     && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/postgis/address_standardizer.git \
     && cd address_standardizer \
@@ -451,6 +452,13 @@ RUN set -ex \
     && git log -1 > /_pgis_address_standardizer_last_commit.txt \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no install \
+    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "ba9a26a013f23908657bb26574ae436b11d4b811" ]; then \
+        for ext in address_standardizer address_standardizer_data_us; do \
+            for from_version in 3.7 3.7.1dev; do \
+                ln -s "${ext}--ANY--4.0.0dev.sql" "$(pg_config --sharedir)/extension/${ext}--${from_version}--4.0.0dev.sql"; \
+            done; \
+        done; \
+    fi \
     # Tiger Geocoder 2025.2 is standalone from PostGIS 3.7 onward.
     && cd /usr/src \
     && curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-connrefused "https://download.osgeo.org/postgis/source/postgis_tiger_geocoder/postgis_tiger_geocoder-${TIGER_GEOCODER_VERSION}.tar.gz" -o postgis_tiger_geocoder.tar.gz \
@@ -526,6 +534,7 @@ RUN set -ex \
       libboost-all-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
+      libicu-dev \
       libjson-c-dev \
       libmpfr-dev \
       libpcre2-dev \

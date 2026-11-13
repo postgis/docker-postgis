@@ -14,6 +14,7 @@ assert example.rstrip().endswith("USER postgres")
 
 for dockerfile in [*root.glob("*/Dockerfile"), *root.glob("*/alpine/Dockerfile")]:
     content = dockerfile.read_text()
+    assert not re.search(r"%%[A-Z0-9_]+%%", content), f"Unresolved placeholder in {dockerfile.relative_to(root)}"
     kind = "alpine" if dockerfile.parent.name == "alpine" else (
         "master" if dockerfile.parent.name.endswith("-master") else (
             "source" if "AS postgis-build" in content else ""
