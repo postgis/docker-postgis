@@ -6,7 +6,7 @@ on:
       - master
   pull_request:
   schedule:
-    - cron: '15 5 * * 1'
+    - cron: '15 5 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -20,7 +20,7 @@ on:
         required: false
 
 concurrency:
-  group: docker-postgis-${{ github.workflow }}-${{ github.ref }}
+  group: docker-postgis-${{ github.workflow }}-${{ github.event_name == 'schedule' && github.run_id || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
@@ -29,15 +29,19 @@ defaults:
 
 permissions:
   contents: read
+  actions: read
 
 # Rebuild tags when their inputs change or their PostgreSQL base is newer.
-# If update.sh or Docker Hub metadata fails, rebuild all eligible tags.
+# Stop scheduled releases when update or registry metadata is unavailable.
 # Skip changes to blank lines, comments, and documentation.
 # Build and test each architecture on a matching runner, then check both results.
 jobs:
   versions:
     name: Discover Docker image versions
     runs-on: ubuntu-24.04
+    concurrency:
+      group: postgis-discovery-${{ github.event_name == 'schedule' && github.ref || github.run_id }}
+      cancel-in-progress: false
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       images: ${{ steps.matrix.outputs.images }}
@@ -56,6 +60,14 @@ jobs:
           nice -n 10 python3 test/image-contracts.py
           nice -n 10 python3 test/workflow-selection.py
           nice -n 10 python3 test/oci-evidence.py
+          nice -n 10 python3 test/update-policy.py
+      - name: Restore update candidate state
+        if: github.event_name == 'schedule'
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/postgis-update-state.json
+          key: postgis-update-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: postgis-update-state-
       - if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
         id: update
         name: Regenerate Dockerfile inputs
@@ -82,7 +94,7 @@ jobs:
             ${{ runner.temp }}/dockerfiles-update.patch
             ${{ runner.temp }}/dockerfiles-update.success
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 30
       - id: matrix
         name: Select affected Docker images
         env:
@@ -92,6 +104,9 @@ jobs:
           UPDATE_SCRIPT_OUTCOME: ${{ steps.update.outcome }}
           DISPATCH_IMAGE: ${{ inputs.image }}
           DISPATCH_MODE: ${{ inputs.mode }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json
@@ -315,8 +330,7 @@ jobs:
                       add_target(version, "alpine")
           elif event_name == "schedule":
               if os.environ.get("UPDATE_SCRIPT_OUTCOME") != "success":
-                  print("WARNING: update.sh failed; rebuilding all eligible images", file=sys.stderr)
-                  selected.update(all_targets)
+                  raise SystemExit("update.sh failed; no release candidates selected")
               else:
                   generated_changes = subprocess.check_output(
                       ["git", "diff", "--name-only", "--no-renames", "HEAD"],
@@ -333,8 +347,7 @@ jobs:
                   try:
                       selected.update(stale_targets_from_base_updates(all_targets))
                   except Exception as error:
-                      print(f"WARNING: cannot compare Docker Hub tag dates ({error}); rebuilding all eligible images", file=sys.stderr)
-                      selected.update(all_targets)
+                      raise SystemExit(f"cannot compare Docker Hub tag dates: {error}") from error
           elif event_name == "workflow_dispatch":
               if os.environ.get("DISPATCH_MODE") == "release" and os.environ.get("UPDATE_SCRIPT_OUTCOME") != "success":
                   raise SystemExit("update.sh failed; manual release stopped")
@@ -402,13 +415,56 @@ jobs:
           latest_version = latest_match.group(1)
           if (latest_version, "default") not in all_targets:
               raise SystemExit(f"latest image {latest_version} is not buildable")
+          security_targets = set()
+          if event_name == "schedule":
+              import importlib.util
+              spec = importlib.util.spec_from_file_location("update_policy", ".github/scripts/update-policy.py")
+              policy = importlib.util.module_from_spec(spec)
+              spec.loader.exec_module(policy)
+              state_file = Path("/tmp/postgis-update-state.json")
+              state = json.loads(state_file.read_text()) if state_file.exists() else {}
+              # A successful workflow can include skipped experimental images.
+              job_cache = {}
+              def previous_status(run_id, image_name):
+                  if run_id not in job_cache:
+                      run = policy.request_json(
+                          f"https://api.github.com/repos/{os.environ['REPOSITORY']}/actions/runs/{run_id}",
+                          token=os.environ.get("GH_TOKEN"))
+                      jobs = []
+                      if run["status"] == "completed":
+                          page = 1
+                          while True:
+                              result = policy.request_json(
+                                  f"https://api.github.com/repos/{os.environ['REPOSITORY']}/actions/runs/{run_id}/jobs?per_page=100&page={page}",
+                                  token=os.environ.get("GH_TOKEN"))
+                              jobs.extend(result["jobs"])
+                              if len(result["jobs"]) < 100:
+                                  break
+                              page += 1
+                      job_cache[run_id] = (run, jobs)
+                  return policy.published_status(*job_cache[run_id], image_name)
+              chosen = set()
+              for version, variant in sorted(selected):
+                  path = dockerfiles[version] if variant == "default" else dockerfiles[version].parent / "alpine/Dockerfile"
+                  base_times = {tag: dockerhub_last_updated("library", "postgres", tag).isoformat()
+                                for tag in postgres_base_tags(path)}
+                  fingerprint = policy.candidate_fingerprint(version, variant, base_times)
+                  if policy.select_candidate(state, version + "/" + variant, fingerprint, os.environ["RUN_ID"],
+                                             lambda run_id: previous_status(run_id, version + "-" + variant)):
+                      chosen.add((version, variant))
+              selected = chosen
+              state_file.write_text(json.dumps(state, sort_keys=True))
+          elif event_name == "workflow_dispatch" and os.environ.get("DISPATCH_MODE") == "release":
+              security_targets = set(selected)
+
           images = []
           include = []
           for version, variant in sorted(selected):
               dockerfile = dockerfiles[version]
               if variant == "alpine":
                   dockerfile = dockerfile.parent / "alpine" / "Dockerfile"
-              image = {"version": version, "variant": variant, "experimental": is_experimental(version, dockerfile)}
+              image = {"version": version, "variant": variant, "experimental": is_experimental(version, dockerfile),
+                       "security": (version, variant) in security_targets}
               images.append(image)
               for platform in platforms:
                   scope = f"postgis-{version}-{variant}-{platform.replace('/', '-')}"
@@ -423,6 +479,13 @@ jobs:
           print("has_images=" + str(bool(images)).lower())
           print("has_master_images=" + str(any(image["version"].endswith("-master") for image in images)).lower())
           PY
+
+      - name: Save update candidate state
+        if: github.event_name == 'schedule'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: /tmp/postgis-update-state.json
+          key: postgis-update-state-${{ github.run_id }}-${{ github.run_attempt }}
 
   master-deps:
     name: Cache Debian master dependencies ${{ matrix.platform }}
@@ -607,7 +670,7 @@ jobs:
           name: postgis-evidence-${{ matrix.version }}-${{ matrix.variant }}-${{ env.PLATFORM_SLUG }}
           path: ${{ env.EVIDENCE }}
           if-no-files-found: error
-          retention-days: 1
+          retention-days: ${{ matrix.security && 30 || 7 }}
 
       - name: Upload tested OCI image
         if: ${{ github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.ref == 'refs/heads/master' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release')))) }}
@@ -617,7 +680,7 @@ jobs:
           path: ${{ env.OCI_LAYOUT }}
           compression-level: 0
           if-no-files-found: error
-          retention-days: 1
+          retention-days: ${{ matrix.security && 30 || 7 }}
 
   verify-build:
     name: Verify native image evidence
@@ -680,14 +743,35 @@ jobs:
           print("has_images=" + str(bool(verified)).lower())
           PY
 
-  publish:
-    name: Publish ${{ matrix.version }}-${{ matrix.variant }}
+  release-policy:
+    name: Check release protection rules
     needs: [versions, verify-build]
+    if: ${{ !cancelled() && needs.verify-build.outputs.has_images == 'true' }}
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
+      actions: read
+    steps:
+      - name: Checkout policy
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Require configured protection for releases
+        if: ${{ github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.ref == 'refs/heads/master' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release')))) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IMAGES: ${{ needs.verify-build.outputs.images }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: python3 .github/scripts/check-release-policy.py
+
+  publish:
+    name: Publish ${{ matrix.version }}-${{ matrix.variant }}
+    needs: [versions, verify-build, release-policy]
+    permissions:
+      contents: read
+      actions: read
       id-token: write
     if: ${{ needs.verify-build.outputs.has_images == 'true' && github.repository == 'postgis/docker-postgis' && (github.event_name == 'schedule' || (github.ref == 'refs/heads/master' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release')))) }}
     runs-on: ubuntu-24.04
+    environment: ${{ matrix.security && 'postgis-security' || (github.event_name == 'schedule' && 'postgis-routine' || 'postgis-manual') }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
@@ -738,6 +822,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y skopeo
+
+      - name: Recheck release protection after waiting
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IMAGES: ${{ needs.verify-build.outputs.images }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: python3 .github/scripts/check-release-policy.py
+
+      - name: Check that the candidate is still current
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'release') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+        run: python3 .github/scripts/check-current-candidate.py
 
       - name: Login to Docker Hub
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0

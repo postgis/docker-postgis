@@ -20,6 +20,13 @@ assert "github.repository == 'postgis/docker-postgis'" in publish
 assert "github.ref == 'refs/heads/master'" in publish
 assert "github.event_name == 'workflow_dispatch' && inputs.mode == 'release'" in publish
 assert "needs.verify-build.outputs.has_images == 'true'" in publish
+assert "needs: [versions, verify-build, release-policy]" in publish
+assert "environment: ${{ matrix.security && 'postgis-security'" in publish
+assert publish.index('Recheck release protection after waiting') < publish.index('Login to Docker Hub')
+assert publish.index('Check that the candidate is still current') < publish.index('Login to Docker Hub')
+current_check = publish.split('Check that the candidate is still current', 1)[1].split('run:', 1)[0]
+assert "github.event_name == 'schedule'" in current_check
+assert "inputs.mode == 'release'" in current_check
 start = workflow.index("          python3 - <<'PY' >> \"$GITHUB_OUTPUT\"\n")
 script = workflow[start:].split("\n          PY\n", 1)[0].split("\n", 1)[1]
 script = textwrap.dedent(script)
@@ -60,11 +67,35 @@ failed_update = subprocess.run([sys.executable, "-c", script], cwd=root, capture
 assert failed_update.returncode != 0
 _, release_target = select("workflow_dispatch", DISPATCH_MODE="release", UPDATE_SCRIPT_OUTCOME="success", DISPATCH_IMAGE="18-3.7")
 assert release_target == {("18-3.7", "default")}
+release, _ = select("workflow_dispatch", DISPATCH_MODE="release", UPDATE_SCRIPT_OUTCOME="success", DISPATCH_IMAGE="18-3.7")
+assert all(image["security"] for image in json.loads(release["images"])["include"])
+assert not any(image["security"] for image in json.loads(push["images"])["include"])
 assert {("19rc2-3.7", "default"), ("19rc2-3.7", "alpine")} <= targets
 experimental = {(item["version"], item["variant"]): item["experimental"] for item in json.loads(dispatch["images"])["include"]}
 assert not experimental["18-3.7", "default"] and not experimental["18-3.7", "alpine"]
 assert all(experimental[target] for target in (("16-master", "default"), ("19rc2-3.7", "default"), ("19rc2-3.7", "default")))
 assert not experimental["18-3.7", "default"] and not experimental["18-3.7", "alpine"]
+
+# Exercise the scheduled path without network calls.
+with tempfile.TemporaryDirectory() as directory:
+    state_file = str(Path(directory) / 'state.json')
+    scheduled = script.replace('/tmp/postgis-update-state.json', state_file)
+    scheduled = scheduled.replace('if event_name == "push" and ref == "refs/heads/master":',
+        'stale_targets_from_base_updates = lambda targets: {( "18-3.7", "default" )}\n'
+        'dockerhub_last_updated = lambda *args: datetime.fromisoformat("2026-01-01T00:00:00+00:00")\n'
+        'if event_name == "push" and ref == "refs/heads/master":', 1)
+    scheduled = scheduled.replace('state = json.loads(state_file.read_text()) if state_file.exists() else {}',
+        'state = json.loads(state_file.read_text()) if state_file.exists() else {}\n    policy.request_json = lambda *args, **kwargs: {"status": "in_progress"}')
+    env = {**os.environ, 'EVENT_NAME': 'schedule', 'REF': 'refs/heads/master',
+           'UPDATE_SCRIPT_OUTCOME': 'success', 'RUN_ID': '1', 'REPOSITORY': 'test/repo'}
+    first = subprocess.check_output([sys.executable, '-c', scheduled], cwd=root, env=env, text=True)
+    image = json.loads(dict(line.split('=', 1) for line in first.splitlines())['images'])['include'][0]
+    assert image['version'] == '18-3.7' and not image['security']
+    env['RUN_ID'] = '2'
+    second = subprocess.check_output([sys.executable, '-c', scheduled], cwd=root, env=env, text=True)
+    assert dict(line.split('=', 1) for line in second.splitlines())['has_images'] == 'false'
+    env['UPDATE_SCRIPT_OUTCOME'] = 'failure'
+    assert subprocess.run([sys.executable, '-c', scheduled], cwd=root, env=env, capture_output=True).returncode != 0
 
 manual_workflow = (root / ".github/workflows/main.yml").read_text()
 assert "make push" not in manual_workflow and "docker/login-action" not in manual_workflow
