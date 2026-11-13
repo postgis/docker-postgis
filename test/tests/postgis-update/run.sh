@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2119,SC2120
 set -e
 
 image="$1"
@@ -8,12 +9,19 @@ export POSTGRES_PASSWORD='my cool postgres password'
 export POSTGRES_DB='my cool postgres database'
 
 cname="postgis-container-$RANDOM-$RANDOM"
-cid="$(docker run -d -e POSTGRES_USER -e POSTGRES_PASSWORD -e POSTGRES_DB --name "$cname" "$image")"
-trap "docker rm -vf $cid > /dev/null" EXIT
+network="$(docker network create "$cname")"
+cid=''
+cleanup() {
+	[ -z "$cid" ] || docker rm -vf "$cid" >/dev/null 2>&1 || true
+	docker network rm "$network" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+cid="$(docker run -d --network "$network" --network-alias postgis \
+	-e POSTGRES_USER -e POSTGRES_PASSWORD -e POSTGRES_DB --name "$cname" "$image")"
 
 psql() {
 	docker run --rm -i \
-		--link "$cname":postgis \
+		--network "$network" \
 		--entrypoint psql \
 		-e PGPASSWORD="$POSTGRES_PASSWORD" \
 		"$image" \
@@ -55,17 +63,15 @@ if [ -n "$outdated" ]; then
 fi
 
 ## test postgis_tiger_geocoder extension
-# PostGIS versions before 3.7 are expected to provide it, later versions don't.
+# Tiger must be installed when the image provides it.
 tiger_state="$(
 	psql <<-'EOSQL'
 	SELECT CASE
-		WHEN (postgis_major < 3 OR (postgis_major = 3 AND postgis_minor < 7)) = installed THEN 'ok'
-		WHEN installed THEN 'unexpected'
+		WHEN available = installed THEN 'ok'
 		ELSE 'missing'
 	END
 	FROM (
-		SELECT substring(postgis_lib_version() from '^([0-9]+)')::integer AS postgis_major,
-		       substring(postgis_lib_version() from '^[0-9]+\.([0-9]+)')::integer AS postgis_minor,
+		SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'postgis_tiger_geocoder') AS available,
 		       EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis_tiger_geocoder') AS installed
 	) AS postgis_version;
 	EOSQL

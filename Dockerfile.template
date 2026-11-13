@@ -10,6 +10,10 @@ LABEL maintainer="PostGIS Project - https://postgis.net" \
 
 ENV POSTGIS_MAJOR=%%POSTGIS_MAJOR%%
 ENV POSTGIS_VERSION=%%POSTGIS_VERSION%%
+ENV H3_VERSION=%%H3_VERSION%%
+ENV PGROUTING_VERSION=%%PGROUTING_VERSION%%
+ENV ADDRESS_PACKAGE_VERSION=%%ADDRESS_PACKAGE_VERSION%%
+ENV TIGER_PACKAGE_VERSION=%%TIGER_PACKAGE_VERSION%%
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
@@ -19,10 +23,23 @@ RUN apt-get update \
            ca-certificates \
            \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
-      && rm -rf /var/lib/apt/lists/*
+           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts=$POSTGIS_VERSION \
+       && if [ -n "$H3_VERSION" ]; then \
+            apt-get install -y --no-install-recommends postgresql-$PG_MAJOR-h3=$H3_VERSION; \
+          fi \
+       && if [ -n "$PGROUTING_VERSION" ]; then \
+            apt-get install -y --no-install-recommends postgresql-$PG_MAJOR-pgrouting=$PGROUTING_VERSION; \
+          fi \
+       && if [ -n "$ADDRESS_PACKAGE_VERSION" ]; then \
+            apt-get install -y --no-install-recommends postgresql-$PG_MAJOR-address-standardizer=$ADDRESS_PACKAGE_VERSION; \
+          fi \
+       && if [ -n "$TIGER_PACKAGE_VERSION" ]; then \
+            apt-get install -y --no-install-recommends postgresql-$PG_MAJOR-postgis-tiger-geocoder=$TIGER_PACKAGE_VERSION; \
+          fi \
+       && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 
+USER postgres
