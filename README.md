@@ -6,12 +6,12 @@
 > **Breaking change (2026-10):** Debian images moved to **trixie** with PostGIS **3.7**; `*-3.5` and `*-3.6` tags are no longer updated.
 > Upgrading from `*-3.5` (bullseye) to `*-3.7` (trixie) also changes the OS and glibc version, which can corrupt text indexes.
 > **The safest way is a full `pg_dump` and `pg_restore` into a new database!**
-> PostGIS 3.7 no longer provides the `postgis_tiger_geocoder` and `address_standardizer` extensions; check your databases before upgrading from `*-3.6`.
+> PostGIS 3.7 images include Address Standardizer separately. Tiger Geocoder is available on PostgreSQL 16 and newer. Check your installed extensions before upgrading.
 
 **⚠️ Breaking change (PostgreSQL 18+):**
 Default `VOLUME` path changed to `/var/lib/postgresql`
 
-The `postgis/postgis` image provides tags for running Postgres with [PostGIS](http://postgis.net/) extensions installed. This image is based on the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image and provides Debian and Alpine variants for PostGIS 3.7.x, compatible with PostgreSQL 14, 15, 16, 17 and 18. Test images are also provided for PostgreSQL 19 pre-releases and builds from the PostGIS/GEOS/PROJ/GDAL master branches (`*-master`).
+The `postgis/postgis` image adds [PostGIS](http://postgis.net/) to the official [`postgres`](https://registry.hub.docker.com/_/postgres/) image. It supports PostgreSQL 14-18 with PostGIS 3.7. PostgreSQL 19 RC2 and development builds are test images.
 
 This image ensures that the default database created by the parent `postgres` image will have the following extensions installed:
 
@@ -19,33 +19,39 @@ This image ensures that the default database created by the parent `postgres` im
 |--------------------------|-----|
 | `postgis`                | yes |
 | `postgis_topology`       | yes |
+| `postgis_tiger_geocoder` | yes, when available |
+| `fuzzystrmatch` | yes, when Tiger is available |
 | `postgis_raster` | no (available) |
 | `postgis_sfcgal` | no (available) |
+| `pgrouting` | no (where packaged or built) |
+| `address_standardizer`| no (available) |
+| `address_standardizer_data_us`| no (available) |
+| `h3`, `h3_postgis` | no (where packaged or built) |
 
-Starting with PostGIS 3.7, `address_standardizer` and `postgis_tiger_geocoder` are no longer provided by PostGIS, so the `*-3.7` images include neither of them (nor `h3`). The `*-master` images install `address_standardizer` separately from https://github.com/postgis/address_standardizer (and `h3` from https://github.com/postgis/h3-pg); these are available but not initialized by default.
+PostGIS 3.7 images provide `address_standardizer` and Tiger Geocoder separately. Tiger requires PostgreSQL 16 or newer. The update script upgrades PostGIS and installed companion extensions when an update path is available.
+
+The smoke test checks that the image starts and its extensions work. It requires pgRouting when `PGROUTING_VERSION` is not empty. H3 is required in Debian development images or when `H3_VERSION` is not empty.
+
+Tiger functions use the `tiger` schema. Call them as `tiger.normalize_address(...)` or add `tiger` to `search_path`.
 
 Unless `-e POSTGRES_DB` is passed to the container at startup time, this database will be named after the admin user (either `postgres` or the user specified with `-e POSTGRES_USER`). If you would prefer to use the older template database mechanism for enabling PostGIS, the image also provides a PostGIS-enabled template database called `template_postgis`.
 
-## Versions (2026-11-05)
+## Versions (2026-11-13)
 
-Supported architecture: `amd64` (x86-64)
+Supported architectures: `amd64` (x86-64) and `arm64` (aarch64). Each published tag contains both platforms.
 
-Recommended version for new users:
+Recommended versions for new users are:
 
 * `postgis/postgis:18-3.7`
   * ⚠️ Uses `VOLUME` path `/var/lib/postgresql` (changed in PostgreSQL 18+)
+* `postgis/postgis:17-3.7`
+  * Uses legacy `VOLUME` path `/var/lib/postgresql/data`
 
 ### Debian based (recommended)
 
-* This Docker-PostGIS image has a cautious release cycle to guarantee high stability.
-  * By "cautious", we mean it does not always have the latest versions of geos, proj, gdal, and sfcgal packages.
-* We use the PostGIS packages from the [PostgreSQL Apt Repository (PGDG)](https://wiki.postgresql.org/wiki/Apt), and the geos, proj, gdal, and sfcgal packages from the Debian repository.
-  * In the Debian Trixie repository (for all PostgreSQL versions), the versions are:
-    * geos=3.13
-    * gdal=3.10
-    * proj=9.6
-    * sfcgal2=2.0
-* This version is easy to extend and has matured over time.
+* Debian images use Trixie and packages from Debian and the PostgreSQL Apt Repository (PGDG). Address Standardizer is built from source until the PGDG package includes the security fixes.
+* If a PostGIS package is unavailable, the image builds PostGIS from source.
+* Trixie: GEOS 3.13, GDAL 3.10, PROJ 9.6, SFCGAL2 2.0.
 
 <!-- debian_autogenerated_begin  -->
 <!-- This part is automatically generated by ./update.sh. Do not modify this section manually. -->
@@ -61,42 +67,39 @@ Recommended version for new users:
 ### Alpine based
 
 * The base operating system is [Alpine Linux](https://alpinelinux.org/). It is designed to be small, simple, and secure, and it's based on [musl libc](https://musl.libc.org/).
-* In the Alpine 3.24 version, the package versions are:
-  * geos=3.14
-  * gdal=3.13
-  * proj=9.8
-  * sfcgal=2.2
-* PostGIS is compiled from source, making it a bit more challenging to extend.
+* Alpine 3.24: GEOS 3.14.1, GDAL 3.13.3, PROJ 9.8.1, SFCGAL 2.2.0.
+* Every Alpine image builds PostGIS from source, as marked in the table.
 
 <!-- alpine_autogenerated_begin  -->
 <!-- This part is automatically generated by ./update.sh. Do not modify this section manually. -->
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
-| [postgis/postgis:14-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.7/alpine/Dockerfile) | alpine:3.24 | 14 | 3.7.0 |
-| [postgis/postgis:15-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.7/alpine/Dockerfile) | alpine:3.24 | 15 | 3.7.0 |
-| [postgis/postgis:16-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.7/alpine/Dockerfile) | alpine:3.24 | 16 | 3.7.0 |
-| [postgis/postgis:17-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.7/alpine/Dockerfile) | alpine:3.24 | 17 | 3.7.0 |
-| [postgis/postgis:18-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18-3.7/alpine/Dockerfile) | alpine:3.24 | 18 | 3.7.0 |
+| [postgis/postgis:14-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=14-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/14-3.7/alpine/Dockerfile) | alpine:3.24 | 14 | 3.7.0 (source) |
+| [postgis/postgis:15-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=15-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/15-3.7/alpine/Dockerfile) | alpine:3.24 | 15 | 3.7.0 (source) |
+| [postgis/postgis:16-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-3.7/alpine/Dockerfile) | alpine:3.24 | 16 | 3.7.0 (source) |
+| [postgis/postgis:17-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-3.7/alpine/Dockerfile) | alpine:3.24 | 17 | 3.7.0 (source) |
+| [postgis/postgis:18-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18-3.7/alpine/Dockerfile) | alpine:3.24 | 18 | 3.7.0 (source) |
 <!-- alpine_autogenerated_end  -->
 
 ### Test images
 
-* We provide alpha, beta, release candidate (rc), and development (identified as ~master) versions.
-* For `*-master` images, the template is updated manually, which might lead to a delay of a few weeks sometimes.
-* Current PostGIS development (`*-master`) images use the up-to-date CGAL revision from the `6.2.x-branch`.
-* Since PostGIS 3.7, PostGIS itself no longer includes the `address_standardizer` and `postgis_tiger_geocoder` extensions. The `*-master` images install `address_standardizer` separately from https://github.com/postgis/address_standardizer and run its upstream-style installcheck. See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
-* They also install the `h3` and `h3_postgis` extensions from the `main` branch of https://github.com/postgis/h3-pg; because this is a development branch, their extension version may appear as `unreleased`.
+* Alpha, beta, rc, and `master` tags are test images. Their dependencies update during scheduled rebuilds.
+* PostgreSQL prerelease images build PostGIS from source. Debian source builds pin development headers to the base image's exact PostgreSQL package version.
+* Images build [`address_standardizer`](https://github.com/postgis/address_standardizer) from a commit that fixes CVE-2026-73514 and CVE-2026-90775. Tiger 2025.2 is included on PostgreSQL 16 or newer.
+* Debian uses H3 packages or the latest stable [`h3-pg`](https://github.com/postgis/h3-pg) release for development builds. H3 is optional on Alpine.
+* Debian `master` images use stable CGAL, SFCGAL, PROJ, GEOS, GDAL, and companion extensions. Only PostGIS comes from its development branch.
 
 <!-- test_autogenerated_begin  -->
 <!-- This part is automatically generated by ./update.sh. Do not modify this section manually. -->
 | DockerHub image | Dockerfile | OS | Postgres | PostGIS |
 | --------------- | ---------- | -- | -------- | ------- |
-| [postgis/postgis:16-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-master/Dockerfile) | debian:trixie | 16 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:17-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-master/Dockerfile) | debian:trixie | 17 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:18-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18-master/Dockerfile) | debian:trixie | 18 | development: postgis, geos, proj, gdal |
-| [postgis/postgis:19rc1-3.7](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-3.7) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-3.7/Dockerfile) | debian:trixie | 19rc1 | 3.7.0 |
-| [postgis/postgis:19rc1-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-3.7/alpine/Dockerfile) | alpine:3.24 | 19rc1 | 3.7.0 |
-| [postgis/postgis:19rc1-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc1-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc1-master/Dockerfile) | debian:trixie | 19rc1 | development: postgis, geos, proj, gdal |
+| [postgis/postgis:16-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=16-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/16-master/Dockerfile) | debian:trixie | 16 | development PostGIS |
+| [postgis/postgis:17-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=17-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/17-master/Dockerfile) | debian:trixie | 17 | development PostGIS |
+| [postgis/postgis:18-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=18-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/18-master/Dockerfile) | debian:trixie | 18 | development PostGIS |
+| [postgis/postgis:19rc2-3.7](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc2-3.7) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc2-3.7/Dockerfile) | debian:trixie | 19rc2 | 3.7.0 (source) |
+| [postgis/postgis:19rc2-3.7-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc2-3.7-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc2-3.7/alpine/Dockerfile) | alpine:3.24 | 19rc2 | 3.7.0 (source) |
+| [postgis/postgis:19rc2-master](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc2-master) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc2-master/Dockerfile) | debian:trixie | 19rc2 | development PostGIS |
+| [postgis/postgis:19rc2-master-alpine](https://registry.hub.docker.com/r/postgis/postgis/tags?page=1&name=19rc2-master-alpine) | [Dockerfile](https://github.com/postgis/docker-postgis/blob/master/19rc2-master/alpine/Dockerfile) | alpine:3.24 | 19rc2 | master (source) |
 <!-- test_autogenerated_end  -->
 
 ## Usage
@@ -177,7 +180,7 @@ These include: `PGDATABASE`, `PGUSER`, `PGPASSWORD`, and others used by client t
 
 ## Troubleshooting tips
 
-Troubleshooting can often be challenging. It's important to know that the docker-postgis repository is an extension of the official Docker PostgreSQL repository. Therefore, if you encounter any issues, it's worth testing whether the problem can be reproduced with the [official PostgreSQL Docker images](https://hub.docker.com/_/postgres). If so, it's recommended to search for solutions based on this. The following websites are suggested:
+First, try to reproduce the problem with the [official PostgreSQL image](https://hub.docker.com/_/postgres). If it also fails, search these resources:
 
 * Upstream docker postgres repo: https://github.com/docker-library/postgres
   * search for the open or closed issues !
@@ -209,7 +212,44 @@ If you wish to experiment with this feature, please do so **at your own risk**, 
 
 * You can add options for using SSL ( [see postgres example](https://github.com/docker-library/postgres/issues/989#issuecomment-1222648067) )
   * `-c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key`
-* Or you can use [SSH Tunnels](https://www.postgresql.org/docs/current/ssh-tunnels.html) with `-p 127.0.0.1:5432:5432`
+* Or you can use [SSH Tunnels](https://www.postgresql.org/docs/15/ssh-tunnels.html) with `-p 127.0.0.1:5432:5432`
+
+### Runtime hardening
+
+Images run as `postgres` by default. Its user and group IDs are `70` on Alpine and `999` on Debian. For rootless Docker, the mounted data directory must be writable by this user.
+
+For a read-only filesystem, keep the data volume writable. Mount writable temporary directories at `/tmp` and `/var/run/postgresql`.
+
+Run `docker run --rm postgis/postgis:18-3.7 id postgres` to see the IDs. For this Debian image, use:
+
+```yaml
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+```
+
+In Kubernetes, mount a writable persistent volume at the data path listed above. Mount memory-backed `emptyDir` volumes at `/tmp` and `/var/run/postgresql`.
+
+For PostgreSQL 18 and newer, run:
+
+```sh
+docker run --read-only \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges:true \
+  --tmpfs /tmp:rw,nosuid,nodev \
+  --tmpfs /var/run/postgresql:rw,nosuid,nodev \
+  --mount type=volume,src=postgis-data,dst=/var/lib/postgresql \
+  -e POSTGRES_PASSWORD=change-me \
+  postgis/postgis:18-3.7
+```
+
+Give `postgres` write access to the data directory before startup. The container cannot repair ownership while it runs as `postgres`.
 
 ### Security scanner information
 
@@ -230,7 +270,9 @@ For more details, you can read [this article](https://pythonspeed.com/articles/d
 
 Unfortunately, we don't have control over updates to Debian and Alpine distributions or the upstream `postgres` image.
 Because of this, there might be some issues that we cannot fix right away.
-On the positive side, the `postgis/postgis` images are regenerated every Monday. This process is to ensure they include the latest changes and improvements. As a result, these images are consistently kept up-to-date.
+Experimental builds are non-blocking, as in the upstream workflow. Only images that pass tests on both native platforms can be published.
+
+Each Monday, CI rebuilds tags with changed build inputs or newer PostgreSQL bases. If the updater or registry lookup fails, it rebuilds all eligible tags.
 
 ## Suggestions Welcome
 

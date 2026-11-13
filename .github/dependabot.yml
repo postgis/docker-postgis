@@ -1,0 +1,23 @@
+version: 2
+
+updates:
+  - package-ecosystem: docker
+    directory: /examples/image-with-postgis-clis
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 10
+    groups:
+      docker:
+        patterns:
+          - "*"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 10
+    groups:
+      github-actions:
+        patterns:
+          - "*"
