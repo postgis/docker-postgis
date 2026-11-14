@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         runner-platform: ['ubuntu-24.04', 'ubuntu-24.04-arm']
-        postgres: [14, 15, 16, 17, 18, 19rc1]
+        postgres: [14, 15, 16, 17, 18, 19rc2]
         postgis: ['3.7']
         variant: [default, alpine]
         include:
@@ -32,7 +32,7 @@ jobs:
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04'
-          - postgres: 19rc1
+          - postgres: 19rc2
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04'
@@ -48,7 +48,7 @@ jobs:
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
-          - postgres: 19rc1
+          - postgres: 19rc2
             postgis: master
             variant: default
             runner-platform: 'ubuntu-24.04-arm'
@@ -114,6 +114,16 @@ jobs:
 
     - name: Checkout source
       uses: actions/checkout@v7
+
+    - name: Check base image platform for ${{ env.VERSION }} ${{ env.VARIANT }}
+      # Docker silently falls back to a "compatible" platform (e.g. linux/arm/v7 on an arm64 host)
+      # when the base image has no manifest for the native platform. Fail early instead.
+      run: |
+        if [[ "$VARIANT" == "alpine" ]]; then
+          .github/scripts/check-base-image-platform.sh "$VERSION/alpine/Dockerfile"
+        else
+          .github/scripts/check-base-image-platform.sh "$VERSION/Dockerfile"
+        fi
 
     - name: Build docker image for ${{ env.VERSION }} ${{ env.VARIANT }}
       run: make test
