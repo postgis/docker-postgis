@@ -114,7 +114,7 @@ RUN set -ex \
 # CGAL and SFCGAL.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=2cc6fe7ba2744e7918341a8cb7e0820a06e1d66d
+ENV CGAL_GIT_HASH=5c8ab47e7593c0684cc58697f712e26941275695
 ENV SFCGAL_GIT_HASH=6d4465a79314aafcac973d64a9375532cab6ab4f
 RUN set -ex \
     && mkdir -p /usr/src \
@@ -149,7 +149,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # PROJ.
-ENV PROJ_GIT_HASH=890f8a0599ee4600344c8b630df5e4bc4762c83f
+ENV PROJ_GIT_HASH=5e7a7e024969d9de9e03991a2a9585df833a1f43
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -182,7 +182,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # GEOS.
-ENV GEOS_GIT_HASH=06da4f3a7808288b3aef036aed02c866038985ad
+ENV GEOS_GIT_HASH=35fa80c99e8db5738f06163082caa49fc7c2ee3d
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -198,7 +198,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # GDAL.
-ENV GDAL_GIT_HASH=a077f4a553b53bb2d1364259d3018201d11f882a
+ENV GDAL_GIT_HASH=8a556e7b81aab50ec6612b47499ffbe942aa3a71
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -345,11 +345,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=2cc6fe7ba2744e7918341a8cb7e0820a06e1d66d
+ENV CGAL_GIT_HASH=5c8ab47e7593c0684cc58697f712e26941275695
 ENV SFCGAL_GIT_HASH=6d4465a79314aafcac973d64a9375532cab6ab4f
-ENV PROJ_GIT_HASH=890f8a0599ee4600344c8b630df5e4bc4762c83f
-ENV GEOS_GIT_HASH=06da4f3a7808288b3aef036aed02c866038985ad
-ENV GDAL_GIT_HASH=a077f4a553b53bb2d1364259d3018201d11f882a
+ENV PROJ_GIT_HASH=5e7a7e024969d9de9e03991a2a9585df833a1f43
+ENV GEOS_GIT_HASH=35fa80c99e8db5738f06163082caa49fc7c2ee3d
+ENV GDAL_GIT_HASH=8a556e7b81aab50ec6612b47499ffbe942aa3a71
 
 # Minimal command-line smoke test (fail fast).
 RUN set -ex \
@@ -368,9 +368,10 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # Install PostGIS and companion development extensions.
-ENV POSTGIS_GIT_HASH=c87677a620f814978f9eb3dced943c2b1241d149
+ENV POSTGIS_GIT_HASH=58fb58832c49c47cf5834f71eaec7e5dea49631f
 ENV H3_PG_GIT_HASH=f960a574eab6aebd186dedff6204711c21742f12
 ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
+ENV POSTGIS_TIGER_GEOCODER_GIT_HASH=3f78cd7c15a318b21902cc92fde98102c57259d3
 
 RUN set -ex \
     && apt-get update \
@@ -441,6 +442,16 @@ RUN set -ex \
     && git log -1 > /_pgis_address_standardizer_last_commit.txt \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no install \
+    # postgis_tiger_geocoder from the latest main branch revision.
+    # Pure PL/pgSQL extension; built after address_standardizer so the
+    # PAGC normalizer regressions (test-pagc_normalize_address) can run.
+    && cd /usr/src/ \
+    && git clone https://github.com/postgis/postgis_tiger_geocoder.git \
+    && cd postgis_tiger_geocoder \
+    && git checkout ${POSTGIS_TIGER_GEOCODER_GIT_HASH} \
+    && git log -1 > /_pgis_postgis_tiger_geocoder_last_commit.txt \
+    && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config \
+    && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config install \
 # Refresh selected PROJ grids needed by the PostGIS regression suite.
 # Workaround for https://trac.osgeo.org/postgis/ticket/5316
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
@@ -458,6 +469,13 @@ RUN set -ex \
         if [ -f test/regression.diffs ]; then cat test/regression.diffs; fi; \
         exit 1; \
     fi \
+    # postgis_tiger_geocoder regressions, including the address_standardizer (PAGC) suite.
+    && cd /usr/src/postgis_tiger_geocoder \
+    && if ! PGUSER=postgres make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config \
+            installcheck ADDRESS_STANDARDIZER=address_standardizer; then \
+        if [ -f regression.diffs ]; then cat regression.diffs; fi; \
+        exit 1; \
+    fi \
     && cd /usr/src/postgis/regress \
     && make -j${NPROC:-$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
@@ -466,28 +484,15 @@ RUN set -ex \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
-    # Optional extensions: create them only if they are available.
-    # Since PostGIS 3.7.0rc, some builds may not include them.
-    # PostGIS 3.6.x still includes them.
+    # address_standardizer and postgis_tiger_geocoder are built from their
+    # standalone repositories in this image, so they are mandatory here.
     # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
-    && su postgres -c "psql -v ON_ERROR_STOP=1 -c \" \
-        DO \\\$\\\$ \
-        DECLARE \
-            extension_name text; \
-        BEGIN \
-            FOREACH extension_name IN ARRAY ARRAY[ \
-                'address_standardizer', \
-                'address_standardizer_data_us', \
-                'postgis_tiger_geocoder' \
-            ] LOOP \
-                IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = extension_name) THEN \
-                    EXECUTE format('CREATE EXTENSION IF NOT EXISTS %I', extension_name); \
-                ELSE \
-                    RAISE NOTICE 'Extension % is not available, skipping', extension_name; \
-                END IF; \
-            END LOOP; \
-        END \
-        \\\$\\\$;\"" \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
+    # postgis_tiger_geocoder smoke test (README "Verifying install").
+    && su postgres -c "psql -v ON_ERROR_STOP=1 -tA -c \"SELECT concat_ws('|', na.address, na.streetname, na.streettypeabbrev, na.zip) FROM tiger.normalize_address('1 Devonshire Place, Boston, MA 02109') AS na;\"" \
+        | grep -qx '1|Devonshire|Pl|02109' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3_postgis;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
@@ -503,6 +508,7 @@ RUN set -ex \
     && rm -rf /usr/src/postgis \
     && rm -rf /usr/src/h3-pg \
     && rm -rf /usr/src/address_standardizer \
+    && rm -rf /usr/src/postgis_tiger_geocoder \
     && apt-get purge -y --autoremove \
       autoconf \
       automake \
