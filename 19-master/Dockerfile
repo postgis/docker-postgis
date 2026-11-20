@@ -9,13 +9,13 @@ ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG DOCKER_ENABLE_IPO=OFF
 ARG CGAL_GIT_BRANCH=6.2.x-branch
 ARG NPROC=
-FROM docker.io/postgres:19rc2-trixie AS builder
+FROM docker.io/postgres:19-trixie AS builder
 
 ARG NPROC
 ARG DOCKER_ENABLE_IPO
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 19rc2 trixie" \
+      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 19 trixie" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
@@ -182,7 +182,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # GEOS.
-ENV GEOS_GIT_HASH=695a19097e4750e689c02f6b4de69bc25a5f70e3
+ENV GEOS_GIT_HASH=35fa80c99e8db5738f06163082caa49fc7c2ee3d
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -289,7 +289,7 @@ RUN set -ex \
 # -------------------------------------------
 # STAGE  final
 # -------------------------------------------
-FROM docker.io/postgres:19rc2-trixie
+FROM docker.io/postgres:19-trixie
 
 ARG NPROC
 ARG DOCKER_CMAKE_BUILD_TYPE
@@ -348,7 +348,7 @@ ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL_GIT_HASH=5c8ab47e7593c0684cc58697f712e26941275695
 ENV SFCGAL_GIT_HASH=6d4465a79314aafcac973d64a9375532cab6ab4f
 ENV PROJ_GIT_HASH=5e7a7e024969d9de9e03991a2a9585df833a1f43
-ENV GEOS_GIT_HASH=695a19097e4750e689c02f6b4de69bc25a5f70e3
+ENV GEOS_GIT_HASH=35fa80c99e8db5738f06163082caa49fc7c2ee3d
 ENV GDAL_GIT_HASH=8a556e7b81aab50ec6612b47499ffbe942aa3a71
 
 # Minimal command-line smoke test (fail fast).
