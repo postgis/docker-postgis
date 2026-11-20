@@ -70,11 +70,11 @@ assert release_target == {("18-3.7", "default")}
 release, _ = select("workflow_dispatch", DISPATCH_MODE="release", UPDATE_SCRIPT_OUTCOME="success", DISPATCH_IMAGE="18-3.7")
 assert all(image["security"] for image in json.loads(release["images"])["include"])
 assert not any(image["security"] for image in json.loads(push["images"])["include"])
-assert {("19rc2-3.7", "default"), ("19rc2-3.7", "alpine")} <= targets
+assert {("19-3.7", "default"), ("19-3.7", "alpine")} <= targets
 experimental = {(item["version"], item["variant"]): item["experimental"] for item in json.loads(dispatch["images"])["include"]}
 assert not experimental["18-3.7", "default"] and not experimental["18-3.7", "alpine"]
-assert all(experimental[target] for target in (("16-master", "default"), ("19rc2-3.7", "default"), ("19rc2-3.7", "default")))
-assert not experimental["18-3.7", "default"] and not experimental["18-3.7", "alpine"]
+assert all(experimental[target] for target in (("16-master", "default"), ("19-master", "default"), ("19-master", "alpine")))
+assert not experimental["19-3.7", "default"] and not experimental["19-3.7", "alpine"]
 
 # Exercise the scheduled path without network calls.
 with tempfile.TemporaryDirectory() as directory:
@@ -89,8 +89,9 @@ with tempfile.TemporaryDirectory() as directory:
     env = {**os.environ, 'EVENT_NAME': 'schedule', 'REF': 'refs/heads/master',
            'UPDATE_SCRIPT_OUTCOME': 'success', 'RUN_ID': '1', 'REPOSITORY': 'test/repo'}
     first = subprocess.check_output([sys.executable, '-c', scheduled], cwd=root, env=env, text=True)
-    image = json.loads(dict(line.split('=', 1) for line in first.splitlines())['images'])['include'][0]
-    assert image['version'] == '18-3.7' and not image['security']
+    images = json.loads(dict(line.split('=', 1) for line in first.splitlines())['images'])['include']
+    assert any(image['version'] == '18-3.7' and image['variant'] == 'default' for image in images)
+    assert not any(image['security'] for image in images)
     env['RUN_ID'] = '2'
     second = subprocess.check_output([sys.executable, '-c', scheduled], cwd=root, env=env, text=True)
     assert dict(line.split('=', 1) for line in second.splitlines())['has_images'] == 'false'
@@ -107,7 +108,7 @@ def manual_matrix(cwd):
 manual = manual_matrix(root)
 assert {(row["postgres"] + "-" + row["postgis"], row["variant"]) for row in manual} == targets
 assert len(manual) == 2 * len(targets)
-assert any(row["postgres"] == "19rc2" and row["postgis"] == "master" and row["variant"] == "alpine" for row in manual)
+assert any(row["postgres"] == "19" and row["postgis"] == "master" and row["variant"] == "alpine" for row in manual)
 with tempfile.TemporaryDirectory() as directory:
     fixture = Path(directory)
     (fixture / "18-3.7").mkdir()
@@ -122,7 +123,7 @@ verifier = textwrap.dedent(verifier.split("          python3 - <<'PY' >> \"$GITH
 with tempfile.TemporaryDirectory() as directory:
     fixture = Path(directory)
     stable = {"version": "18-3.7", "variant": "default", "experimental": False}
-    preview = {"version": "19rc2-3.7", "variant": "default", "experimental": True}
+    preview = {"version": "19-master", "variant": "default", "experimental": True}
     def evidence(image, arch):
         path = fixture / f"evidence/postgis-evidence-{image['version']}-default-{arch}/image.json"
         path.parent.mkdir(parents=True, exist_ok=True)

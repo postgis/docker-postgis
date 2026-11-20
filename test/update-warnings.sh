@@ -72,7 +72,7 @@ assert_not_contains "$postgresWarnings" '14' 'represented PostgreSQL release war
 source_block 'stable_git_tag() {' '}'
 source_block 'stable_git_hash() {' '}'
 source_block 'address_standardizer_build_hash() {' '}'
-assert_equal e987949e0fccff6a0e7a6d3f86814d5c7a01f481 "$(address_standardizer_build_hash fa11ff53eb49b863d9ffff37f6afd5ff9299c581)" 'security fixes for Address Standardizer 3.7.0'
+assert_equal ba9a26a013f23908657bb26574ae436b11d4b811 "$(address_standardizer_build_hash fa11ff53eb49b863d9ffff37f6afd5ff9299c581)" 'security fixes for Address Standardizer 3.7.0'
 assert_equal newer-release "$(address_standardizer_build_hash newer-release)" 'prefer newer Address Standardizer releases'
 git_ls_remote() {
     if [ "$1" = --tags ]; then

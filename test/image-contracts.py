@@ -28,7 +28,7 @@ smoke = (root / "test/tests/postgis-basics/run.sh").read_text()
 requirements = smoke.split("h3_required=false\n", 1)[1].split("\ntest_h3=", 1)[0]
 for image, advertised, expected in (
     ("16-master", "false", "true"),
-    ("19rc2-master-alpine", "false", "false"),
+    ("19-master-alpine", "false", "false"),
     ("18-3.7", "true", "true"),
     ("18-3.7-alpine", "false", "false"),
 ):

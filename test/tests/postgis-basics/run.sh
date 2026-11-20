@@ -119,6 +119,14 @@ echo "SELECT topology.TopoGeo_AddPoint('smoke_topology', ST_SetSRID(ST_Point(0, 
 echo 'DROP SCHEMA smoke_topology CASCADE' | psql >/dev/null
 
 tiger_available="$(echo "SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'postgis_tiger_geocoder')" | psql)"
+case "${image##*:}" in
+	*-master|*-master-alpine|19-3.7|19-3.7-alpine)
+		if [ "$tiger_available" != t ]; then
+			echo >&2 "postgis_tiger_geocoder is missing from $image"
+			exit 1
+		fi
+		;;
+esac
 if [ "$tiger_available" = t ]; then
 	echo 'CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;' | psql >/dev/null
 	response=$(echo "SET search_path = tiger, public; SELECT na.address, na.streetname, na.streettypeabbrev, na.zip FROM normalize_address('1 Devonshire Place, Boston, MA 02109-1234') AS na;" | psql)

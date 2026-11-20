@@ -1,21 +1,21 @@
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG BASE_IMAGE=postgres:19rc2-alpine3.24
+ARG BASE_IMAGE=postgres:19-alpine3.24
 FROM ${BASE_IMAGE}
 
 ARG NPROC=
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.7.0 spatial database extension with PostgreSQL 19rc2 Alpine" \
+      org.opencontainers.image.description="PostGIS master spatial database extension with PostgreSQL 19 Alpine" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
-ENV POSTGIS_VERSION=3.7.0
-ENV POSTGIS_SOURCE_VERSION=3.7.0
-ENV POSTGIS_SHA256=306d68a115b88c59d9ffbd134b28fd1b0eccb7b0dabcbb5df2dc0b009d9de848
+ENV POSTGIS_VERSION=master
+ENV POSTGIS_SOURCE_VERSION=58fb58832c49c47cf5834f71eaec7e5dea49631f
+ENV POSTGIS_SHA256=434b4bbf35a4afa61586285320a62bdcb2001dfc94753822174c90b71859b1cc
 ENV PGROUTING_VERSION=4.0.2
 ENV PGROUTING_SHA256=2faf31b178db969637c1f392ba3ba18fba8d5aed15bdc73fbb4a53a72c5d0f71
-ENV ADDRESS_STANDARDIZER_GIT_HASH=e987949e0fccff6a0e7a6d3f86814d5c7a01f481
+ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
 ENV TIGER_GEOCODER_VERSION=2025.2
 ENV TIGER_GEOCODER_SHA256=c33cfbfb40785db8754a36be66060e8d023773e7e1be8fb8a622bb3c48db9f54
 
@@ -113,9 +113,11 @@ RUN set -eux \
         && git checkout ${ADDRESS_STANDARDIZER_GIT_HASH} \
         && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no \
         && make PG_CONFIG="$(command -v pg_config)" PG_CFLAGS=-Wno-error with_llvm=no install \
-    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "e987949e0fccff6a0e7a6d3f86814d5c7a01f481" ]; then \
+    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "ba9a26a013f23908657bb26574ae436b11d4b811" ]; then \
         for ext in address_standardizer address_standardizer_data_us; do \
-            ln -s "${ext}--ANY--3.7.1dev.sql" "$(pg_config --sharedir)/extension/${ext}--3.7--3.7.1dev.sql"; \
+            for from_version in 3.7 3.7.1dev; do \
+                ln -s "${ext}--ANY--4.0.0dev.sql" "$(pg_config --sharedir)/extension/${ext}--${from_version}--4.0.0dev.sql"; \
+            done; \
         done; \
     fi \
         && cd /usr/src/postgis; \

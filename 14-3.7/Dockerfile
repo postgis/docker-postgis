@@ -4,18 +4,20 @@
 
 FROM docker.io/postgres:14-trixie AS address-build
 
-ARG ADDRESS_STANDARDIZER_GIT_HASH=e987949e0fccff6a0e7a6d3f86814d5c7a01f481
+ARG ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential ca-certificates git libpcre2-dev "postgresql-server-dev-$PG_MAJOR=$PG_VERSION" \
+    && apt-get install -y --no-install-recommends build-essential ca-certificates git libicu-dev libpcre2-dev "postgresql-server-dev-$PG_MAJOR=$PG_VERSION" \
     && git clone --quiet https://github.com/postgis/address_standardizer.git /usr/src/address_standardizer \
     && cd /usr/src/address_standardizer \
     && git checkout "$ADDRESS_STANDARDIZER_GIT_HASH" \
     && make PG_CONFIG="$(command -v pg_config)" \
     && make PG_CONFIG="$(command -v pg_config)" test-rules-api \
     && make PG_CONFIG="$(command -v pg_config)" DESTDIR=/address-root install \
-    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "e987949e0fccff6a0e7a6d3f86814d5c7a01f481" ]; then \
+    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "ba9a26a013f23908657bb26574ae436b11d4b811" ]; then \
         for ext in address_standardizer address_standardizer_data_us; do \
-            ln -s "${ext}--ANY--3.7.1dev.sql" "/address-root$(pg_config --sharedir)/extension/${ext}--3.7--3.7.1dev.sql"; \
+            for from_version in 3.7 3.7.1dev; do \
+                ln -s "${ext}--ANY--4.0.0dev.sql" "/address-root$(pg_config --sharedir)/extension/${ext}--${from_version}--4.0.0dev.sql"; \
+            done; \
         done; \
     fi
 

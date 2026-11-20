@@ -177,7 +177,7 @@ h3PgGitHash="$(stable_git_hash https://github.com/postgis/h3-pg.git)"
 address_standardizer_build_hash() {
     # The 3.7.0 release predates CVE-2026-73514 and CVE-2026-90775 fixes.
     if [ "$1" = fa11ff53eb49b863d9ffff37f6afd5ff9299c581 ]; then
-        printf '%s\n' e987949e0fccff6a0e7a6d3f86814d5c7a01f481
+        printf '%s\n' ba9a26a013f23908657bb26574ae436b11d4b811
     else
         printf '%s\n' "$1"
     fi
