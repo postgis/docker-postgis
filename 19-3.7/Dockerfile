@@ -2,10 +2,10 @@
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM docker.io/postgres:19rc2-trixie
+FROM docker.io/postgres:19-trixie
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS 3.7.0+dfsg-1.pgdg13+2 spatial database extension with PostgreSQL 19rc2 trixie" \
+      org.opencontainers.image.description="PostGIS 3.7.0+dfsg-1.pgdg13+2 spatial database extension with PostgreSQL 19 trixie" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 ENV POSTGIS_MAJOR=3
