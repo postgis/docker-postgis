@@ -877,25 +877,29 @@ jobs:
           fi
           docker buildx imagetools create "${tags[@]}" "${sources[@]}"
 
-      - name: Update Docker Hub description
+      - name: Check Docker Hub description credentials
+        id: description-credentials
         if: ${{ matrix.version == env.LATEST_VERSION && matrix.variant == 'default' }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
         run: |
-          for attempt in 1 2 3; do
-            if docker run --rm -v "$GITHUB_WORKSPACE":/workspace \
-              -e DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME" \
-              -e DOCKERHUB_PASSWORD="$DOCKERHUB_ACCESS_TOKEN" \
-              -e DOCKERHUB_REPOSITORY="$DOCKERHUB_REPOSITORY" \
-              -e README_FILEPATH=/workspace/README.md \
-              docker.io/peterevans/dockerhub-description:5; then
-              exit 0
-            fi
-            echo "Docker Hub description update failed (attempt ${attempt}/3); retrying" >&2
-            sleep $((attempt * 5))
-          done
-          exit 1
+          if [[ -z "$DOCKERHUB_USERNAME" && -z "$DOCKERHUB_ACCESS_TOKEN" ]]; then
+            exit 0
+          fi
+          if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_ACCESS_TOKEN" ]]; then
+            echo "Set both Docker Hub description credentials or remove both to skip the update." >&2
+            exit 1
+          fi
+          echo 'configured=true' >> "$GITHUB_OUTPUT"
+
+      - name: Update Docker Hub description
+        if: steps.description-credentials.outputs.configured == 'true'
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          repository: ${{ env.DOCKERHUB_REPOSITORY }}
 
   verify-published:
     name: Verify published ${{ matrix.version }}-${{ matrix.variant }}

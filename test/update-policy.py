@@ -6,6 +6,9 @@ import json
 import os
 from pathlib import Path
 import runpy
+import subprocess
+from tempfile import TemporaryDirectory
+from textwrap import dedent
 from urllib.error import HTTPError, URLError
 from unittest.mock import patch
 
@@ -89,4 +92,17 @@ assert run_check('check-current-candidate.py', candidate, iter([
     run, HTTPError('https://hub.docker.com', 404, 'new tag', {}, None)]))
 assert not run_check('check-current-candidate.py', candidate, iter([
     run, HTTPError('https://hub.docker.com', 500, 'unavailable', {}, None)]))
-print('Release approval, cooldown, and superseded candidate checks passed')
+workflow = (path.parents[1] / 'workflows/docker.yml').read_text()
+description = workflow.split('id: description-credentials\n', 1)[1].split('      - name:', 1)[0]
+check_credentials = dedent(description.split('        run: |\n', 1)[1])
+with TemporaryDirectory() as directory:
+    output = Path(directory) / 'output'
+    for username, token, expected in (('', '', 0), ('user', '', 1), ('', 'token', 1), ('user', 'token', 0)):
+        output.write_text('')
+        result = subprocess.run(['bash', '-e', '-c', check_credentials], capture_output=True, env={
+            **os.environ, 'GITHUB_OUTPUT': str(output),
+            'DOCKERHUB_USERNAME': username, 'DOCKERHUB_ACCESS_TOKEN': token,
+        })
+        assert result.returncode == expected, result.stderr.decode()
+        assert output.read_text() == ('configured=true\n' if username and token else '')
+print('Release approval, cooldown, superseded candidate, and description credential checks passed')

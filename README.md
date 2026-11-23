@@ -312,6 +312,7 @@ This Docker-PostGIS project [is part of the PostGIS group](https://postgis.net/d
 
 - Protect `master` with a branch ruleset that requires code owner approval. Assign maintainers in `.github/CODEOWNERS` to `CODEOWNERS`, the workflows, CI scripts, Dockerfiles, templates, `Makefile`, and `update.sh`. [GitHub ruleset options](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
 - Enable **Require actions to be pinned to a full-length commit SHA** in the repository's Actions settings. Review Dependabot changes and check the tools and downloads that each action uses. Review changes to the Buildx version and helper image digests in `.github/workflows/docker.yml` and to the smoke test revision in `Makefile`. [GitHub Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository)
+- Scope the Docker Hub OIDC connection to `postgis/postgis` and the allowed GitHub release environment subjects. Use `DOCKERHUB_USERNAME` and `DOCKERHUB_ACCESS_TOKEN` only if the workflow should also update the Docker Hub description. Keep that token in the release environments and revoke any old image publishing tokens. [Docker Hub OIDC rulesets](https://docs.docker.com/security/authentication/oidc-connections/rulesets-claims/)
 
 ## Code of Conduct
 
