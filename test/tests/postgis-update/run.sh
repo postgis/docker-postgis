@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2119,SC2120
 set -e
 
 image="$1"
@@ -8,12 +9,19 @@ export POSTGRES_PASSWORD='my cool postgres password'
 export POSTGRES_DB='my cool postgres database'
 
 cname="postgis-container-$RANDOM-$RANDOM"
-cid="$(docker run -d -e POSTGRES_USER -e POSTGRES_PASSWORD -e POSTGRES_DB --name "$cname" "$image")"
-trap "docker rm -vf $cid > /dev/null" EXIT
+network="$(docker network create "$cname")"
+cid=''
+cleanup() {
+	[ -z "$cid" ] || docker rm -vf "$cid" >/dev/null 2>&1 || true
+	docker network rm "$network" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+cid="$(docker run -d --network "$network" --network-alias postgis \
+	-e POSTGRES_USER -e POSTGRES_PASSWORD -e POSTGRES_DB --name "$cname" "$image")"
 
 psql() {
 	docker run --rm -i \
-		--link "$cname":postgis \
+		--network "$network" \
 		--entrypoint psql \
 		-e PGPASSWORD="$POSTGRES_PASSWORD" \
 		"$image" \
@@ -36,9 +44,20 @@ while ! echo 'SELECT 1' | psql &> /dev/null; do
 	sleep 2
 done
 
+# Exercise the security-fix upgrade when the old package scripts are present.
+old_address_available="$(echo "SELECT count(*) = 2 FROM pg_available_extension_versions WHERE name IN ('address_standardizer', 'address_standardizer_data_us') AND version = '3.7'" | psql)"
+if [ "$old_address_available" = t ]; then
+	echo "CREATE EXTENSION IF NOT EXISTS address_standardizer VERSION '3.7'; CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us VERSION '3.7'; INSERT INTO us_lex (seq, word, stdword, token) VALUES (1, 'CUSTOMTEST', 'CUSTOMTEST', 1);" | psql >/dev/null
+fi
+
 # Run twice: update-postgis.sh must be idempotent.
 docker exec "$cid" update-postgis.sh
 docker exec "$cid" update-postgis.sh
+
+if [ "$old_address_available" = t ]; then
+	[ "$(echo "SELECT count(*) = 2 FROM pg_available_extensions WHERE name IN ('address_standardizer', 'address_standardizer_data_us') AND installed_version = default_version" | psql)" = t ]
+	[ "$(echo "SELECT count(*) = 1 FROM us_lex WHERE word = 'CUSTOMTEST' AND is_custom" | psql)" = t ]
+fi
 
 ## test postgis extensions are at the version provided by the image
 outdated="$(
@@ -55,17 +74,15 @@ if [ -n "$outdated" ]; then
 fi
 
 ## test postgis_tiger_geocoder extension
-# PostGIS versions before 3.7 are expected to provide it, later versions don't.
+# Tiger must be installed when the image provides it.
 tiger_state="$(
 	psql <<-'EOSQL'
 	SELECT CASE
-		WHEN (postgis_major < 3 OR (postgis_major = 3 AND postgis_minor < 7)) = installed THEN 'ok'
-		WHEN installed THEN 'unexpected'
+		WHEN available = installed THEN 'ok'
 		ELSE 'missing'
 	END
 	FROM (
-		SELECT substring(postgis_lib_version() from '^([0-9]+)')::integer AS postgis_major,
-		       substring(postgis_lib_version() from '^[0-9]+\.([0-9]+)')::integer AS postgis_minor,
+		SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'postgis_tiger_geocoder') AS available,
 		       EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis_tiger_geocoder') AS installed
 	) AS postgis_version;
 	EOSQL

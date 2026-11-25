@@ -2,23 +2,24 @@
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "make update"! PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-# Experimental image template for current development snapshots. Expect frequent changes.
+# Build development PostGIS with stable releases of its build libraries.
 # This is a multi-stage Dockerfile, requiring a minimum Docker version of 17.05.
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG DOCKER_ENABLE_IPO=OFF
-ARG CGAL_GIT_BRANCH=6.2.x-branch
+ARG CGAL_GIT_BRANCH=v6.2.1
 ARG NPROC=
-FROM docker.io/postgres:18-trixie AS builder
+FROM debian:trixie-slim AS master-deps
 
 ARG NPROC
 ARG DOCKER_ENABLE_IPO
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 18 trixie" \
+      org.opencontainers.image.description="PostGIS master build dependencies" \
       org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
 
 WORKDIR /
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 # Install runtime libraries needed by source-built components and build tools.
 RUN set -ex \
@@ -47,7 +48,7 @@ RUN set -ex \
       libtiff6 \
       libxml2 \
       sqlite3 \
-      # build dependencies
+      # Build dependencies.
       autoconf \
       automake \
       autotools-dev \
@@ -73,7 +74,7 @@ RUN set -ex \
       pkg-config \
       protobuf-c-compiler \
       xsltproc \
-      # GDAL optional driver dependencies
+      # Optional GDAL driver dependencies.
       libblosc-dev \
       libcfitsio-dev \
       libeigen3-dev \
@@ -91,16 +92,15 @@ RUN set -ex \
 ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 ENV DOCKER_ENABLE_IPO=${DOCKER_ENABLE_IPO}
+ARG NLOHMANN_JSON_VERSION=3.12.0
 
 # nlohmann/json - header-only library for SFCGAL (with CMake support)
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
-    # Fetch the latest nlohmann/json release because SFCGAL needs its CMake package.
-    && NLOHMANN_JSON_VERSION=$(curl -s https://api.github.com/repos/nlohmann/json/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/') \
     && echo "Installing nlohmann/json version: ${NLOHMANN_JSON_VERSION}" \
     # Use the full source archive; the single-header package has no CMake config.
-    && curl -L "https://github.com/nlohmann/json/archive/refs/tags/v${NLOHMANN_JSON_VERSION}.tar.gz" -o nlohmann-json.tar.gz \
+    && curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-connrefused "https://github.com/nlohmann/json/archive/refs/tags/v${NLOHMANN_JSON_VERSION}.tar.gz" -o nlohmann-json.tar.gz \
     && tar -xzf nlohmann-json.tar.gz \
     && cd "json-${NLOHMANN_JSON_VERSION}" \
     && mkdir build \
@@ -114,17 +114,17 @@ RUN set -ex \
 # CGAL and SFCGAL.
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=5c8ab47e7593c0684cc58697f712e26941275695
-ENV SFCGAL_GIT_HASH=6d4465a79314aafcac973d64a9375532cab6ab4f
+ENV CGAL_GIT_HASH=28811b671a12b5caa9e3688569dadbc6b3728fe6
+ENV SFCGAL_GIT_HASH=137203dae01faab4a1287934f9457e925e3b4383
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
-    && git clone --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet --depth 1 --branch ${CGAL_GIT_BRANCH} https://github.com/CGAL/cgal  \
     && cd cgal \
     && git checkout ${CGAL_GIT_HASH} \
     && git log -1 > /_pgis_cgal_last_commit.txt \
     && cd /usr/src \
-    && git clone https://gitlab.com/SFCGAL/SFCGAL.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://gitlab.com/SFCGAL/SFCGAL.git \
     && cd SFCGAL \
     && git checkout ${SFCGAL_GIT_HASH} \
     && git log -1 > /_pgis_sfcgal_last_commit.txt \
@@ -149,10 +149,10 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # PROJ.
-ENV PROJ_GIT_HASH=5e7a7e024969d9de9e03991a2a9585df833a1f43
+ENV PROJ_GIT_HASH=1df2be61c0e4732aa1326126113776b291ae7657
 RUN set -ex \
     && cd /usr/src \
-    && git clone https://github.com/OSGeo/PROJ.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/OSGeo/PROJ.git \
     && cd PROJ \
     && git checkout ${PROJ_GIT_HASH} \
     && git log -1 > /_pgis_proj_last_commit.txt \
@@ -182,10 +182,10 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # GEOS.
-ENV GEOS_GIT_HASH=35fa80c99e8db5738f06163082caa49fc7c2ee3d
+ENV GEOS_GIT_HASH=355bdf141fbe22ba87d80c8324fc23213bfe7bcd
 RUN set -ex \
     && cd /usr/src \
-    && git clone https://github.com/libgeos/geos.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/libgeos/geos.git \
     && cd geos \
     && git checkout ${GEOS_GIT_HASH} \
     && git log -1 > /_pgis_geos_last_commit.txt \
@@ -198,10 +198,10 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # GDAL.
-ENV GDAL_GIT_HASH=8a556e7b81aab50ec6612b47499ffbe942aa3a71
+ENV GDAL_GIT_HASH=c8b4c45fca87d3e6fbf80e7a7898b8a661ad0edc
 RUN set -ex \
     && cd /usr/src \
-    && git clone https://github.com/OSGeo/gdal.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/OSGeo/gdal.git \
     && cd gdal \
     && git checkout ${GDAL_GIT_HASH} \
     && git log -1 > /_pgis_gdal_last_commit.txt \
@@ -286,16 +286,21 @@ RUN set -ex \
     && sfcgal-config --version \
     && pcre2-config --version
 
+# Keep the common source-built libraries reusable across PostgreSQL majors.
+FROM master-deps AS builder
+
 # -------------------------------------------
 # STAGE  final
 # -------------------------------------------
 FROM docker.io/postgres:18-trixie
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 ARG NPROC
 ARG DOCKER_CMAKE_BUILD_TYPE
 ARG DOCKER_ENABLE_IPO
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 ENV DOCKER_ENABLE_IPO=${DOCKER_ENABLE_IPO}
+ENV PGROUTING_VERSION=4.0.2-1.pgdg13+2
 
 RUN set -ex \
     && apt-get update \
@@ -337,6 +342,9 @@ RUN set -ex \
       libkmlengine1t64 \
       libopenjp2-7 \
       libqhull-r8.0 \
+    && if [ -n "$PGROUTING_VERSION" ]; then \
+      apt-get install -y --no-install-recommends postgresql-$PG_MAJOR-pgrouting=$PGROUTING_VERSION; \
+    fi \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -345,11 +353,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH=5c8ab47e7593c0684cc58697f712e26941275695
-ENV SFCGAL_GIT_HASH=6d4465a79314aafcac973d64a9375532cab6ab4f
-ENV PROJ_GIT_HASH=5e7a7e024969d9de9e03991a2a9585df833a1f43
-ENV GEOS_GIT_HASH=35fa80c99e8db5738f06163082caa49fc7c2ee3d
-ENV GDAL_GIT_HASH=8a556e7b81aab50ec6612b47499ffbe942aa3a71
+ENV CGAL_GIT_HASH=28811b671a12b5caa9e3688569dadbc6b3728fe6
+ENV SFCGAL_GIT_HASH=137203dae01faab4a1287934f9457e925e3b4383
+ENV PROJ_GIT_HASH=1df2be61c0e4732aa1326126113776b291ae7657
+ENV GEOS_GIT_HASH=355bdf141fbe22ba87d80c8324fc23213bfe7bcd
+ENV GDAL_GIT_HASH=c8b4c45fca87d3e6fbf80e7a7898b8a661ad0edc
 
 # Minimal command-line smoke test (fail fast).
 RUN set -ex \
@@ -367,11 +375,12 @@ RUN set -ex \
     && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
-# Install PostGIS and companion development extensions.
-ENV POSTGIS_GIT_HASH=58fb58832c49c47cf5834f71eaec7e5dea49631f
-ENV H3_PG_GIT_HASH=f960a574eab6aebd186dedff6204711c21742f12
+# Install PostGIS and stable companion extensions.
+ENV POSTGIS_GIT_HASH=f5ae31dd4190aafa726cbc6be9b892ca85c94e94
+ENV H3_PG_GIT_HASH=ed9a09c834787abb5952318bccef1c4fee119f1d
 ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
-ENV POSTGIS_TIGER_GEOCODER_GIT_HASH=3f78cd7c15a318b21902cc92fde98102c57259d3
+ENV TIGER_GEOCODER_VERSION=2025.2
+ENV TIGER_GEOCODER_SHA256=c33cfbfb40785db8754a36be66060e8d023773e7e1be8fb8a622bb3c48db9f54
 
 RUN set -ex \
     && apt-get update \
@@ -391,6 +400,7 @@ RUN set -ex \
       libcunit1-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
+      libicu-dev \
       libjson-c-dev \
       libmpfr-dev \
       libpcre2-dev \
@@ -402,13 +412,13 @@ RUN set -ex \
       libxml2-utils \
       make \
       pkg-config \
-      postgresql-server-dev-$PG_MAJOR \
+      "postgresql-server-dev-$PG_MAJOR=$PG_VERSION" \
       protobuf-c-compiler \
       xsltproc \
     && cd \
     # PostGIS master.
     && cd /usr/src/ \
-    && git clone https://github.com/postgis/postgis.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/postgis/postgis.git \
     && cd postgis \
     && git checkout ${POSTGIS_GIT_HASH} \
     && git log -1 > /_pgis_last_commit.txt \
@@ -419,9 +429,9 @@ RUN set -ex \
         --enable-lto \
     && make -j${NPROC:-$(nproc)} \
     && make install \
-    # h3-pg from the latest main branch revision.
+    # h3-pg from the latest stable release.
     && cd /usr/src/ \
-    && git clone https://github.com/postgis/h3-pg.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/postgis/h3-pg.git \
     && cd h3-pg \
     && git checkout ${H3_PG_GIT_HASH} \
     && git log -1 > /_pgis_h3_pg_last_commit.txt \
@@ -434,24 +444,31 @@ RUN set -ex \
         find /usr/src/h3-pg/build \( -path '*/test/log/*' -o -name 'regression.diffs' -o -name 'regression.out' -o -name 'regression.log' -o -name 'LastTest.log' \) -type f -print -exec sh -c 'echo "===== $1 ====="; cat "$1"' sh {} \; ; \
         exit 1; \
     fi \
-    # address_standardizer from the latest main branch revision.
+    # address_standardizer from the selected release or security fix.
     && cd /usr/src/ \
-    && git clone https://github.com/postgis/address_standardizer.git \
+    && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/postgis/address_standardizer.git \
     && cd address_standardizer \
     && git checkout ${ADDRESS_STANDARDIZER_GIT_HASH} \
     && git log -1 > /_pgis_address_standardizer_last_commit.txt \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config PG_CFLAGS=-Werror with_llvm=no install \
-    # postgis_tiger_geocoder from the latest main branch revision.
-    # Pure PL/pgSQL extension; built after address_standardizer so the
-    # PAGC normalizer regressions (test-pagc_normalize_address) can run.
-    && cd /usr/src/ \
-    && git clone https://github.com/postgis/postgis_tiger_geocoder.git \
+    && if [ "$ADDRESS_STANDARDIZER_GIT_HASH" = "ba9a26a013f23908657bb26574ae436b11d4b811" ]; then \
+        for ext in address_standardizer address_standardizer_data_us; do \
+            for from_version in 3.7 3.7.1dev; do \
+                ln -s "${ext}--ANY--4.0.0dev.sql" "$(pg_config --sharedir)/extension/${ext}--${from_version}--4.0.0dev.sql"; \
+            done; \
+        done; \
+    fi \
+    # Tiger Geocoder 2025.2 is standalone from PostGIS 3.7 onward.
+    && cd /usr/src \
+    && curl --fail --silent --show-error --location --retry 5 --retry-delay 2 --retry-connrefused "https://download.osgeo.org/postgis/source/postgis_tiger_geocoder/postgis_tiger_geocoder-${TIGER_GEOCODER_VERSION}.tar.gz" -o postgis_tiger_geocoder.tar.gz \
+    && echo "${TIGER_GEOCODER_SHA256} *postgis_tiger_geocoder.tar.gz" | sha256sum -c - \
+    && tar -xzf postgis_tiger_geocoder.tar.gz \
     && cd postgis_tiger_geocoder \
-    && git checkout ${POSTGIS_TIGER_GEOCODER_GIT_HASH} \
-    && git log -1 > /_pgis_postgis_tiger_geocoder_last_commit.txt \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config \
     && make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config install \
+    && rm -f /usr/src/postgis_tiger_geocoder.tar.gz \
+    && cd /usr/src/postgis \
 # Refresh selected PROJ grids needed by the PostGIS regression suite.
 # Workaround for https://trac.osgeo.org/postgis/ticket/5316
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
@@ -462,37 +479,33 @@ RUN set -ex \
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
-    && su postgres -c 'pg_ctl -D /tempdb -c -l /tmp/logfile -o '-F' start ' \
+    && su postgres -c 'pg_ctl -D /tempdb -c -l /tempdb/logfile -o '-F' start ' \
     && ldconfig \
     && cd /usr/src/address_standardizer \
     && if ! PGUSER=postgres make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config installcheck; then \
         if [ -f test/regression.diffs ]; then cat test/regression.diffs; fi; \
         exit 1; \
     fi \
-    # postgis_tiger_geocoder regressions, including the address_standardizer (PAGC) suite.
-    && cd /usr/src/postgis_tiger_geocoder \
-    && if ! PGUSER=postgres make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config \
-            installcheck ADDRESS_STANDARDIZER=address_standardizer; then \
-        if [ -f regression.diffs ]; then cat regression.diffs; fi; \
-        exit 1; \
-    fi \
     && cd /usr/src/postgis/regress \
+    && make -j${NPROC:-$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
+    && cd /usr/src/postgis/sfcgal \
     && make -j${NPROC:-$(nproc)} check RUNTESTFLAGS="--extension --verbose" PGUSER=postgres \
     \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_raster;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; --needed for postgis_tiger_geocoder "' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
-    # address_standardizer and postgis_tiger_geocoder are built from their
-    # standalone repositories in this image, so they are mandatory here.
+    # The explicit CREATE statements below make missing standalone controls fatal.
     # See: https://lists.osgeo.org/pipermail/postgis-devel/2026-February/030730.html
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
-    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
-    # postgis_tiger_geocoder smoke test (README "Verifying install").
-    && su postgres -c "psql -v ON_ERROR_STOP=1 -tA -c \"SELECT concat_ws('|', na.address, na.streetname, na.streettypeabbrev, na.zip) FROM tiger.normalize_address('1 Devonshire Place, Boston, MA 02109') AS na;\"" \
+    # Require separately built controls; a missing extension must fail the image build. \
+    && su postgres -c 'psql -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS address_standardizer;"' \
+    && su postgres -c 'psql -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;"' \
+    && su postgres -c 'psql -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;"' \
+    && su postgres -c "psql -v ON_ERROR_STOP=1 -qAt -c \"SET search_path = tiger, public; SELECT concat_ws('|', na.address, na.streetname, na.streettypeabbrev, na.zip) FROM tiger.normalize_address('1 Devonshire Place, Boston, MA 02109') AS na;\"" \
         | grep -qx '1|Devonshire|Pl|02109' \
+    && cd /usr/src/postgis_tiger_geocoder \
+    && PGUSER=postgres make PG_CONFIG=/usr/lib/postgresql/$PG_MAJOR/bin/pg_config installcheck ADDRESS_STANDARDIZER=address_standardizer \
+    && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3;"' \
     && su postgres -c 'psql    -c "CREATE EXTENSION IF NOT EXISTS h3_postgis;"' \
     && su postgres -c 'psql -t -c "SELECT version();"' >> /_pgis_full_version.txt \
@@ -501,8 +514,6 @@ RUN set -ex \
     \
     && su postgres -c 'pg_ctl -D /tempdb --mode=immediate stop' \
     && rm -rf /tempdb \
-    && rm -rf /tmp/logfile \
-    && rm -rf /tmp/pgis_reg \
 # Clean build dependencies and source trees.
     && cd / \
     && rm -rf /usr/src/postgis \
@@ -523,6 +534,7 @@ RUN set -ex \
       libboost-all-dev \
       libcurl4-gnutls-dev \
       libgmp-dev \
+      libicu-dev \
       libjson-c-dev \
       libmpfr-dev \
       libpcre2-dev \
@@ -564,3 +576,5 @@ RUN set -ex \
     && find /_pgis_*_last_commit.txt -type f -print -exec cat {} \;  \
     # List PostgreSQL and PostGIS version details.
     && cat _pgis_full_version.txt
+
+USER postgres
