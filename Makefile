@@ -73,7 +73,7 @@ DOCKERHUB_DESC_IMG=peterevans/dockerhub-description:5
 GIT=git
 OFFIMG_LOCAL_CLONE=$(HOME)/official-images
 OFFIMG_REPO_URL=https://github.com/docker-library/official-images.git
-OFFIMG_REV=039b12a09e3e919d20ada5fe2791e9fad26b6780
+OFFIMG_REV=ab809b32642b472f89271433c2eab038022396ad
 
 
 build: copy-scripts $(foreach version,$(VERSIONS),build-$(version))
