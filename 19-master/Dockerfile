@@ -182,7 +182,7 @@ RUN set -ex \
     && rm -fr /usr/src/PROJ
 
 # GEOS.
-ENV GEOS_GIT_HASH=d0228513abb0c29c185443cf2bfb06c9281024b5
+ENV GEOS_GIT_HASH=355bdf141fbe22ba87d80c8324fc23213bfe7bcd
 RUN set -ex \
     && cd /usr/src \
     && git -c http.maxRetries=5 -c http.retryDelay=2 clone --quiet https://github.com/libgeos/geos.git \
@@ -356,7 +356,7 @@ ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
 ENV CGAL_GIT_HASH=28811b671a12b5caa9e3688569dadbc6b3728fe6
 ENV SFCGAL_GIT_HASH=137203dae01faab4a1287934f9457e925e3b4383
 ENV PROJ_GIT_HASH=1df2be61c0e4732aa1326126113776b291ae7657
-ENV GEOS_GIT_HASH=d0228513abb0c29c185443cf2bfb06c9281024b5
+ENV GEOS_GIT_HASH=355bdf141fbe22ba87d80c8324fc23213bfe7bcd
 ENV GDAL_GIT_HASH=c8b4c45fca87d3e6fbf80e7a7898b8a661ad0edc
 
 # Minimal command-line smoke test (fail fast).
@@ -376,7 +376,7 @@ RUN set -ex \
             || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # Install PostGIS and stable companion extensions.
-ENV POSTGIS_GIT_HASH=58fb58832c49c47cf5834f71eaec7e5dea49631f
+ENV POSTGIS_GIT_HASH=f5ae31dd4190aafa726cbc6be9b892ca85c94e94
 ENV H3_PG_GIT_HASH=ed9a09c834787abb5952318bccef1c4fee119f1d
 ENV ADDRESS_STANDARDIZER_GIT_HASH=ba9a26a013f23908657bb26574ae436b11d4b811
 ENV TIGER_GEOCODER_VERSION=2025.2
